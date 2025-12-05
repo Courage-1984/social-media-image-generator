@@ -1,0 +1,325 @@
+/**
+ * Layout Styles
+ * Grid system and layout utilities
+ */
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.global-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-section h1 {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.presets-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.presets-controls input[type="text"] {
+  min-width: 100px;
+  max-width: 150px;
+  flex: 0 1 auto;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.presets-controls select {
+  display: none; /* Hide native select - custom dropdown will replace it */
+}
+
+.custom-preset-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-preset-dropdown-button {
+  padding: 0.4rem 1.5rem 0.4rem 0.6rem !important;
+  background: #0a0a0a !important;
+  border: 1px solid rgba(0, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  position: relative !important;
+  font-size: 0.85rem !important;
+  min-width: 180px !important;
+  max-width: 280px !important;
+  width: auto !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  overflow: visible !important;
+}
+
+.custom-preset-dropdown-button .dropdown-text {
+  display: inline-block;
+  overflow: visible !important;
+  white-space: nowrap;
+}
+
+.custom-preset-dropdown-button .dropdown-arrow {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(0deg); /* Down = closed (default) */
+  font-size: 0.7rem;
+  color: #00ffff;
+  pointer-events: none;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.custom-preset-dropdown-button.active .dropdown-arrow {
+  transform: translateY(-50%) rotate(180deg); /* Up = open */
+  color: #ff00ff; /* Magenta when open */
+}
+
+.custom-preset-dropdown-button.active {
+  border-color: #00ffff !important;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3) !important;
+}
+
+.custom-preset-dropdown-menu {
+  position: fixed;
+  background: #1a1a2e;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  min-width: 180px;
+}
+
+.custom-preset-dropdown-menu .dropdown-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.custom-preset-dropdown-menu .dropdown-option:hover {
+  background: rgba(0, 255, 255, 0.2);
+}
+
+.presets-controls .preset-btn {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: auto;
+}
+
+/* Column layout configuration */
+:root {
+  --column-top-offset: 1rem; /* Sticky top offset */
+  --column-header-space: 4.5rem; /* Space for header + body padding + top offset */
+  --column-bottom-gap: 1rem; /* Configurable gap at bottom of viewport */
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+  /* Removed position: relative - not needed for sticky children and was creating interfering stacking context */
+  /* Sticky positioning works relative to scrolling ancestor, not parent */
+}
+
+.controls-column {
+  position: sticky;
+  top: var(--column-top-offset);
+  /* Use min-height and max-height to fill viewport with configurable bottom gap */
+  min-height: calc(100vh - var(--column-header-space) - var(--column-bottom-gap));
+  max-height: calc(100vh - var(--column-header-space) - var(--column-bottom-gap));
+  border-radius: 8px; /* Rounded corners */
+  overflow-x: hidden; /* Clip horizontal overflow to preserve rounded corners */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+  padding-right: 0.5rem;
+  background: #1a1a2e; /* Match controls background for seamless rounded frame */
+  z-index: 1; /* Lower z-index for left column */
+  box-sizing: border-box; /* Include padding in height calculation */
+}
+
+.preview-column {
+  position: sticky;
+  top: var(--column-top-offset);
+  /* Match controls column height exactly */
+  min-height: calc(100vh - var(--column-header-space) - var(--column-bottom-gap));
+  max-height: calc(100vh - var(--column-header-space) - var(--column-bottom-gap));
+  border-radius: 8px; /* Match controls column rounded corners */
+  overflow-x: hidden !important; /* Clip horizontal overflow to preserve rounded corners - override any conflicting rules */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+  padding-right: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000 !important; /* Very high z-index to ensure preview column is always on top */
+  background: #1a1a2e; /* Match controls column background for consistent rounded frame */
+  box-sizing: border-box; /* Include padding in height calculation */
+}
+
+/* At 100% zoom on larger screens, try to fit without scrolling */
+@media (min-width: 1200px) {
+  .preview-column {
+    /* Allow overflow if needed, but try to fit */
+    overflow-y: auto;
+    overflow-x: hidden !important; /* Match controls column - preserve rounded corners */
+  }
+}
+
+/* Custom scrollbar for sticky columns */
+.controls-column::-webkit-scrollbar,
+.preview-column::-webkit-scrollbar {
+  width: 8px;
+}
+
+.controls-column::-webkit-scrollbar-track,
+.preview-column::-webkit-scrollbar-track {
+  background: #0a0a0a;
+  border-radius: 4px;
+}
+
+.controls-column::-webkit-scrollbar-thumb,
+.preview-column::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.controls-column::-webkit-scrollbar-thumb:hover,
+.preview-column::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+.grid-2,
+.grid-3 {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.grid-2 {
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: start; /* Align all grid items at the top */
+}
+
+@media (max-width: 1200px) {
+  .header-section {
+    flex-direction: column;
+  }
+
+  .presets-section {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .presets-controls {
+    flex-wrap: wrap;
+  }
+
+  .presets-controls input[type="text"],
+  .presets-controls select {
+    min-width: 120px;
+  }
+
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .controls-column,
+  .preview-column {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .presets-section {
+    min-width: 100%;
+  }
+
+  .presets-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .presets-controls label {
+    margin-bottom: 0.25rem;
+  }
+
+  .presets-controls input[type="text"],
+  .presets-controls select {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .presets-controls .preset-btn {
+    width: 100%;
+  }
+}
+
+.logo-color-upload-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.logo-color-half,
+.logo-upload-half {
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* Remove gap to ensure consistent spacing */
+}
+
+.logo-color-half label,
+.logo-upload-half label {
+  margin-bottom: 0.25rem; /* Match standard label margin-bottom */
+  font-size: 0.85rem;
+}
+
+.logo-upload-half .upload-btn {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .logo-color-upload-split {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -1,0 +1,678 @@
+{
+  "project": {
+    "name": "social-media-image-generator",
+    "type": "Vanilla JavaScript Web Application",
+    "description": "Social media image generator with canvas rendering, export functionality, and preset management"
+  },
+  "structure": {
+    "directories": [
+      {
+        "path": "css",
+        "type": "stylesheets",
+        "files": 8
+      },
+      {
+        "path": "docs",
+        "type": "documentation",
+        "files": 8
+      },
+      {
+        "path": "js",
+        "type": "javascript",
+        "files": 28
+      },
+      {
+        "path": "js/utils",
+        "type": "utilities",
+        "files": 4
+      }
+    ],
+    "rootFiles": [
+      "generate.html",
+      "preview-popout-window.html"
+    ]
+  },
+  "files": {
+    "html": [
+      "generate.html",
+      "preview-popout-window.html"
+    ],
+    "css": [
+      "css/base.css",
+      "css/canvas.css",
+      "css/color-picker.css",
+      "css/controls.css",
+      "css/layout.css",
+      "css/skeleton.css",
+      "css/tabs.css",
+      "css/toast.css"
+    ],
+    "javascript": {
+      "core": [
+        "js/main.js",
+        "js/config.js",
+        "js/preview.js",
+        "js/export.js"
+      ],
+      "ui": [
+        "js/color-picker.js",
+        "js/tabs.js",
+        "js/button-tooltips.js",
+        "js/pattern-preview-tooltip.js",
+        "js/pattern-settings-tooltip.js"
+      ],
+      "customComponents": [
+        "js/custom-logo-color-dropdown.js",
+        "js/custom-logo-position-dropdown.js",
+        "js/custom-preset-dropdown.js",
+        "js/custom-export-quality-dropdown.js",
+        "js/custom-template-dropdown.js",
+        "js/custom-pattern-dropdown.js"
+      ],
+      "features": [
+        "js/background-patterns.js",
+        "js/templates.js",
+        "js/preset-storage.js",
+        "js/history.js",
+        "js/grid-overlay.js",
+        "js/ruler-guides.js",
+        "js/text-alignment.js",
+        "js/css-filter-solver.js",
+        "js/preview-popout.js",
+        "js/batch-export.js"
+      ],
+      "utilities": [
+        "js/utils/toast.js",
+        "js/utils/export-high-res.js",
+        "js/utils/export-high-res-worker.js",
+        "js/utils/dither-worker.js"
+      ],
+      "testing": [
+        "js/test-cls-monitor.js"
+      ]
+    },
+    "documentation": [
+      "docs/DETAILED_REPORT.md",
+      "docs/DOCUMENTATION_OVERHAUL_SUMMARY.md",
+      "docs/EXECUTIVE_SUMMARY.md",
+      "docs/EXPORT_SYSTEM_REPORT.md",
+      "docs/export-hires.md",
+      "docs/IMPLEMENTATION_ALIGNMENT.md",
+      "docs/README.md",
+      "docs/RULER_GUIDES.md"
+    ]
+  },
+  "dependencies": {
+    "external": {
+      "runtime": [
+        {
+          "name": "html-to-image",
+          "type": "CDN",
+          "purpose": "Canvas rendering and export",
+          "loaded": "dynamically via script tag"
+        },
+        {
+          "name": "html2canvas",
+          "type": "CDN",
+          "purpose": "Fallback canvas rendering",
+          "loaded": "dynamically via script tag"
+        }
+      ],
+      "browser": [
+        "Web Workers API",
+        "OffscreenCanvas API",
+        "LocalStorage API",
+        "Blob API",
+        "Canvas API"
+      ]
+    },
+    "internal": {
+      "entryPoint": "js/main.js",
+      "coreModules": [
+        {
+          "module": "js/config.js",
+          "exports": [
+            "IMAGE_TYPES",
+            "colorPalette",
+            "glowColors",
+            "presets",
+            "logoPositions",
+            "logoPositionLabels"
+          ],
+          "importedBy": [
+            "js/main.js",
+            "js/preview.js",
+            "js/export.js",
+            "js/color-picker.js",
+            "js/custom-logo-color-dropdown.js",
+            "js/custom-pattern-dropdown.js",
+            "js/batch-export.js"
+          ]
+        },
+        {
+          "module": "js/preview.js",
+          "exports": [
+            "updatePreview",
+            "setImageType",
+            "setPreset",
+            "scaleCanvasForPreview",
+            "setZoomLevel",
+            "getZoomLevel",
+            "cycleZoomLevel",
+            "setPan",
+            "getPan"
+          ],
+          "imports": [
+            "js/config.js",
+            "js/color-picker.js",
+            "js/background-patterns.js",
+            "js/grid-overlay.js"
+          ],
+          "importedBy": [
+            "js/main.js"
+          ]
+        },
+        {
+          "module": "js/export.js",
+          "exports": [
+            "exportImage",
+            "loadHtml2Canvas",
+            "loadHtmlToImage",
+            "convertMaskedLogoToImage"
+          ],
+          "imports": [
+            "js/config.js",
+            "js/utils/toast.js",
+            "js/utils/export-high-res.js",
+            "js/test-cls-monitor.js"
+          ],
+          "importedBy": [
+            "js/main.js",
+            "js/batch-export.js"
+          ]
+        },
+        {
+          "module": "js/main.js",
+          "exports": [],
+          "imports": [
+            "js/config.js",
+            "js/color-picker.js",
+            "js/preview.js",
+            "js/export.js",
+            "js/grid-overlay.js",
+            "js/background-patterns.js",
+            "js/preset-storage.js",
+            "js/history.js",
+            "js/templates.js",
+            "js/pattern-preview-tooltip.js",
+            "js/custom-pattern-dropdown.js",
+            "js/custom-template-dropdown.js",
+            "js/custom-export-quality-dropdown.js",
+            "js/custom-logo-position-dropdown.js",
+            "js/custom-logo-color-dropdown.js",
+            "js/preview-popout.js",
+            "js/tabs.js",
+            "js/pattern-settings-tooltip.js",
+            "js/custom-preset-dropdown.js",
+            "js/utils/toast.js",
+            "js/button-tooltips.js",
+            "js/ruler-guides.js"
+          ],
+          "role": "Application entry point and orchestration"
+        }
+      ],
+      "utilityModules": [
+        {
+          "module": "js/utils/toast.js",
+          "exports": ["showToast"],
+          "importedBy": [
+            "js/main.js",
+            "js/export.js"
+          ]
+        },
+        {
+          "module": "js/utils/export-high-res.js",
+          "exports": [
+            "exportHighResCanvas",
+            "exportHighResGradient"
+          ],
+          "importedBy": [
+            "js/export.js"
+          ]
+        },
+        {
+          "module": "js/utils/export-high-res-worker.js",
+          "exports": ["exportHighResCanvas"],
+          "imports": [
+            "js/utils/dither-worker.js"
+          ],
+          "uses": ["Web Workers API"]
+        },
+        {
+          "module": "js/utils/dither-worker.js",
+          "exports": [],
+          "role": "Web Worker for off-thread dithering",
+          "usedBy": [
+            "js/utils/export-high-res-worker.js"
+          ]
+        }
+      ],
+      "featureModules": [
+        {
+          "module": "js/color-picker.js",
+          "exports": [
+            "createColorPicker",
+            "getSelectedColor",
+            "getSelectedColorKey",
+            "setSelectedColor"
+          ],
+          "imports": ["js/config.js"],
+          "importedBy": [
+            "js/main.js",
+            "js/preview.js",
+            "js/custom-pattern-dropdown.js"
+          ]
+        },
+        {
+          "module": "js/background-patterns.js",
+          "exports": [
+            "backgroundPatterns",
+            "applyBackgroundPattern",
+            "patternDefaults",
+            "hexToRgba"
+          ],
+          "importedBy": [
+            "js/main.js",
+            "js/preview.js",
+            "js/custom-pattern-dropdown.js",
+            "js/pattern-preview-tooltip.js"
+          ]
+        },
+        {
+          "module": "js/preset-storage.js",
+          "exports": [
+            "savePreset",
+            "loadPreset",
+            "deletePreset",
+            "getSavedPresets",
+            "presetExists"
+          ],
+          "uses": ["LocalStorage API"],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/history.js",
+          "exports": [
+            "addToHistory",
+            "undo",
+            "redo",
+            "canUndo",
+            "canRedo",
+            "initHistory",
+            "getHistory",
+            "getStateAt",
+            "setHistoryIndex",
+            "clearHistory"
+          ],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/templates.js",
+          "exports": [
+            "templates",
+            "getTemplate",
+            "getAllTemplates",
+            "applyTemplate"
+          ],
+          "importedBy": [
+            "js/main.js",
+            "js/custom-template-dropdown.js"
+          ]
+        },
+        {
+          "module": "js/grid-overlay.js",
+          "exports": [
+            "toggleGridOverlay",
+            "isGridOverlayVisible",
+            "updateGridOverlayDimensions"
+          ],
+          "importedBy": [
+            "js/main.js",
+            "js/preview.js"
+          ]
+        },
+        {
+          "module": "js/ruler-guides.js",
+          "exports": [
+            "initRulerGuides",
+            "getRulerState",
+            "setRulerState"
+          ],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/preview-popout.js",
+          "exports": [
+            "createPopoutPreview",
+            "showPopoutPreview",
+            "hidePopoutPreview",
+            "togglePopoutPreview",
+            "syncPopoutPreview",
+            "isPopoutOpenState"
+          ],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/batch-export.js",
+          "exports": [
+            "batchExport",
+            "generateVariations"
+          ],
+          "imports": [
+            "js/export.js",
+            "js/config.js"
+          ]
+        }
+      ],
+      "uiModules": [
+        {
+          "module": "js/tabs.js",
+          "exports": ["initTabs"],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/button-tooltips.js",
+          "exports": [
+            "showButtonTooltip",
+            "hideButtonTooltip",
+            "initButtonTooltips"
+          ],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/pattern-preview-tooltip.js",
+          "exports": [
+            "showPatternPreview",
+            "hidePatternPreview",
+            "initPatternPreview"
+          ],
+          "imports": [
+            "js/background-patterns.js",
+            "js/color-picker.js"
+          ],
+          "importedBy": [
+            "js/main.js",
+            "js/custom-pattern-dropdown.js"
+          ]
+        },
+        {
+          "module": "js/pattern-settings-tooltip.js",
+          "exports": [
+            "showSettingTooltip",
+            "hideSettingTooltip",
+            "getSettingDescription",
+            "initPatternSettingsTooltips"
+          ],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/custom-logo-color-dropdown.js",
+          "exports": [
+            "createCustomLogoColorDropdown",
+            "setSelectedColor",
+            "getSelectedColorKey",
+            "initCustomLogoColorDropdown"
+          ],
+          "imports": ["js/config.js"],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/custom-logo-position-dropdown.js",
+          "exports": [
+            "createCustomLogoPositionDropdown",
+            "initCustomLogoPositionDropdown"
+          ],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/custom-preset-dropdown.js",
+          "exports": ["createCustomPresetDropdown"],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/custom-export-quality-dropdown.js",
+          "exports": [
+            "createCustomExportQualityDropdown",
+            "initCustomExportQualityDropdown"
+          ],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/custom-template-dropdown.js",
+          "exports": [
+            "createCustomTemplateDropdown",
+            "initCustomTemplateDropdown"
+          ],
+          "imports": ["js/templates.js"],
+          "importedBy": ["js/main.js"]
+        },
+        {
+          "module": "js/custom-pattern-dropdown.js",
+          "exports": [
+            "createCustomPatternDropdown",
+            "initCustomPatternDropdown"
+          ],
+          "imports": [
+            "js/background-patterns.js",
+            "js/color-picker.js",
+            "js/pattern-preview-tooltip.js"
+          ],
+          "importedBy": ["js/main.js"]
+        }
+      ],
+      "helperModules": [
+        {
+          "module": "js/text-alignment.js",
+          "exports": [
+            "calculateTextPosition",
+            "applyTextPosition"
+          ]
+        },
+        {
+          "module": "js/css-filter-solver.js",
+          "exports": ["generateColorFilter"]
+        },
+        {
+          "module": "js/test-cls-monitor.js",
+          "exports": [
+            "initCLSMonitor",
+            "startExportMonitoring",
+            "stopExportMonitoring",
+            "resetCLSMonitor",
+            "cleanupCLSMonitor"
+          ],
+          "importedBy": ["js/export.js"]
+        }
+      ]
+    }
+  },
+  "moduleRelationships": {
+    "centralHub": {
+      "module": "js/main.js",
+      "description": "Main orchestration module that imports and coordinates all other modules",
+      "dependencies": 22,
+      "role": "Application entry point"
+    },
+    "configurationHub": {
+      "module": "js/config.js",
+      "description": "Central configuration module with constants, presets, and color palettes",
+      "dependents": 7,
+      "role": "Shared configuration"
+    },
+    "renderingHub": {
+      "module": "js/preview.js",
+      "description": "Core rendering and preview update logic",
+      "dependencies": 4,
+      "dependents": 1,
+      "role": "Canvas rendering"
+    },
+    "exportHub": {
+      "module": "js/export.js",
+      "description": "Export functionality with high-res support",
+      "dependencies": 4,
+      "dependents": 2,
+      "role": "Image export"
+    },
+    "dependencyChains": [
+      {
+        "chain": "main.js → preview.js → config.js",
+        "depth": 2
+      },
+      {
+        "chain": "main.js → export.js → export-high-res.js",
+        "depth": 2
+      },
+      {
+        "chain": "main.js → custom-pattern-dropdown.js → background-patterns.js → config.js",
+        "depth": 3
+      },
+      {
+        "chain": "export.js → export-high-res-worker.js → dither-worker.js",
+        "depth": 2
+      }
+    ]
+  },
+  "couplingAnalysis": {
+    "highCoupling": [
+      {
+        "module": "js/config.js",
+        "reason": "Imported by 7+ modules (main, preview, export, color-picker, custom components)",
+        "risk": "Low - configuration is meant to be shared"
+      },
+      {
+        "module": "js/main.js",
+        "reason": "Imports 22 modules, central orchestration point",
+        "risk": "Medium - large dependency surface, but expected for entry point"
+      }
+    ],
+    "potentialHotspots": [
+      {
+        "module": "js/main.js",
+        "lines": 3498,
+        "concern": "Very large file, may benefit from splitting into smaller modules",
+        "suggestions": [
+          "Extract event handlers into separate module",
+          "Extract state management into separate module",
+          "Extract initialization logic into separate module"
+        ]
+      },
+      {
+        "module": "js/preview.js",
+        "concern": "Core rendering logic, changes here affect entire application",
+        "suggestions": [
+          "Consider extracting rendering strategies",
+          "Add unit tests for rendering functions"
+        ]
+      },
+      {
+        "module": "js/export.js",
+        "concern": "Handles critical export functionality with external dependencies",
+        "suggestions": [
+          "Add error handling tests",
+          "Consider fallback strategies for export failures"
+        ]
+      }
+    ],
+    "lowCoupling": [
+      {
+        "module": "js/text-alignment.js",
+        "reason": "Standalone utility with no dependencies",
+        "status": "Good - isolated functionality"
+      },
+      {
+        "module": "js/css-filter-solver.js",
+        "reason": "Standalone utility with no dependencies",
+        "status": "Good - isolated functionality"
+      }
+    ]
+  },
+  "entryPoints": {
+    "primary": {
+      "file": "generate.html",
+      "script": "js/main.js",
+      "type": "ES Module"
+    },
+    "secondary": {
+      "file": "preview-popout-window.html",
+      "type": "Standalone popup window",
+      "communication": "postMessage API with parent window"
+    }
+  },
+  "stylesheets": {
+    "loadOrder": [
+      "css/base.css",
+      "css/layout.css",
+      "css/controls.css",
+      "css/color-picker.css",
+      "css/canvas.css",
+      "css/tabs.css",
+      "css/toast.css"
+    ],
+    "organization": "Modular CSS architecture with separation of concerns"
+  },
+  "webWorkers": [
+    {
+      "file": "js/utils/dither-worker.js",
+      "purpose": "Off-thread dithering for high-res exports",
+      "usedBy": "js/utils/export-high-res-worker.js",
+      "api": "OffscreenCanvas"
+    }
+  ],
+  "storage": {
+    "localStorage": {
+      "usedBy": "js/preset-storage.js",
+      "purpose": "Save/load user presets"
+    }
+  },
+  "externalAPIs": {
+    "html-to-image": {
+      "loaded": "Dynamically via CDN",
+      "purpose": "Primary canvas rendering and export",
+      "fallback": "html2canvas"
+    },
+    "html2canvas": {
+      "loaded": "Dynamically via CDN",
+      "purpose": "Fallback canvas rendering"
+    }
+  },
+  "architecture": {
+    "pattern": "Modular ES6 architecture",
+    "moduleSystem": "ES6 Modules (import/export)",
+    "bundler": "None - direct browser module loading",
+    "framework": "Vanilla JavaScript",
+    "stateManagement": "Centralized in main.js with history.js for undo/redo",
+    "ui": "DOM manipulation with custom components",
+    "styling": "Modular CSS files"
+  },
+  "metrics": {
+    "totalFiles": 48,
+    "javascriptFiles": 30,
+    "cssFiles": 8,
+    "htmlFiles": 2,
+    "documentationFiles": 8,
+    "totalModules": 30,
+    "coreModules": 4,
+    "utilityModules": 4,
+    "featureModules": 10,
+    "uiModules": 10,
+    "helperModules": 3,
+    "largestModule": {
+      "file": "js/main.js",
+      "lines": 3498
+    },
+    "averageModuleSize": "~300 lines",
+    "dependencyDepth": 3,
+    "maxDependencies": 22
+  }
+}
+

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a0a;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    #previewContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background: #0a0a0a;
+      box-sizing: border-box;
+    }
+
+    #canvasWrapperPopout {
+      position: relative;
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      flex-shrink: 0;
+    }
+
+    .og-canvas {
+      width: 1200px;
+      height: 630px;
+    }
+
+    .twitter-canvas {
+      width: 1200px;
+      height: 675px;
+    }
+
+    /* Loading indicator */
+    .loading {
+      color: #00ffff;
+      font-size: 1.5rem;
+      text-align: center;
+      padding: 2rem;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    /* Hide scrollbars but allow scrolling */
+    #previewContainer::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    #previewContainer::-webkit-scrollbar-track {
+      background: #0a0a0a;
+    }
+
+    #previewContainer::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 255, 0.3);
+      border-radius: 4px;
+    }
+
+    #previewContainer::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 255, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div id="previewContainer">
+    <div id="canvasWrapperPopout" class="og-canvas">
+      <div class="loading">Loading preview...</div>
+    </div>
+  </div>
+
+  <script>
+    // Set window size on load (some browsers ignore window.open() size)
+    function resizeWindow() {
+      try {
+        // Check if window is maximized or too large
+        const targetWidth = 750;
+        const targetHeight = 800;
+
+        // Try multiple times as browser might delay
+        let attempts = 0;
+        const tryResize = () => {
+          attempts++;
+          try {
+            const currentWidth = window.outerWidth || window.innerWidth;
+            const currentHeight = window.outerHeight || window.innerHeight;
+
+            // Check if window appears maximized (covers most of screen)
+            const isMaximized = currentWidth >= screen.width - 10 && currentHeight >= screen.height - 10;
+
+            if (isMaximized || currentWidth > targetWidth + 50 || currentHeight > targetHeight + 50) {
+              // Try to restore if maximized (this might not work in all browsers)
+              if (isMaximized && window.restore) {
+                try {
+                  window.restore();
+                  // Wait a bit then resize
+                  setTimeout(() => {
+                    window.resizeTo(targetWidth, targetHeight);
+                    const left = Math.round((screen.width - targetWidth) / 2);
+                    const top = Math.round((screen.height - targetHeight) / 2);
+                    window.moveTo(left, top);
+                  }, 100);
+                } catch (e) {
+                  // restore() not available, just try resize
+                  window.resizeTo(targetWidth, targetHeight);
+                  const left = Math.round((screen.width - targetWidth) / 2);
+                  const top = Math.round((screen.height - targetHeight) / 2);
+                  window.moveTo(left, top);
+                }
+              } else {
+                // Just resize
+                window.resizeTo(targetWidth, targetHeight);
+                const left = Math.round((screen.width - targetWidth) / 2);
+                const top = Math.round((screen.height - targetHeight) / 2);
+                window.moveTo(left, top);
+              }
+            }
+
+            // Try a few more times if still not right size
+            if (attempts < 5 && (window.outerWidth > targetWidth + 50 || window.outerHeight > targetHeight + 50)) {
+              setTimeout(tryResize, 100);
+            }
+          } catch (e) {
+            // resizeTo/moveTo might be blocked
+            if (attempts === 1) {
+              console.log('Window resize blocked by browser security');
+            }
+          }
+        };
+
+        // Try immediately and after delays
+        tryResize();
+        setTimeout(tryResize, 50);
+        setTimeout(tryResize, 200);
+        setTimeout(tryResize, 500);
+      } catch (e) {
+        console.log('Window resize error:', e);
+      }
+    }
+
+    window.addEventListener('load', resizeWindow);
+    // Also try on DOMContentLoaded in case load fires too late
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', resizeWindow);
+    } else {
+      resizeWindow();
+    }
+
+    // Listen for messages from parent window
+    window.addEventListener('message', (event) => {
+      // Security: Only accept messages from same origin (or localhost for development)
+      const allowedOrigins = [
+        window.location.origin,
+        'http://localhost:8000',
+        'http://localhost:8001',
+        'http://127.0.0.1:8000',
+        'http://127.0.0.1:8001'
+      ];
+
+      if (!allowedOrigins.includes(event.origin) && !event.origin.startsWith('file://')) {
+        return;
+      }
+
+      if (event.data.type === 'updatePreview') {
+        const canvas = document.getElementById('canvasWrapperPopout');
+        if (canvas && event.data.html) {
+          canvas.innerHTML = event.data.html;
+          canvas.className = event.data.className || 'og-canvas';
+
+          // Apply styles
+          if (event.data.styles) {
+            Object.assign(canvas.style, event.data.styles);
+          }
+
+          // Hide loading indicator once preview is loaded
+          const loading = canvas.querySelector('.loading');
+          if (loading) {
+            loading.remove();
+          }
+        }
+      }
+
+      // Handle resize request from parent
+      if (event.data.type === 'resizeWindow') {
+        try {
+          window.resizeTo(event.data.width || 750, event.data.height || 800);
+          if (event.data.left !== undefined && event.data.top !== undefined) {
+            window.moveTo(event.data.left, event.data.top);
+          }
+        } catch (e) {
+          // Resize blocked
+        }
+      }
+    });
+
+    // Notify parent that popout is ready
+    if (window.opener) {
+      window.opener.postMessage({ type: 'popoutReady' }, '*');
+    }
+  </script>
+</body>
+</html>
+

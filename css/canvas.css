@@ -1,0 +1,664 @@
+/**
+ * Canvas Styles
+ * Preview canvas and animation styles
+ */
+
+.preview-section {
+  background: #1a1a2e;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  margin-bottom: 0;
+  margin-top: 0; /* Removed auto - no empty space above preview section */
+  flex-shrink: 0; /* Don't shrink preview section */
+  position: relative;
+  z-index: 100 !important; /* Very high z-index to ensure preview section is above tabs and tab content */
+}
+
+.canvas-container {
+  background: #0a0a0a;
+  border: 2px dashed rgba(0, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  overflow: hidden; /* Changed to hidden to prevent scrollHeight from including full canvas size */
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 0; /* Important for aspect-ratio to work properly */
+  max-height: none; /* Allow aspect-ratio to control height */
+  box-sizing: border-box; /* Include padding in width calculation */
+  z-index: 1; /* Ensure canvas container is above other elements within preview section */
+  transition: background-image 0.3s ease;
+  /* CRITICAL: Prevent layout shifts during canvas updates */
+  contain: layout style paint; /* Isolate layout calculations */
+  will-change: contents; /* Optimize for content changes */
+}
+
+/* Transparency Checkerboard Pattern */
+.canvas-container.transparency-checker {
+  background-image:
+    repeating-linear-gradient(45deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 10px,
+      rgba(0, 0, 0, 0.1) 10px,
+      rgba(0, 0, 0, 0.1) 20px);
+  background-color: #1a1a2e; /* Fallback color */
+}
+
+/* Fullscreen button positioned in upper right corner of preview */
+/* Apply exact same base styles as preview section buttons */
+/* CRITICAL: More specific selector to override .preview-section .preset-btn rules */
+.canvas-container .fullscreen-btn-preview {
+  position: absolute !important;
+  top: 0.75rem !important;
+  right: 0.75rem !important;
+  left: auto !important; /* CRITICAL: Override left: 0 from .preview-section .preset-btn */
+  z-index: 10;
+  margin: 0;
+  background: rgba(22, 33, 62, 0.7) !important;
+  backdrop-filter: blur(4px);
+  /* CRITICAL: Explicit size constraints to prevent expansion */
+  width: auto !important; /* Use natural button size - override width: 100% */
+  height: auto !important; /* Use natural button size - override height: 100% */
+  min-width: auto !important; /* Reset any min-width */
+  min-height: auto !important; /* Reset any min-height */
+  max-width: none !important; /* Allow natural width */
+  max-height: none !important; /* Allow natural height */
+  /* Exact same base styles as preview section buttons */
+  font-size: 1.1rem !important; /* Match preview section buttons base size */
+  line-height: 1 !important;
+  padding: 0.516rem 0.818rem !important; /* Match preview section buttons padding */
+  box-sizing: border-box !important;
+  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, font-size 0.3s ease, padding 0.3s ease !important; /* Smooth transitions matching preview buttons */
+  transform-origin: center !important; /* Scale from center */
+  will-change: transform !important; /* Optimize GPU-accelerated animations */
+  display: inline-flex !important; /* Use inline-flex instead of flex to prevent expansion */
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important; /* Prevent shrinking */
+}
+
+/* Exact same hover effects as preview section buttons */
+.canvas-container .fullscreen-btn-preview:hover {
+  border-color: rgba(0, 255, 255, 0.6) !important;
+  background: rgba(0, 255, 255, 0.05) !important;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2) !important;
+  color: #ed12ff !important; /* Magenta icon color on hover - matches preview buttons */
+  transform: scale(1.1) !important; /* Scale button container up on hover - matches preview buttons */
+  font-size: 1.9rem !important; /* Scale unicode symbol (from 1.1rem to 1.9rem = ~73% increase) - matches preview buttons */
+  padding: 0.35rem 0.65rem !important; /* Reduced padding to compensate for larger font-size - matches preview buttons */
+}
+
+/* Fullscreen zoom button positioned below fullscreen button */
+/* CRITICAL: More specific selector to override .preview-section .preset-btn rules */
+.canvas-container .fullscreen-zoom-btn {
+  position: absolute !important;
+  top: 3rem !important; /* Below fullscreen button */
+  right: 0.75rem !important;
+  left: auto !important; /* CRITICAL: Override left: 0 from .preview-section .preset-btn */
+  z-index: 10;
+  margin: 0;
+  background: rgba(22, 33, 62, 0.7) !important;
+  backdrop-filter: blur(4px);
+  /* CRITICAL: Explicit size constraints to prevent expansion */
+  width: auto !important; /* Use natural button size - override width: 100% */
+  height: auto !important; /* Use natural button size - override height: 100% */
+  min-width: auto !important; /* Reset any min-width */
+  min-height: auto !important; /* Reset any min-height */
+  max-width: none !important; /* Allow natural width */
+  max-height: none !important; /* Allow natural height */
+  /* Exact same base styles as preview section buttons */
+  font-size: 1.1rem !important; /* Match preview section buttons base size */
+  line-height: 1 !important;
+  padding: 0.516rem 0.818rem !important; /* Match preview section buttons padding */
+  box-sizing: border-box !important;
+  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, font-size 0.3s ease, padding 0.3s ease !important; /* Smooth transitions matching preview buttons */
+  transform-origin: center !important; /* Scale from center */
+  will-change: transform !important; /* Optimize GPU-accelerated animations */
+  display: inline-flex !important; /* Use inline-flex instead of flex to prevent expansion */
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important; /* Prevent shrinking */
+}
+
+.canvas-container .fullscreen-zoom-btn:hover {
+  border-color: rgba(0, 255, 255, 0.6) !important;
+  background: rgba(0, 255, 255, 0.05) !important;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2) !important;
+  color: #ed12ff !important; /* Magenta icon color on hover */
+  transform: scale(1.1) !important; /* Scale button container up on hover */
+  font-size: 1.9rem !important; /* Scale unicode symbol (from 1.1rem to 1.9rem = ~73% increase) */
+  padding: 0.35rem 0.65rem !important; /* Reduced padding to compensate for larger font-size */
+}
+
+/* Zoom indicator in upper left corner of preview */
+.zoom-indicator {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10;
+  padding: 0.25rem 0.5rem;
+  background: rgba(22, 33, 62, 0.85);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  color: #00ffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  pointer-events: auto; /* Changed to allow clicking */
+  user-select: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.zoom-indicator:hover {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+/* Canvas maintains actual pixel dimensions for export */
+.canvas-container .og-canvas,
+.canvas-container .twitter-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0; /* Top-left origin for consistent transforms */
+  /* Actual dimensions maintained for html2canvas export */
+  /* Scale is applied via JavaScript in preview.js */
+  max-width: none !important;
+  max-height: none !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  box-sizing: content-box !important; /* Don't include padding/border in width */
+  z-index: 2; /* Ensure canvas is above container background */
+  /* CRITICAL: Prevent layout shifts during content updates */
+  contain: layout style paint; /* Isolate layout calculations */
+  will-change: transform, contents; /* Optimize for transform and content changes */
+  backface-visibility: hidden; /* Force GPU acceleration */
+}
+
+.canvas-container .og-canvas {
+  width: 1200px !important;
+  height: 630px !important;
+}
+
+.canvas-container .twitter-canvas {
+  width: 1200px !important;
+  height: 675px !important;
+}
+
+.canvas-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.canvas-container::-webkit-scrollbar-track {
+  background: #0a0a0a;
+  border-radius: 4px;
+}
+
+.canvas-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.canvas-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+.og-canvas,
+.twitter-canvas {
+  position: relative;
+  overflow: visible; /* Changed to visible so scaled content isn't cut off */
+  font-family: 'Orbitron', sans-serif;
+}
+
+.og-canvas {
+  width: 1200px;
+  height: 630px;
+}
+
+.twitter-canvas {
+  width: 1200px;
+  height: 675px;
+}
+
+/* Preview column canvas container - no scaling needed, aspect-ratio handles it */
+.preview-column .canvas-container {
+  margin-bottom: 0;
+}
+
+@keyframes matrixFall {
+  to {
+    top: var(--canvas-height, 630px);
+  }
+}
+
+/* Pop-out Preview Styles */
+.preview-popout {
+  transition: opacity 0.2s ease;
+}
+
+.popout-header {
+  transition: background 0.2s ease;
+}
+
+.popout-header:hover {
+  background: #1a1a2e;
+}
+
+.popout-control-btn {
+  transition: all 0.2s ease;
+}
+
+.popout-control-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px currentColor;
+}
+
+.popout-resize-handle {
+  transition: background 0.2s ease;
+}
+
+.popout-resize-handle:hover {
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 255, 255, 0.5) 40%,
+    rgba(0, 255, 255, 0.5) 60%,
+    transparent 60%
+  );
+}
+
+/* Ruler/Guides Overlay */
+.ruler-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.ruler-horizontal,
+.ruler-vertical {
+  position: absolute;
+  background: rgba(0, 255, 255, 0.15);
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  pointer-events: auto;
+}
+
+.ruler-horizontal {
+  top: 0;
+  left: 20px; /* Account for vertical ruler */
+  width: calc(100% - 20px);
+  height: 24px;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.4);
+  overflow: hidden;
+}
+
+.ruler-vertical {
+  top: 24px; /* Account for horizontal ruler */
+  left: 0;
+  width: 24px;
+  height: calc(100% - 24px);
+  border-right: 1px solid rgba(0, 255, 255, 0.4);
+  overflow: hidden;
+}
+
+.ruler-marks {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.ruler-mark {
+  position: absolute;
+  color: #00ffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-shadow: 0 0 4px rgba(0, 255, 255, 0.8);
+  pointer-events: none;
+}
+
+.ruler-horizontal .ruler-mark {
+  transform: translateX(-50%);
+  top: 2px;
+  border-left: 1px solid rgba(0, 255, 255, 0.5);
+  padding-left: 4px;
+}
+
+.ruler-vertical .ruler-mark {
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center;
+  left: 2px;
+  border-top: 1px solid rgba(0, 255, 255, 0.5);
+  padding-top: 4px;
+  white-space: nowrap;
+}
+
+.guide-horizontal,
+.guide-vertical {
+  position: absolute;
+  background: rgba(0, 255, 255, 0.4);
+  pointer-events: auto;
+  cursor: ns-resize;
+  z-index: 11;
+  transition: background 0.2s;
+}
+
+.guide-horizontal {
+  top: 50%;
+  left: 20px; /* Account for vertical ruler */
+  width: calc(100% - 20px);
+  height: 2px;
+  transform: translateY(-50%);
+  cursor: ns-resize;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+}
+
+.guide-horizontal:hover {
+  background: rgba(0, 255, 255, 0.6);
+  height: 3px;
+}
+
+.guide-vertical {
+  top: 24px; /* Account for horizontal ruler */
+  left: 50%;
+  width: 2px;
+  height: calc(100% - 24px);
+  transform: translateX(-50%);
+  cursor: ew-resize;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+}
+
+.guide-vertical:hover {
+  background: rgba(0, 255, 255, 0.6);
+  width: 3px;
+}
+
+.ruler-info {
+  position: fixed;
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  color: #00ffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), 0 0 16px rgba(0, 255, 255, 0.3);
+  display: none;
+}
+
+.ruler-info div {
+  margin: 0.25rem 0;
+  line-height: 1.4;
+}
+
+/* History Timeline */
+.history-timeline {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  max-height: 80%;
+  background: #1a1a2e;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 8px;
+  z-index: 1000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 255, 255, 0.3);
+}
+
+.history-timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.history-timeline-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.history-timeline-header .preset-btn {
+  min-width: auto;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.history-timeline-content {
+  overflow-y: auto;
+  padding: 0.5rem;
+  flex: 1;
+}
+
+.history-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.history-item:hover {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 255, 255, 0.4);
+  transform: translateX(4px);
+}
+
+.history-item.active {
+  background: rgba(0, 255, 255, 0.15);
+  border-color: rgba(0, 255, 255, 0.6);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+}
+
+.history-item-preview {
+  width: 80px;
+  height: 42px;
+  background: #0a0a0a;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.history-item-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.history-item-index {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.history-item-time {
+  color: #b0b0b0;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+}
+
+.history-timeline-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.history-timeline-content::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.history-timeline-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.history-timeline-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+/* Layer Visibility Panel */
+.layer-visibility-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  max-height: 80vh;
+  background: #1a1a2e;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 8px;
+  z-index: 10000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 255, 255, 0.3);
+  user-select: none;
+}
+
+.layer-visibility-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  background: rgba(0, 255, 255, 0.05);
+  cursor: move;
+  user-select: none;
+}
+
+.layer-visibility-header:hover {
+  background: rgba(0, 255, 255, 0.1);
+}
+
+.layer-visibility-header.dragging {
+  cursor: grabbing;
+  background: rgba(0, 255, 255, 0.15);
+}
+
+.layer-visibility-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+  user-select: none;
+}
+
+.layer-visibility-header .preset-btn {
+  position: static !important; /* Override absolute positioning from .preview-section .preset-btn */
+  top: auto !important;
+  left: auto !important;
+  width: auto !important; /* Override width: 100% from .preview-section .preset-btn */
+  height: auto !important; /* Override height: 100% from .preview-section .preset-btn */
+  min-width: auto;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0; /* Prevent button from shrinking */
+}
+
+.layer-visibility-content {
+  overflow-y: auto;
+  padding: 0.75rem;
+  flex: 1;
+}
+
+.layer-visibility-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.layer-visibility-item:hover {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 255, 255, 0.4);
+}
+
+.layer-visibility-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #00ffff;
+}
+
+.layer-visibility-item label {
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  cursor: pointer;
+  user-select: none;
+  flex: 1;
+}
+
+.layer-visibility-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.layer-visibility-content::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.layer-visibility-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.layer-visibility-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+/* Fullscreen styles */
+.canvas-container:fullscreen {
+  background: #0a0a0a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.canvas-container:fullscreen .og-canvas,
+.canvas-container:fullscreen .twitter-canvas {
+  transform: scale(1) !important;
+}

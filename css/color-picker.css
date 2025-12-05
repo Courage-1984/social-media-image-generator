@@ -1,0 +1,46 @@
+/**
+ * Color Picker Styles
+ * Color selection UI components
+ */
+
+.color-picker-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.color-option {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px currentColor;
+}
+
+.color-option.selected {
+  border-color: #ffffff;
+  box-shadow: 0 0 15px currentColor;
+}
+
+.glow-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.glow-toggle input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  accent-color: #00ffff;
+  cursor: pointer;
+}
+

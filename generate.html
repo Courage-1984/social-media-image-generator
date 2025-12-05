@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#00ffff" />
+    <title>Social Media Image Generator - Logi-Ink</title>
+
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <!-- Content Security Policy - Allows inline styles for dynamic styling -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: blob:; font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://cdn.jsdelivr.net;"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/controls.css" />
+    <link rel="stylesheet" href="css/color-picker.css" />
+    <link rel="stylesheet" href="css/canvas.css" />
+    <link rel="stylesheet" href="css/tabs.css" />
+    <link rel="stylesheet" href="css/toast.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-section">
+        <div style="display: flex; align-items: center; gap: 0.75rem">
+          <h1>Social Media Image Generator</h1>
+          <button
+            type="button"
+            class="hard-refresh-btn"
+            id="hardRefreshBtn"
+            title="Hard Refresh (Clear Cache)"
+          >
+            <span class="unicode-char">֍</span>
+          </button>
+        </div>
+        <div class="header-controls">
+          <div class="presets-controls">
+            <input type="text" id="presetName" placeholder="Enter preset name" />
+            <button class="preset-btn" id="savePresetBtn">
+              <span class="unicode-char">🖫</span> SAVE
+            </button>
+            <button class="preset-btn" id="loadPresetBtn">
+              <span class="unicode-char">⬐</span> LOAD
+            </button>
+            <button class="preset-btn" id="deletePresetBtn">
+              <span class="unicode-char">✕</span> DELETE
+            </button>
+            <select id="savedPresets">
+              <option value="">Select a saved preset...</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-layout">
+        <!-- Left Column: All Controls -->
+        <div class="controls-column">
+          <div class="controls">
+            <div class="control-group">
+              <label>Background Pattern (Optional)</label>
+              <select id="backgroundPattern">
+                <option value="">None (Use Preset Background)</option>
+              </select>
+              <div
+                id="patternCustomization"
+                style="
+                  display: none;
+                  margin-top: 0.5rem;
+                  background: rgba(0, 255, 255, 0.05);
+                  border-radius: 4px;
+                  border: 1px solid rgba(0, 255, 255, 0.2);
+                "
+              >
+                <button
+                  id="patternSettingsToggle"
+                  class="pattern-settings-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="patternSettingsContent"
+                >
+                  <span class="pattern-settings-toggle-text">Pattern Settings</span>
+                  <span class="pattern-settings-toggle-icon">▼</span>
+                </button>
+                <div
+                  id="patternSettingsContent"
+                  class="pattern-settings-content collapsed"
+                  style="padding: 0.75rem; display: none; opacity: 0; max-height: 0"
+                >
+                  <div class="grid-3" style="grid-template-rows: auto auto auto auto auto auto">
+                    <div class="control-group" style="grid-row: 1 / 4">
+                      <label>Pattern Color</label>
+                      <div class="color-picker-group" id="patternColorPicker"></div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Opacity</label>
+                      <div class="range-group">
+                        <input type="range" id="patternOpacity" min="0" max="100" value="20" />
+                        <input
+                          type="number"
+                          id="patternOpacityValue"
+                          min="0"
+                          max="100"
+                          value="20"
+                        />
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Size</label>
+                      <div class="range-group">
+                        <input type="range" id="patternSize" min="10" max="200" value="50" />
+                        <input type="number" id="patternSizeValue" min="10" max="200" value="50" />
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Rotation</label>
+                      <div class="range-group">
+                        <input type="range" id="patternRotation" min="0" max="360" value="0" />
+                        <input
+                          type="number"
+                          id="patternRotationValue"
+                          min="0"
+                          max="360"
+                          value="0"
+                        />
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Blend Mode</label>
+                      <select id="patternBlendMode">
+                        <option value="normal">Normal</option>
+                        <option value="multiply">Multiply</option>
+                        <option value="screen">Screen</option>
+                        <option value="overlay">Overlay</option>
+                        <option value="soft-light">Soft Light</option>
+                        <option value="hard-light">Hard Light</option>
+                        <option value="difference">Difference</option>
+                        <option value="exclusion">Exclusion</option>
+                        <option value="color-dodge">Color Dodge</option>
+                        <option value="color-burn">Color Burn</option>
+                      </select>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Density</label>
+                      <div class="range-group">
+                        <input type="range" id="patternDensity" min="1" max="20" value="1" />
+                        <input type="number" id="patternDensityValue" min="1" max="20" value="1" />
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Spacing</label>
+                      <div class="range-group">
+                        <input type="range" id="patternSpacing" min="0" max="100" value="0" />
+                        <input type="number" id="patternSpacingValue" min="0" max="100" value="0" />
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Offset X</label>
+                      <div class="range-group">
+                        <input type="range" id="patternOffsetX" min="-200" max="200" value="0" />
+                        <input
+                          type="number"
+                          id="patternOffsetXValue"
+                          min="-200"
+                          max="200"
+                          value="0"
+                        />
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Offset Y</label>
+                      <div class="range-group">
+                        <input type="range" id="patternOffsetY" min="-200" max="200" value="0" />
+                        <input
+                          type="number"
+                          id="patternOffsetYValue"
+                          min="-200"
+                          max="200"
+                          value="0"
+                        />
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Blur</label>
+                      <div class="range-group">
+                        <input type="range" id="patternBlur" min="0" max="20" value="0" />
+                        <input type="number" id="patternBlurValue" min="0" max="20" value="0" />
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Scale</label>
+                      <div class="range-group">
+                        <input
+                          type="range"
+                          id="patternScale"
+                          min="50"
+                          max="300"
+                          value="100"
+                          step="10"
+                        />
+                        <input
+                          type="number"
+                          id="patternScaleValue"
+                          min="50"
+                          max="300"
+                          value="100"
+                          step="10"
+                        />
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Repeat</label>
+                      <select id="patternRepeat">
+                        <option value="repeat">Repeat</option>
+                        <option value="no-repeat">No Repeat</option>
+                        <option value="repeat-x">Repeat X</option>
+                        <option value="repeat-y">Repeat Y</option>
+                        <option value="space">Space</option>
+                        <option value="round">Round</option>
+                      </select>
+                    </div>
+                    <div class="control-group">
+                      <label>Pattern Intensity</label>
+                      <div class="range-group">
+                        <input type="range" id="patternIntensity" min="0" max="200" value="100" />
+                        <input
+                          type="number"
+                          id="patternIntensityValue"
+                          min="0"
+                          max="200"
+                          value="100"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="control-group">
+                <label for="logoPosition">Logo Position</label>
+                <select id="logoPosition">
+                  <option value="top-left">Top Left</option>
+                  <option value="top-center">Top Center</option>
+                  <option value="top-right">Top Right</option>
+                  <option value="center-left">Center Left</option>
+                  <option value="center">Center Center</option>
+                  <option value="center-right">Center Right</option>
+                  <option value="bottom-left">Bottom Left</option>
+                  <option value="bottom-center">Bottom Center</option>
+                  <option value="bottom-right">Bottom Right</option>
+                  <option value="hidden">Hidden</option>
+                </select>
+              </div>
+              <div class="control-group">
+                <label>Logo Size</label>
+                <div class="range-group">
+                  <input type="range" id="logoSize" min="60" max="300" value="120" />
+                  <input type="number" id="logoSizeValue" min="60" max="300" value="120" />
+                </div>
+              </div>
+              <div class="control-group logo-color-upload-split">
+                <div class="logo-color-half">
+                  <label>Logo Colour</label>
+                  <select id="logoColorSelect" style="display: none"></select>
+                  <div class="custom-logo-color-dropdown-wrapper"></div>
+                </div>
+                <div class="logo-upload-half">
+                  <label for="logoUpload">Upload Logo</label>
+                  <input
+                    type="file"
+                    id="logoUpload"
+                    accept="image/svg+xml,image/png,image/jpeg"
+                    style="display: none"
+                  />
+                  <button type="button" class="upload-btn" id="logoUploadBtn">
+                    <span class="unicode-char">⬑</span> Upload
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Text Sections: 3-Column Layout -->
+            <div class="grid-3">
+              <!-- Title Column -->
+              <div class="control-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" value="Logi-Ink" placeholder="Enter title" />
+
+                <label>Title Color</label>
+                <div class="color-picker-group" id="titleColorPicker"></div>
+                <div class="glow-toggle">
+                  <input type="checkbox" id="titleGlow" />
+                  <label for="titleGlow">Enable Glow</label>
+                </div>
+
+                <label>Title Size</label>
+                <div class="range-group">
+                  <input type="range" id="titleSize" min="30" max="120" value="72" />
+                  <input type="number" id="titleSizeValue" min="30" max="120" value="72" />
+                </div>
+
+                <label>Title X Position</label>
+                <div class="range-group">
+                  <input type="range" id="titleX" min="-200" max="200" value="0" />
+                  <input type="number" id="titleXValue" min="-200" max="200" value="0" />
+                </div>
+
+                <label>Title Y Position</label>
+                <div class="range-group">
+                  <input type="range" id="titleY" min="-200" max="200" value="0" />
+                  <input type="number" id="titleYValue" min="-200" max="200" value="0" />
+                </div>
+
+                <button
+                  class="preset-btn"
+                  id="resetTitlePos"
+                  style="margin-top: 0.5rem; width: 100%"
+                >
+                  Reset Title
+                </button>
+
+                <div class="checkbox-group" style="margin-top: 0.5rem">
+                  <input type="checkbox" id="dividerAboveTitle" />
+                  <label for="dividerAboveTitle">Divider Above</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="dividerBelowTitle" />
+                  <label for="dividerBelowTitle">Divider Below</label>
+                </div>
+
+                <label>Title Divider Color</label>
+                <div class="color-picker-group" id="titleDividerColorPicker"></div>
+                <label>Title Divider Width</label>
+                <div class="range-group">
+                  <input type="range" id="titleDividerWidth" min="1" max="10" value="2" />
+                  <input type="number" id="titleDividerWidthValue" min="1" max="10" value="2" />
+                </div>
+              </div>
+
+              <!-- Subtitle Column -->
+              <div class="control-group">
+                <label for="subtitle">Subtitle</label>
+                <input
+                  type="text"
+                  id="subtitle"
+                  value="Digital Innovation | Creative Solutions"
+                  placeholder="Enter subtitle"
+                />
+
+                <label>Subtitle Color</label>
+                <div class="color-picker-group" id="subtitleColorPicker"></div>
+                <div class="glow-toggle">
+                  <input type="checkbox" id="subtitleGlow" />
+                  <label for="subtitleGlow">Enable Glow</label>
+                </div>
+
+                <label>Subtitle Size</label>
+                <div class="range-group">
+                  <input type="range" id="subtitleSize" min="16" max="48" value="28" />
+                  <input type="number" id="subtitleSizeValue" min="16" max="48" value="28" />
+                </div>
+
+                <label>Subtitle X Position</label>
+                <div class="range-group">
+                  <input type="range" id="subtitleX" min="-200" max="200" value="0" />
+                  <input type="number" id="subtitleXValue" min="-200" max="200" value="0" />
+                </div>
+
+                <label>Subtitle Y Position</label>
+                <div class="range-group">
+                  <input type="range" id="subtitleY" min="-200" max="200" value="0" />
+                  <input type="number" id="subtitleYValue" min="-200" max="200" value="0" />
+                </div>
+
+                <button
+                  class="preset-btn"
+                  id="resetSubtitlePos"
+                  style="margin-top: 0.5rem; width: 100%"
+                >
+                  Reset Subtitle
+                </button>
+
+                <div class="checkbox-group" style="margin-top: 0.5rem">
+                  <input type="checkbox" id="dividerAboveSubtitle" />
+                  <label for="dividerAboveSubtitle">Divider Above</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="dividerBelowSubtitle" />
+                  <label for="dividerBelowSubtitle">Divider Below</label>
+                </div>
+
+                <label>Subtitle Divider Color</label>
+                <div class="color-picker-group" id="subtitleDividerColorPicker"></div>
+                <label>Subtitle Divider Width</label>
+                <div class="range-group">
+                  <input type="range" id="subtitleDividerWidth" min="1" max="10" value="2" />
+                  <input type="number" id="subtitleDividerWidthValue" min="1" max="10" value="2" />
+                </div>
+              </div>
+
+              <!-- Slogan Column -->
+              <div class="control-group">
+                <label for="slogan">Slogan (Optional)</label>
+                <input
+                  type="text"
+                  id="slogan"
+                  value="Transforming Ideas Into Reality"
+                  placeholder="Enter slogan"
+                />
+
+                <label>Slogan Color</label>
+                <div class="color-picker-group" id="sloganColorPicker"></div>
+                <div class="glow-toggle">
+                  <input type="checkbox" id="sloganGlow" />
+                  <label for="sloganGlow">Enable Glow</label>
+                </div>
+
+                <label>Slogan Size</label>
+                <div class="range-group">
+                  <input type="range" id="sloganSize" min="14" max="36" value="20" />
+                  <input type="number" id="sloganSizeValue" min="14" max="36" value="20" />
+                </div>
+
+                <label>Slogan X Position</label>
+                <div class="range-group">
+                  <input type="range" id="sloganX" min="-200" max="200" value="0" />
+                  <input type="number" id="sloganXValue" min="-200" max="200" value="0" />
+                </div>
+
+                <label>Slogan Y Position</label>
+                <div class="range-group">
+                  <input type="range" id="sloganY" min="-200" max="200" value="0" />
+                  <input type="number" id="sloganYValue" min="-200" max="200" value="0" />
+                </div>
+
+                <button
+                  class="preset-btn"
+                  id="resetSloganPos"
+                  style="margin-top: 0.5rem; width: 100%"
+                >
+                  Reset Slogan
+                </button>
+
+                <div class="checkbox-group" style="margin-top: 0.5rem">
+                  <input type="checkbox" id="dividerAboveSlogan" />
+                  <label for="dividerAboveSlogan">Divider Above</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="dividerBelowSlogan" />
+                  <label for="dividerBelowSlogan">Divider Below</label>
+                </div>
+
+                <label>Slogan Divider Color</label>
+                <div class="color-picker-group" id="sloganDividerColorPicker"></div>
+                <label>Slogan Divider Width</label>
+                <div class="range-group">
+                  <input type="range" id="sloganDividerWidth" min="1" max="10" value="2" />
+                  <input type="number" id="sloganDividerWidthValue" min="1" max="10" value="2" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Tabs + Preview -->
+        <div class="preview-column">
+          <!-- Tabs Navigation -->
+          <div class="tabs">
+            <div class="tab-list">
+              <button class="tab-button active" data-tab="image-type">Image Type</button>
+              <button class="tab-button" data-tab="templates">Templates</button>
+              <button class="tab-button" data-tab="presets">Preset Style</button>
+            </div>
+          </div>
+
+          <!-- Tab Content: Image Type -->
+          <div class="tab-content active" id="tab-image-type">
+            <div class="controls tab-controls">
+              <div class="control-group tab-control-group">
+                <div class="inline-control">
+                  <label>Image Type</label>
+                  <div class="mode-buttons">
+                    <button class="mode-btn active" data-mode="og">OG Image (1200×630)</button>
+                    <button class="mode-btn" data-mode="twitter">Twitter Card (1200×675)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content: Templates -->
+          <div class="tab-content" id="tab-templates">
+            <div class="controls tab-controls">
+              <div class="control-group tab-control-group">
+                <div class="inline-control">
+                  <label>Templates</label>
+                  <select id="templateSelect">
+                    <option value="">Select a template...</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content: Preset Style -->
+          <div class="tab-content" id="tab-presets">
+            <div class="controls tab-controls">
+              <div class="control-group tab-control-group">
+                <div class="inline-control">
+                  <label>Preset Style</label>
+                  <div class="preset-buttons compact">
+                    <button class="preset-btn active" data-preset="hero">Hero</button>
+                    <button class="preset-btn" data-preset="service">Service</button>
+                    <button class="preset-btn" data-preset="minimal">Minimal</button>
+                    <button class="preset-btn" data-preset="gradient">Gradient</button>
+                    <button class="preset-btn" data-preset="particles">Particles</button>
+                    <button class="preset-btn" data-preset="cyberpunk">Cyber</button>
+                    <button class="preset-btn" data-preset="neon">Neon</button>
+                    <button class="preset-btn" data-preset="geometric">Geo</button>
+                    <button class="preset-btn" data-preset="wave">Wave</button>
+                    <button class="preset-btn" data-preset="matrix">Matrix</button>
+                    <button class="preset-btn" data-preset="dark">Dark</button>
+                    <button class="preset-btn" data-preset="space">Space</button>
+                    <button class="preset-btn" data-preset="glow">Glow</button>
+                    <button class="preset-btn" data-preset="tech">Tech</button>
+                    <button class="preset-btn" data-preset="electric">Electric</button>
+                    <button class="preset-btn" data-preset="void">Void</button>
+                    <button class="random-btn" id="randomBtn">⤭</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-section">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+              "
+            >
+              <h2>Preview</h2>
+              <div class="preview-buttons-container">
+                <div class="preview-button-wrapper">
+                  <button class="preset-btn" id="randomizeBtn" title="Randomize all settings">
+                    ⤭
+                  </button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button class="preset-btn" id="resetBtn" title="Reset to defaults">↺</button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button class="preset-btn" id="popoutBtn" title="Pop-out Preview (New Window)">
+                    ⧉
+                  </button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button class="preset-btn" id="undoBtn" title="Undo (Ctrl+Z)">↶</button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button class="preset-btn" id="redoBtn" title="Redo (Ctrl+Y)">↷</button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button class="preset-btn" id="gridToggleBtn" title="Toggle Grid Overlay">
+                    ▦
+                  </button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button class="preset-btn" id="rulerToggleBtn" title="Toggle Ruler/Guides">
+                    ⌖
+                  </button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button
+                    class="preset-btn"
+                    id="contrastToggleBtn"
+                    title="Contrast / Invert Colors"
+                  >
+                    ☯
+                  </button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button
+                    class="preset-btn"
+                    id="transparencyCheckerBtn"
+                    title="Toggle Transparency Checkerboard"
+                  >
+                    ▧
+                  </button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button
+                    class="preset-btn"
+                    id="layerVisibilityBtn"
+                    title="Toggle Layer Visibility Panel"
+                  >
+                    ◐
+                  </button>
+                </div>
+                <div class="preview-button-wrapper">
+                  <button class="preset-btn" id="historyTimelineBtn" title="History Timeline">
+                    ⧗
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="canvas-container" id="canvasContainer">
+              <button
+                class="preset-btn fullscreen-btn-preview"
+                id="fullscreenBtn"
+                title="Toggle Fullscreen"
+              >
+                ⛶
+              </button>
+              <button
+                class="preset-btn fullscreen-zoom-btn"
+                id="fullscreenZoomBtn"
+                title="Zoom: Fit"
+              >
+                ⌕
+              </button>
+              <div class="zoom-indicator" id="zoomIndicator" style="display: none">Fit</div>
+              <div id="canvasWrapper" class="og-canvas preset-hero"></div>
+              <!-- Ruler/Guides Overlay -->
+              <div id="rulerOverlay" class="ruler-overlay" style="display: none">
+                <div class="ruler-horizontal" id="rulerHorizontal">
+                  <div class="ruler-marks"></div>
+                </div>
+                <div class="ruler-vertical" id="rulerVertical">
+                  <div class="ruler-marks"></div>
+                </div>
+                <div class="guide-horizontal" id="guideHorizontal"></div>
+                <div class="guide-vertical" id="guideVertical"></div>
+                <div class="ruler-info" id="rulerInfo"></div>
+              </div>
+              <!-- History Timeline -->
+              <div id="historyTimeline" class="history-timeline" style="display: none">
+                <div class="history-timeline-header">
+                  <h3>History Timeline</h3>
+                  <button class="preset-btn" id="closeHistoryBtn" title="Close">×</button>
+                </div>
+                <div class="history-timeline-content" id="historyTimelineContent"></div>
+              </div>
+              <!-- Layer Visibility Panel -->
+              <div id="layerVisibilityPanel" class="layer-visibility-panel" style="display: none">
+                <div class="layer-visibility-header">
+                  <h3>Layer Visibility</h3>
+                  <button class="preset-btn" id="closeLayerVisibilityBtn" title="Close">×</button>
+                </div>
+                <div class="layer-visibility-content">
+                  <div class="layer-visibility-item">
+                    <input type="checkbox" id="layerVisibilityLogo" checked />
+                    <label for="layerVisibilityLogo">Logo</label>
+                  </div>
+                  <div class="layer-visibility-item">
+                    <input type="checkbox" id="layerVisibilityTitle" checked />
+                    <label for="layerVisibilityTitle">Title</label>
+                  </div>
+                  <div class="layer-visibility-item">
+                    <input type="checkbox" id="layerVisibilitySubtitle" checked />
+                    <label for="layerVisibilitySubtitle">Subtitle</label>
+                  </div>
+                  <div class="layer-visibility-item">
+                    <input type="checkbox" id="layerVisibilitySlogan" checked />
+                    <label for="layerVisibilitySlogan">Slogan</label>
+                  </div>
+                  <div class="layer-visibility-item">
+                    <input type="checkbox" id="layerVisibilityPattern" checked />
+                    <label for="layerVisibilityPattern">Background Pattern</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid-2" style="margin-top: 0.5rem; gap: 0.5rem; align-items: center">
+              <div class="control-group inline-control" style="margin-bottom: 0">
+                <label for="exportQuality">Export Quality</label>
+                <select id="exportQuality">
+                  <option value="1">1x (Fast, Lower Quality)</option>
+                  <option value="2" selected>2x (Recommended)</option>
+                  <option value="3">3x (High Quality)</option>
+                  <option value="4">4x (Ultra High Quality)</option>
+                </select>
+              </div>
+              <div class="control-group" style="margin-bottom: 0">
+                <div class="grid-2" style="gap: 0.5rem; margin-top: 0">
+                  <button class="export-btn" id="exportBtn">
+                    <span class="unicode-char">⭳</span> EXPORT
+                  </button>
+                  <button class="export-btn" id="copyBtn">
+                    <span class="unicode-char">❐</span> COPY
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1155 @@
+/**
+ * Control Styles
+ * Form controls, buttons, and input elements
+ */
+
+.controls {
+  background: #1a1a2e;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+/* Override padding for tab controls */
+.tab-controls.controls {
+  padding: 0.25rem 0.5rem !important;
+  margin-bottom: 0 !important;
+}
+
+.controls-column .controls:last-child {
+  margin-bottom: 0;
+}
+
+.preview-column .controls:last-child {
+  margin-bottom: 0;
+}
+
+/* Tab controls should have consistent height - removed min-height to allow tab-content to control height */
+
+.control-group {
+  margin-bottom: 0.75rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #b0b0b0;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* Collapsible Sections */
+.collapsible-section {
+  margin-bottom: 1rem;
+}
+
+.collapsible-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.5rem 0;
+  margin-bottom: 0.75rem;
+  transition: color 0.2s;
+}
+
+.collapsible-label:hover {
+  color: #00ffff;
+}
+
+.collapsible-label .collapse-icon {
+  font-size: 0.9rem;
+  color: #00ffff;
+  transition: color 0.2s;
+  display: inline-block;
+  min-width: 1rem;
+  text-align: center;
+  font-family: monospace;
+}
+
+.collapsible-section.collapsed .collapse-icon {
+  color: #00ffff; /* Cyan when collapsed */
+}
+
+.collapsible-section:not(.collapsed) .collapse-icon {
+  color: #ff00ff; /* Magenta when expanded */
+}
+
+.collapsible-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
+  max-height: none;
+  opacity: 1;
+  padding: 0;
+}
+
+.collapsible-section.collapsed .collapsible-content {
+  max-height: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Override for inline controls - labels should not be block */
+.inline-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inline-control label {
+  display: inline-block !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+  width: auto !important;
+  flex-shrink: 0;
+  white-space: nowrap;
+  vertical-align: middle;
+  line-height: normal; /* Will be set to match sibling height via JS if needed */
+}
+
+.inline-control select {
+  flex: 1;
+  min-width: 0;
+}
+
+input[type='text'],
+input[type='number'],
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  background: #0a0a0a;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Override width and display for select in inline-control */
+.inline-control select {
+  display: inline-block !important;
+  width: auto !important;
+  flex: 1 !important;
+  min-width: 0;
+  margin: 0;
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: #00ffff;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.preset-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.preset-buttons.compact {
+  gap: 0.35rem;
+  margin-bottom: 0;
+}
+
+.preset-buttons.compact .preset-btn,
+.preset-buttons.compact .random-btn {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.7rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.preset-btn,
+.random-btn,
+.mode-btn {
+  padding: 0.5rem 1rem;
+  background: #16213e;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #00ffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.8rem;
+}
+
+/* CRITICAL: Prevent layout shift - Wrapper solution for preview section buttons */
+.preview-buttons-container {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: nowrap !important; /* CRITICAL: Keep all buttons on single row - NO WRAPPING */
+  align-items: center;
+  contain: layout; /* Isolate layout calculations - prevents scaling from affecting parent */
+}
+
+/* Fixed-size wrapper for each button - prevents layout shift */
+.preview-button-wrapper {
+  position: relative;
+  width: 41.6px; /* Exact default button width - DO NOT CHANGE */
+  height: 35.17px; /* Exact default button height - DO NOT CHANGE */
+  flex-shrink: 0; /* Prevent shrinking in flex container */
+  overflow: visible; /* Allow scaled button to overflow without clipping */
+  contain: layout style; /* Further isolate layout and style calculations */
+}
+
+/* Increase icon size for preview section buttons without changing button size */
+.preview-section .preset-btn {
+  position: absolute; /* Remove from normal flow - prevents layout shift */
+  top: 0;
+  left: 0;
+  width: 100%; /* Fill wrapper exactly */
+  height: 100%; /* Fill wrapper exactly */
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.516rem 0.818rem; /* Calculated to maintain original button dimensions */
+  box-sizing: border-box;
+  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, font-size 0.3s ease, padding 0.3s ease; /* Smooth transitions including transform, font-size, and padding */
+  transform-origin: center; /* Scale from center */
+  will-change: transform; /* Optimize GPU-accelerated animations */
+  display: flex; /* Use flex for centering icon */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Smooth magenta color transition and icon scaling on hover for preview section button icons */
+.preview-section .preset-btn:hover {
+  border-color: rgba(0, 255, 255, 0.6);
+  background: rgba(0, 255, 255, 0.05);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  color: #ed12ff; /* Lighter magenta for better visibility */
+  transform: scale(1.1); /* Scale button container up on hover */
+  font-size: 1.9rem; /* Scale unicode symbol even more (from 1.1rem to 1.9rem = ~73% increase) */
+  padding: 0.35rem 0.65rem; /* Reduced padding to compensate for larger font-size and keep button size unchanged */
+}
+
+.preset-btn:hover,
+.random-btn:hover,
+.mode-btn:hover {
+  border-color: rgba(0, 255, 255, 0.6);
+  background: rgba(0, 255, 255, 0.05);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  color: #ffffff; /* White text on hover for buttons with text (SAVE, LOAD, DELETE) */
+}
+
+/* Preset Style tab buttons - specific hover effects */
+.preset-buttons.compact .preset-btn {
+  transition: all 0.3s ease, transform 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+  transform-origin: center;
+  position: relative;
+  z-index: 1;
+}
+
+.preset-buttons.compact .preset-btn:hover {
+  border-color: rgba(0, 255, 255, 0.6);
+  background: rgba(0, 255, 255, 0.05);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  color: #ff00ff; /* Magenta text on hover */
+  transform: scale(1.1); /* Scale button on hover */
+  font-size: 0.75rem; /* Scale text up slightly (from 0.65rem) */
+  z-index: 10; /* Bring scaled button above other elements */
+}
+
+/* Random button - moving gradient animation on hover */
+@keyframes moving-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.preset-buttons.compact .random-btn {
+  transition: all 0.3s ease, transform 0.3s ease, font-size 0.3s ease, background-position 0.3s ease;
+  transform-origin: center;
+  background-size: 200% 200%;
+  position: relative;
+  z-index: 1;
+}
+
+.preset-buttons.compact .random-btn:hover {
+  border-color: rgba(0, 255, 255, 0.6);
+  background: linear-gradient(135deg, #ff00ff, #00ffff, #ff00ff, #00ffff);
+  background-size: 200% 200%;
+  animation: moving-gradient 2s ease infinite;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  transform: scale(1.1); /* Scale button on hover */
+  font-size: 0.75rem; /* Scale text up slightly (from 0.65rem) */
+  color: #0a0a0a; /* Keep dark text for contrast on gradient */
+  z-index: 10; /* Bring scaled button above other elements */
+}
+
+.preset-btn.active,
+.mode-btn.active {
+  background: #00ffff;
+  color: #0a0a0a;
+}
+
+/* Hard Refresh Button - Circular */
+.hard-refresh-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  background: #16213e;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #00ffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.3s;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hard-refresh-btn:hover {
+  border-color: rgba(0, 255, 255, 0.6);
+  background: rgba(0, 255, 255, 0.05);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  transform: rotate(180deg);
+}
+
+/* Hard refresh button Unicode character - magenta color and scaling on hover */
+.hard-refresh-btn .unicode-char {
+  display: inline-block;
+  transition: color 0.3s ease, transform 0.3s ease;
+  transform-origin: center;
+}
+
+.hard-refresh-btn:hover .unicode-char {
+  color: #ed12ff; /* Magenta on hover */
+  transform: scale(1.85); /* Scale Unicode character without layout shift */
+}
+
+.random-btn {
+  background: linear-gradient(135deg, #ff00ff, #00ffff);
+  color: #0a0a0a;
+  font-weight: 700;
+}
+
+.mode-selector {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #1a1a2e;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.inline-control {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem;
+  width: 100%;
+  flex-wrap: nowrap !important;
+  flex-direction: row !important;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.mode-btn {
+  flex: 1;
+  min-width: 0;
+}
+
+
+.range-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.range-group input[type='range'] {
+  flex: 1;
+  height: 43.39px; /* Match Logo Colour dropdown button height */
+  box-sizing: border-box;
+}
+
+.range-group input[type='number'] {
+  width: 70px;
+  padding: 0.5rem 0.75rem;
+  padding-right: 0.5rem; /* Reduce right padding to make room for spinners */
+  font-size: 0.85rem;
+  height: 43.39px; /* Match Logo Colour dropdown button height */
+  box-sizing: border-box;
+  flex-shrink: 0;
+  -moz-appearance: textfield; /* Firefox - hide default spinners */
+}
+
+/* Style number input spinner buttons (up/down incrementors) - WebKit browsers */
+.range-group input[type='number']::-webkit-inner-spin-button,
+.range-group input[type='number']::-webkit-outer-spin-button {
+  opacity: 1;
+  height: 1rem;
+  width: 1.25rem;
+  cursor: pointer;
+  background: rgba(0, 255, 255, 0.1);
+  border-left: 1px solid rgba(0, 255, 255, 0.3);
+  transition: all 0.2s;
+  margin-right: 0.25rem;
+}
+
+.range-group input[type='number']::-webkit-inner-spin-button:hover,
+.range-group input[type='number']::-webkit-outer-spin-button:hover {
+  background: rgba(0, 255, 255, 0.2);
+  border-left-color: rgba(0, 255, 255, 0.5);
+}
+
+.range-group input[type='number']::-webkit-inner-spin-button:active,
+.range-group input[type='number']::-webkit-outer-spin-button:active {
+  background: rgba(0, 255, 255, 0.3);
+}
+
+/* Ensure proper alignment in grid layouts */
+.control-group .range-group {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-group input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  accent-color: #00ffff;
+  cursor: pointer;
+}
+
+.export-btn {
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #00ffff, #00cccc);
+  border: none;
+  color: #0a0a0a;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  box-sizing: border-box;
+  height: auto;
+}
+
+.export-btn:hover {
+  border: 1px solid rgba(0, 255, 255, 0.6); /* Add border on hover (base has border: none) */
+  background: rgba(0, 255, 255, 0.05);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  transform: translateY(-2px);
+  color: #ffffff; /* White text on hover */
+}
+
+/* Export button Unicode character - magenta color and scaling on hover */
+.export-btn .unicode-char {
+  display: inline-block;
+  transition: color 0.3s ease, transform 0.3s ease;
+  transform-origin: center;
+}
+
+.export-btn:hover .unicode-char {
+  color: #ed12ff; /* Magenta on hover */
+  transform: scale(1.85); /* Scale Unicode character without layout shift */
+}
+
+.export-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.preset-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.preset-btn:disabled:hover {
+  background: #16213e;
+  color: #00ffff;
+  box-shadow: none;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: #1a1a2e;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  max-width: 500px;
+  width: 90%;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #00ffff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+}
+
+.modal-close:hover {
+  color: #ffffff;
+}
+
+.custom-select-wrapper {
+  position: relative;
+}
+
+.pattern-preview-tooltip {
+  position: fixed !important;
+  width: 500px;
+  height: 400px;
+  background: #0a0a0a;
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 255, 255, 0.3);
+  z-index: 999999 !important; /* Very high z-index to appear above preview column (1000) */
+  pointer-events: none;
+  overflow: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.pattern-preview-tooltip[style*='display: none'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Pattern setting disabled state */
+.pattern-setting-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  position: relative;
+}
+
+/* Pattern setting info icon */
+.pattern-setting-info {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(0, 255, 255, 0.2);
+  color: #00ffff;
+  font-size: 0.7rem;
+  font-weight: bold;
+  font-style: italic;
+  cursor: help;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.pattern-setting-info:hover {
+  background: rgba(0, 255, 255, 0.4);
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+}
+
+/* Pattern setting tooltip */
+.pattern-setting-tooltip {
+  position: fixed;
+  background: #1a1a2e;
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  max-width: 300px;
+  z-index: 999999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 16px rgba(0, 255, 255, 0.2);
+}
+
+.pattern-setting-tooltip ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.pattern-setting-tooltip li {
+  margin-bottom: 0.25rem;
+  line-height: 1.3;
+}
+
+.pattern-setting-tooltip strong {
+  color: #00ffff;
+  font-weight: 600;
+}
+
+/* Pattern settings collapsible */
+.pattern-settings-toggle {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 255, 255, 0.1);
+  border: none;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 4px 4px 0 0;
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.pattern-settings-toggle:hover {
+  background: rgba(0, 255, 255, 0.15);
+  color: #00ffff;
+}
+
+.pattern-settings-toggle:focus {
+  outline: 2px solid rgba(0, 255, 255, 0.5);
+  outline-offset: -2px;
+}
+
+.pattern-settings-toggle-icon {
+  font-size: 0.7rem;
+  color: #00ffff;
+  transition: transform 0.2s, color 0.2s;
+  display: inline-block;
+  transform: rotate(0deg); /* Down = closed (default) */
+}
+
+.pattern-settings-toggle[aria-expanded="true"] .pattern-settings-toggle-icon {
+  transform: rotate(180deg); /* Up = open */
+  color: #ff00ff; /* Magenta when open */
+}
+
+.pattern-settings-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, padding 0.3s ease-out, opacity 0.3s ease-out;
+  max-height: none;
+}
+
+.pattern-settings-content.collapsed {
+  max-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.pattern-setting-disabled::after {
+  content: 'N/A';
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pattern-setting-disabled label {
+  opacity: 0.4 !important;
+}
+
+.pattern-setting-disabled input,
+.pattern-setting-disabled select {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+}
+
+.custom-pattern-dropdown-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.custom-pattern-dropdown-wrapper,
+.custom-template-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-pattern-dropdown-button .dropdown-arrow {
+  font-size: 0.8rem;
+  color: #00ffff;
+  transition: transform 0.2s, color 0.2s;
+  transform: rotate(0deg); /* Down = closed (default) */
+}
+
+.custom-pattern-dropdown-button.active .dropdown-arrow {
+  transform: rotate(180deg); /* Up = open */
+  color: #ff00ff; /* Magenta when open */
+}
+
+.custom-pattern-dropdown-button:hover {
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+.custom-pattern-dropdown-menu {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 255, 0.3) #1a1a2e;
+}
+
+.custom-pattern-dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-pattern-dropdown-menu::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.custom-pattern-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.custom-pattern-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+.custom-pattern-dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.custom-pattern-dropdown-option:hover {
+  background: rgba(0, 255, 255, 0.1);
+  color: #00ffff;
+}
+
+/* Custom Export Quality Dropdown - Match Background Pattern dropdown */
+.custom-export-quality-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-export-quality-dropdown-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.custom-export-quality-dropdown-button .dropdown-arrow {
+  font-size: 0.8rem;
+  color: #00ffff;
+  transition: transform 0.2s, color 0.2s;
+  transform: rotate(0deg); /* Down = closed (default) */
+}
+
+.custom-export-quality-dropdown-button.active .dropdown-arrow {
+  transform: rotate(180deg); /* Up = open */
+  color: #ff00ff; /* Magenta when open */
+}
+
+.custom-export-quality-dropdown-button:hover {
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+.custom-export-quality-dropdown-menu {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 255, 0.3) #1a1a2e;
+}
+
+.custom-export-quality-dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-export-quality-dropdown-menu::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.custom-export-quality-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.custom-export-quality-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+.custom-export-quality-dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.custom-export-quality-dropdown-option:hover {
+  background: rgba(0, 255, 255, 0.1);
+  color: #00ffff;
+}
+
+/* Custom Logo Position Dropdown - Match Background Pattern dropdown */
+.custom-logo-position-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-logo-position-dropdown-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: #0a0a0a;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  font-size: 0.85rem;
+}
+
+.custom-logo-position-dropdown-button .position-indicator {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-logo-position-dropdown-button .position-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1px;
+  width: 100%;
+  height: 100%;
+  font-size: 0.35rem;
+  line-height: 1;
+  color: rgba(0, 255, 255, 0.6);
+}
+
+.custom-logo-position-dropdown-button .position-grid span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.35rem;
+}
+
+.custom-logo-position-dropdown-button .dropdown-text {
+  flex: 1;
+}
+
+.custom-logo-position-dropdown-button .dropdown-arrow {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: #00ffff;
+  transition: transform 0.2s, color 0.2s;
+  transform: rotate(0deg); /* Down = closed (default) */
+}
+
+.custom-logo-position-dropdown-button.active .dropdown-arrow {
+  transform: rotate(180deg); /* Up = open */
+  color: #ff00ff; /* Magenta when open */
+}
+
+.custom-logo-position-dropdown-button:hover {
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+.custom-logo-position-dropdown-menu {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 255, 0.3) #1a1a2e;
+}
+
+.custom-logo-position-dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-logo-position-dropdown-menu::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.custom-logo-position-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.custom-logo-position-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+.custom-logo-position-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.position-indicator {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.position-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+  font-size: 0.5rem;
+  line-height: 1;
+  color: rgba(0, 255, 255, 0.6);
+}
+
+.position-grid span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+}
+
+.position-text {
+  flex: 1;
+}
+
+/* Global Controls */
+.global-btn {
+  padding: 0.4rem 0.8rem;
+  background: #0a0a0a;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.global-btn:hover {
+  border-color: rgba(0, 255, 255, 0.6);
+  background: rgba(0, 255, 255, 0.05);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+}
+
+.global-btn:active {
+  transform: scale(0.98);
+}
+
+/* Upload Button */
+.upload-btn {
+  padding: 0.5rem 0.75rem;
+  background: #0a0a0a;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  width: 100%;
+  height: 43.39px; /* Match Logo Colour dropdown button height */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-btn:hover {
+  border-color: rgba(0, 255, 255, 0.6);
+  background: rgba(0, 255, 255, 0.05);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  color: #ffffff; /* White text on hover */
+}
+
+/* Unicode character color transition and scaling on hover for preset and upload buttons */
+.preset-btn .unicode-char,
+.upload-btn .unicode-char {
+  display: inline-block;
+  transition: color 0.3s ease, transform 0.3s ease;
+  transform-origin: center;
+}
+
+.preset-btn:hover .unicode-char,
+.upload-btn:hover .unicode-char {
+  color: #ed12ff; /* Magenta on hover */
+  transform: scale(1.85); /* Scale Unicode character without layout shift */
+}
+
+.custom-logo-position-dropdown-item:hover {
+  background: rgba(0, 255, 255, 0.1);
+  color: #00ffff;
+}
+
+.custom-logo-position-dropdown-item.selected {
+  background: rgba(0, 255, 255, 0.2);
+  color: #00ffff;
+}
+
+.custom-logo-position-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+/* Custom Logo Color Dropdown - Match Background Pattern dropdown */
+.custom-logo-color-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-logo-color-dropdown-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 43.39px; /* Fixed height to match other controls */
+  box-sizing: border-box;
+}
+
+.custom-logo-color-dropdown-button .color-square {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: #00ffff;
+  flex-shrink: 0;
+}
+
+.custom-logo-color-dropdown-button .dropdown-arrow {
+  font-size: 0.8rem;
+  color: #00ffff;
+  transition: transform 0.2s, color 0.2s;
+  margin-left: 0.5rem;
+  transform: rotate(0deg); /* Down = closed (default) */
+}
+
+.custom-logo-color-dropdown-button.active .dropdown-arrow {
+  transform: rotate(180deg); /* Up = open */
+  color: #ff00ff; /* Magenta when open */
+}
+
+.custom-logo-color-dropdown-button:hover {
+  border-color: rgba(0, 255, 255, 0.5);
+}
+
+.custom-logo-color-dropdown-menu {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 255, 0.3) #1a1a2e;
+}
+
+.custom-logo-color-dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-logo-color-dropdown-menu::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.custom-logo-color-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.custom-logo-color-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+.custom-logo-color-dropdown-item {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.custom-logo-color-dropdown-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* Button Tooltips */
+.button-tooltip {
+  position: fixed;
+  background: #1a1a2e;
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  max-width: 200px;
+  z-index: 999999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 16px rgba(0, 255, 255, 0.2);
+  white-space: nowrap;
+}
+
