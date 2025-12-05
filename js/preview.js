@@ -564,46 +564,54 @@ export function updatePreview(state) {
     // Logo is in root directory, HTML is in generate/ folder
     const logoUrl = window.customLogoUrl || '../logo-white.svg';
 
-    // Get logo color hex value
-    let logoColorHex = '#ffffff'; // Default to white
-    if (logoColor && typeof logoColor === 'string') {
-      const colorObj = colorPalette[logoColor];
-      if (colorObj) {
-        logoColorHex = colorObj.hex || (typeof colorObj === 'string' ? colorObj : '#ffffff');
+    // Only create logo if we have a valid logo URL
+    if (!logoUrl) {
+      console.warn('No logo URL available - logo will not be displayed');
+    } else {
+      // Get logo color hex value
+      let logoColorHex = '#ffffff'; // Default to white
+      if (logoColor && typeof logoColor === 'string') {
+        const colorObj = colorPalette[logoColor];
+        if (colorObj) {
+          logoColorHex = colorObj.hex || (typeof colorObj === 'string' ? colorObj : '#ffffff');
+        }
       }
+
+      // Apply CSS Masking technique:
+      // 1. Set background-color to the target hex color (100% accurate)
+      // 2. Use mask-image with the SVG to create a stencil effect
+      // 3. The background color shows through only where the mask is opaque
+      logoContainer.className = 'logo-masked'; // Add class for export identification
+      logoContainer.dataset.logoUrl = logoUrl; // Store logo URL for export
+      logoContainer.dataset.logoColor = logoColorHex; // Store color for export
+      logoContainer.dataset.layer = 'logo'; // Add layer identifier for visibility toggle
+      logoContainer.style.backgroundColor = logoColorHex;
+      
+      // Format logo URL properly for CSS (handle data URLs and file paths)
+      const formattedLogoUrl = logoUrl.startsWith('data:') ? logoUrl : `url(${logoUrl})`;
+      logoContainer.style.webkitMaskImage = formattedLogoUrl;
+      logoContainer.style.maskImage = formattedLogoUrl;
+      logoContainer.style.webkitMaskSize = 'contain';
+      logoContainer.style.maskSize = 'contain';
+      logoContainer.style.webkitMaskRepeat = 'no-repeat';
+      logoContainer.style.maskRepeat = 'no-repeat';
+      logoContainer.style.webkitMaskPosition = 'center';
+      logoContainer.style.maskPosition = 'center';
+
+      // For uploaded logos that might be PNG/JPEG (not SVG), use luminance mode
+      // This interprets white pixels as opaque and black as transparent
+      if (logoUrl && (logoUrl.includes('.png') || logoUrl.includes('.jpg') || logoUrl.includes('.jpeg') || logoUrl.startsWith('data:image/png') || logoUrl.startsWith('data:image/jpeg'))) {
+        logoContainer.style.webkitMaskMode = 'luminance';
+        logoContainer.style.maskMode = 'luminance';
+      }
+      // For SVG files, alpha mode is default (works with transparent backgrounds)
+
+      // Apply positioning and sizing
+      applyLogoPosition(logoContainer, logoPosition, logoSize);
+
+      // Append to DOM
+      canvasWrapper.appendChild(logoContainer);
     }
-
-    // Apply CSS Masking technique:
-    // 1. Set background-color to the target hex color (100% accurate)
-    // 2. Use mask-image with the SVG to create a stencil effect
-    // 3. The background color shows through only where the mask is opaque
-    logoContainer.className = 'logo-masked'; // Add class for export identification
-    logoContainer.dataset.logoUrl = logoUrl; // Store logo URL for export
-    logoContainer.dataset.logoColor = logoColorHex; // Store color for export
-    logoContainer.dataset.layer = 'logo'; // Add layer identifier for visibility toggle
-    logoContainer.style.backgroundColor = logoColorHex;
-    logoContainer.style.webkitMaskImage = `url(${logoUrl})`;
-    logoContainer.style.maskImage = `url(${logoUrl})`;
-    logoContainer.style.webkitMaskSize = 'contain';
-    logoContainer.style.maskSize = 'contain';
-    logoContainer.style.webkitMaskRepeat = 'no-repeat';
-    logoContainer.style.maskRepeat = 'no-repeat';
-    logoContainer.style.webkitMaskPosition = 'center';
-    logoContainer.style.maskPosition = 'center';
-
-    // For uploaded logos that might be PNG/JPEG (not SVG), use luminance mode
-    // This interprets white pixels as opaque and black as transparent
-    if (logoUrl && (logoUrl.includes('.png') || logoUrl.includes('.jpg') || logoUrl.includes('.jpeg'))) {
-      logoContainer.style.webkitMaskMode = 'luminance';
-      logoContainer.style.maskMode = 'luminance';
-    }
-    // For SVG files, alpha mode is default (works with transparent backgrounds)
-
-    // Apply positioning and sizing
-    applyLogoPosition(logoContainer, logoPosition, logoSize);
-
-    // Append to DOM
-    canvasWrapper.appendChild(logoContainer);
   }
 
   // Calculate positions with alignment offsets
