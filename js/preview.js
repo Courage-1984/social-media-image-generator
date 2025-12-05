@@ -586,11 +586,8 @@ export function updatePreview(state) {
       logoContainer.dataset.logoColor = logoColorHex; // Store color for export
       logoContainer.dataset.layer = 'logo'; // Add layer identifier for visibility toggle
       logoContainer.style.backgroundColor = logoColorHex;
-      
-      // Format logo URL properly for CSS (handle data URLs and file paths)
-      const formattedLogoUrl = logoUrl.startsWith('data:') ? logoUrl : `url(${logoUrl})`;
-      logoContainer.style.webkitMaskImage = formattedLogoUrl;
-      logoContainer.style.maskImage = formattedLogoUrl;
+      logoContainer.style.webkitMaskImage = `url(${logoUrl})`;
+      logoContainer.style.maskImage = `url(${logoUrl})`;
       logoContainer.style.webkitMaskSize = 'contain';
       logoContainer.style.maskSize = 'contain';
       logoContainer.style.webkitMaskRepeat = 'no-repeat';
