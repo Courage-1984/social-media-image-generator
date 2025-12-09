@@ -166,7 +166,11 @@ export async function exportImage(canvasWrapper, imageType, exportBtn, scale = 2
     monitor.startExportMonitoring();
   }
 
-  exportBtn.textContent = 'Exporting...';
+  // Store original button content to restore later
+  const originalButtonHTML = exportBtn.innerHTML;
+  const originalButtonDisabled = exportBtn.disabled;
+  
+  exportBtn.innerHTML = 'Exporting...';
   exportBtn.disabled = true;
 
   // Get parent container to prevent layout shifts
@@ -951,8 +955,9 @@ export async function exportImage(canvasWrapper, imageType, exportBtn, scale = 2
     // Clean up object URL after a short delay
     setTimeout(() => URL.revokeObjectURL(link.href), 100);
 
-    exportBtn.textContent = 'Export as PNG';
-    exportBtn.disabled = false;
+    // Restore original button content
+    exportBtn.innerHTML = originalButtonHTML;
+    exportBtn.disabled = originalButtonDisabled;
 
     // PHASE 1 Testing: Stop CLS monitoring and report results
     if (clsMonitor && clsMonitor.stopExportMonitoring) {
@@ -1008,8 +1013,10 @@ export async function exportImage(canvasWrapper, imageType, exportBtn, scale = 2
 
     const errorMessage = error.message || 'Unknown error occurred';
     showToast(`Export failed: ${errorMessage}`, 'error', 10000);
-    exportBtn.textContent = 'Export as PNG';
-    exportBtn.disabled = false;
+    
+    // Restore original button content
+    exportBtn.innerHTML = originalButtonHTML;
+    exportBtn.disabled = originalButtonDisabled;
   }
 }
 

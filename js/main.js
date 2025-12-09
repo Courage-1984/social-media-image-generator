@@ -3,7 +3,7 @@
  * Initializes the generator and handles events
  */
 
-import { IMAGE_TYPES, presets, colorPalette, logoPositions } from './config.js';
+import { IMAGE_TYPES, presets, colorPalette } from './config.js';
 
 /**
  * Get a random color key from the color palette
@@ -90,7 +90,8 @@ let currentState = {
   title: 'Logi-Ink',
   subtitle: 'Digital Innovation & Creative Solutions',
   slogan: 'Transforming Ideas Into Reality',
-  logoPosition: 'top-left',
+  logoX: 40,
+  logoY: 40,
   logoSize: 120,
   logoColor: 'cyan',
   titleSize: 72,
@@ -112,10 +113,12 @@ let currentState = {
   titleDividerColor: 'cyan',
   subtitleDividerColor: 'cyan',
   sloganDividerColor: 'cyan',
-  titleOffsetX: 0,
-  titleOffsetY: 0,
-  subtitleOffsetX: 0,
-  subtitleOffsetY: 0,
+  titleX: 600,
+  titleY: 315,
+  subtitleX: 600,
+  subtitleY: 395,
+  sloganX: 600,
+  sloganY: 455,
   backgroundPattern: '',
   patternColor: '',
   patternOpacity: 20,
@@ -134,9 +137,10 @@ let currentState = {
 };
 
 // DOM Elements
-let titleInput, subtitleInput, sloganInput, logoPositionSelect;
+let titleInput, subtitleInput, sloganInput;
 let titleSizeSlider, titleSizeValue, subtitleSizeSlider, subtitleSizeValue;
 let sloganSizeSlider, sloganSizeValue, logoSizeSlider, logoSizeValue;
+let logoXSlider, logoXValue, logoYSlider, logoYValue;
 let titleGlow, subtitleGlow, sloganGlow;
 let dividerAboveTitle, dividerBelowTitle, dividerAboveSubtitle, dividerBelowSubtitle;
 let dividerAboveSlogan, dividerBelowSlogan;
@@ -181,7 +185,10 @@ function initDOMElements() {
   titleInput = document.getElementById('title');
   subtitleInput = document.getElementById('subtitle');
   sloganInput = document.getElementById('slogan');
-  logoPositionSelect = document.getElementById('logoPosition');
+  logoXSlider = document.getElementById('logoX');
+  logoXValue = document.getElementById('logoXValue');
+  logoYSlider = document.getElementById('logoY');
+  logoYValue = document.getElementById('logoYValue');
   titleSizeSlider = document.getElementById('titleSize');
   titleSizeValue = document.getElementById('titleSizeValue');
   subtitleSizeSlider = document.getElementById('subtitleSize');
@@ -369,7 +376,8 @@ function updateState(skipHistory = false) {
     title: titleInput.value || '',
     subtitle: subtitleInput.value || '',
     slogan: sloganInput ? sloganInput.value : '',
-    logoPosition: logoPositionSelect ? logoPositionSelect.value : 'top-left',
+    logoX: logoXValue ? parseInt(logoXValue.value) || 40 : 40,
+    logoY: logoYValue ? parseInt(logoYValue.value) || 40 : 40,
     logoSize: logoSizeValue ? parseInt(logoSizeValue.value) || 120 : 120,
     logoColor: currentState.logoColor || getLogoColorKey() || 'cyan', // Preserve existing logoColor if set
     titleSize: titleSizeValue ? parseInt(titleSizeValue.value) || 72 : 72,
@@ -393,12 +401,12 @@ function updateState(skipHistory = false) {
     titleDividerColor: getSelectedColorKey('titleDividerColorPicker') || 'cyan',
     subtitleDividerColor: getSelectedColorKey('subtitleDividerColorPicker') || 'cyan',
     sloganDividerColor: getSelectedColorKey('sloganDividerColorPicker') || 'cyan',
-    titleOffsetX: titleXValue ? parseInt(titleXValue.value) || 0 : 0,
-    titleOffsetY: titleYValue ? parseInt(titleYValue.value) || 0 : 0,
-    subtitleOffsetX: subtitleXValue ? parseInt(subtitleXValue.value) || 0 : 0,
-    subtitleOffsetY: subtitleYValue ? parseInt(subtitleYValue.value) || 0 : 0,
-    sloganOffsetX: sloganXValue ? parseInt(sloganXValue.value) || 0 : 0,
-    sloganOffsetY: sloganYValue ? parseInt(sloganYValue.value) || 0 : 0,
+    titleX: titleXValue ? parseInt(titleXValue.value) || 600 : 600,
+    titleY: titleYValue ? parseInt(titleYValue.value) || 315 : 315,
+    subtitleX: subtitleXValue ? parseInt(subtitleXValue.value) || 600 : 600,
+    subtitleY: subtitleYValue ? parseInt(subtitleYValue.value) || 395 : 395,
+    sloganX: sloganXValue ? parseInt(sloganXValue.value) || 600 : 600,
+    sloganY: sloganYValue ? parseInt(sloganYValue.value) || 455 : 455,
     backgroundPattern: backgroundPatternSelect ? backgroundPatternSelect.value || '' : '',
     patternColor: patternColorPicker ? getSelectedColorKey('patternColorPicker') : '',
     patternOpacity: patternOpacityValue ? parseInt(patternOpacityValue.value) || 20 : 20,
@@ -439,7 +447,10 @@ function applyStateToUI(state) {
   titleInput.value = state.title || '';
   subtitleInput.value = state.subtitle || '';
   sloganInput.value = state.slogan || '';
-  logoPositionSelect.value = state.logoPosition || 'top-left';
+  if (logoXValue) logoXValue.value = state.logoX !== undefined ? state.logoX : 40;
+  if (logoXSlider) logoXSlider.value = state.logoX !== undefined ? state.logoX : 40;
+  if (logoYValue) logoYValue.value = state.logoY !== undefined ? state.logoY : 40;
+  if (logoYSlider) logoYSlider.value = state.logoY !== undefined ? state.logoY : 40;
   logoSizeValue.value = state.logoSize || 120;
   logoSizeSlider.value = state.logoSize || 120;
   titleSizeValue.value = state.titleSize || 72;
@@ -471,21 +482,104 @@ function applyStateToUI(state) {
     sloganDividerWidthValue.value = state.sloganDividerWidth || 2;
     sloganDividerWidthSlider.value = state.sloganDividerWidth || 2;
   }
-  titleXValue.value = state.titleOffsetX || 0;
-  titleXSlider.value = state.titleOffsetX || 0;
-  titleYValue.value = state.titleOffsetY || 0;
-  titleYSlider.value = state.titleOffsetY || 0;
-  subtitleXValue.value = state.subtitleOffsetX || 0;
-  subtitleXSlider.value = state.subtitleOffsetX || 0;
-  subtitleYValue.value = state.subtitleOffsetY || 0;
-  subtitleYSlider.value = state.subtitleOffsetY || 0;
-  if (sloganXValue) {
-    sloganXValue.value = state.sloganOffsetX || 0;
-    sloganXSlider.value = state.sloganOffsetX || 0;
+  // Handle migration from offset to absolute positions
+  if (state.titleX !== undefined) {
+    titleXValue.value = state.titleX;
+    titleXSlider.value = state.titleX;
+  } else if (state.titleOffsetX !== undefined) {
+    // Migrate old offset to absolute position (center + offset)
+    const centerX = IMAGE_TYPES.OG.width / 2;
+    const centerY = IMAGE_TYPES.OG.height / 2;
+    titleXValue.value = centerX + state.titleOffsetX;
+    titleXSlider.value = centerX + state.titleOffsetX;
+  } else {
+    titleXValue.value = 600;
+    titleXSlider.value = 600;
   }
+  
+  if (state.titleY !== undefined) {
+    titleYValue.value = state.titleY;
+    titleYSlider.value = state.titleY;
+  } else if (state.titleOffsetY !== undefined) {
+    const centerY = IMAGE_TYPES.OG.height / 2;
+    titleYValue.value = centerY - 40 + state.titleOffsetY;
+    titleYSlider.value = centerY - 40 + state.titleOffsetY;
+  } else {
+    titleYValue.value = 315;
+    titleYSlider.value = 315;
+  }
+  
+  if (state.subtitleX !== undefined) {
+    subtitleXValue.value = state.subtitleX;
+    subtitleXSlider.value = state.subtitleX;
+  } else if (state.subtitleOffsetX !== undefined) {
+    const centerX = IMAGE_TYPES.OG.width / 2;
+    subtitleXValue.value = centerX + state.subtitleOffsetX;
+    subtitleXSlider.value = centerX + state.subtitleOffsetX;
+  } else {
+    subtitleXValue.value = 600;
+    subtitleXSlider.value = 600;
+  }
+  
+  if (state.subtitleY !== undefined) {
+    subtitleYValue.value = state.subtitleY;
+    subtitleYSlider.value = state.subtitleY;
+  } else if (state.subtitleOffsetY !== undefined) {
+    const centerY = IMAGE_TYPES.OG.height / 2;
+    subtitleYValue.value = centerY + 80 + state.subtitleOffsetY;
+    subtitleYSlider.value = centerY + 80 + state.subtitleOffsetY;
+  } else {
+    subtitleYValue.value = 395;
+    subtitleYSlider.value = 395;
+  }
+  
+  if (sloganXValue) {
+    if (state.sloganX !== undefined) {
+      sloganXValue.value = state.sloganX;
+      sloganXSlider.value = state.sloganX;
+    } else if (state.sloganOffsetX !== undefined) {
+      const centerX = IMAGE_TYPES.OG.width / 2;
+      sloganXValue.value = centerX + state.sloganOffsetX;
+      sloganXSlider.value = centerX + state.sloganOffsetX;
+    } else {
+      sloganXValue.value = 600;
+      sloganXSlider.value = 600;
+    }
+  }
+  
   if (sloganYValue) {
-    sloganYValue.value = state.sloganOffsetY || 0;
-    sloganYSlider.value = state.sloganOffsetY || 0;
+    if (state.sloganY !== undefined) {
+      sloganYValue.value = state.sloganY;
+      sloganYSlider.value = state.sloganY;
+    } else if (state.sloganOffsetY !== undefined) {
+      const centerY = IMAGE_TYPES.OG.height / 2;
+      sloganYValue.value = centerY + 140 + state.sloganOffsetY;
+      sloganYSlider.value = centerY + 140 + state.sloganOffsetY;
+    } else {
+      sloganYValue.value = 455;
+      sloganYSlider.value = 455;
+    }
+  }
+  
+  // Handle logo position migration
+  if (state.logoX === undefined && state.logoY === undefined && state.logoPosition) {
+    // Migrate old logoPosition to X/Y coordinates
+    const logoPos = state.logoPosition;
+    let x = 40, y = 40;
+    if (logoPos === 'top-center') { x = IMAGE_TYPES.OG.width / 2; y = 40; }
+    else if (logoPos === 'top-right') { x = IMAGE_TYPES.OG.width - 40; y = 40; }
+    else if (logoPos === 'center-left') { x = 40; y = IMAGE_TYPES.OG.height / 2; }
+    else if (logoPos === 'center') { x = IMAGE_TYPES.OG.width / 2; y = IMAGE_TYPES.OG.height / 2; }
+    else if (logoPos === 'center-right') { x = IMAGE_TYPES.OG.width - 40; y = IMAGE_TYPES.OG.height / 2; }
+    else if (logoPos === 'bottom-left') { x = 40; y = IMAGE_TYPES.OG.height - 40; }
+    else if (logoPos === 'bottom-center') { x = IMAGE_TYPES.OG.width / 2; y = IMAGE_TYPES.OG.height - 40; }
+    else if (logoPos === 'bottom-right') { x = IMAGE_TYPES.OG.width - 40; y = IMAGE_TYPES.OG.height - 40; }
+    else if (logoPos === 'hidden') { x = -1000; y = -1000; } // Hide off-screen
+    
+    if (logoXValue) logoXValue.value = x;
+    if (logoXSlider) logoXSlider.value = x;
+    if (logoYValue) logoYValue.value = y;
+    if (logoYSlider) logoYSlider.value = y;
   }
   backgroundPatternSelect.value = state.backgroundPattern || '';
   if (patternCustomization) {
@@ -638,6 +732,12 @@ function setupEventListeners() {
   if (logoSizeSlider && logoSizeValue) {
     syncSliderInputDebounced(logoSizeSlider, logoSizeValue, () => debouncedUpdateState());
   }
+  if (logoXSlider && logoXValue) {
+    syncSliderInputDebounced(logoXSlider, logoXValue, () => debouncedUpdateState());
+  }
+  if (logoYSlider && logoYValue) {
+    syncSliderInputDebounced(logoYSlider, logoYValue, () => debouncedUpdateState());
+  }
   if (dividerWidthSlider && dividerWidthValue) {
     syncSliderInputDebounced(dividerWidthSlider, dividerWidthValue, () => debouncedUpdateState());
   }
@@ -762,10 +862,10 @@ function setupEventListeners() {
   // Reset position buttons
   if (resetTitlePosBtn && titleXSlider && titleXValue && titleYSlider && titleYValue) {
     resetTitlePosBtn.addEventListener('click', () => {
-      titleXSlider.value = 0;
-      titleXValue.value = 0;
-      titleYSlider.value = 0;
-      titleYValue.value = 0;
+      titleXSlider.value = 600;
+      titleXValue.value = 600;
+      titleYSlider.value = 315;
+      titleYValue.value = 315;
       updateState();
     });
   }
@@ -778,10 +878,19 @@ function setupEventListeners() {
     subtitleYValue
   ) {
     resetSubtitlePosBtn.addEventListener('click', () => {
-      subtitleXSlider.value = 0;
-      subtitleXValue.value = 0;
-      subtitleYSlider.value = 0;
-      subtitleYValue.value = 0;
+      subtitleXSlider.value = 600;
+      subtitleXValue.value = 600;
+      subtitleYSlider.value = 395;
+      subtitleYValue.value = 395;
+      updateState();
+    });
+  }
+  if (resetSloganPosBtn && sloganXSlider && sloganXValue && sloganYSlider && sloganYValue) {
+    resetSloganPosBtn.addEventListener('click', () => {
+      sloganXSlider.value = 600;
+      sloganXValue.value = 600;
+      sloganYSlider.value = 455;
+      sloganYValue.value = 455;
       updateState();
     });
   }
@@ -793,10 +902,7 @@ function setupEventListeners() {
     }
   });
 
-  // Logo position select - use 'change' event for selects
-  if (logoPositionSelect) {
-    logoPositionSelect.addEventListener('change', () => updateState());
-  }
+  // Logo X/Y position sliders are handled above with syncSliderInputDebounced
 
   // Checkboxes
   [
@@ -898,10 +1004,10 @@ function setupEventListeners() {
         return;
       }
 
-      // Store button state
-      const originalText = copyClipboardBtn.textContent;
+      // Store button state (preserve HTML including unicode character)
+      const originalButtonHTML = copyClipboardBtn.innerHTML;
       const originalDisabled = copyClipboardBtn.disabled;
-      copyClipboardBtn.textContent = 'Copying...';
+      copyClipboardBtn.innerHTML = 'Copying...';
       copyClipboardBtn.disabled = true;
 
       // Store original styles to restore later
@@ -1159,7 +1265,7 @@ function setupEventListeners() {
             });
 
             // Restore button state
-            copyClipboardBtn.textContent = originalText;
+            copyClipboardBtn.innerHTML = originalButtonHTML;
             copyClipboardBtn.disabled = originalDisabled;
           }
         }, 'image/png');
@@ -1182,7 +1288,7 @@ function setupEventListeners() {
         canvasWrapper.style.overflow = originalStyles.overflow || '';
 
         // Restore button state
-        copyClipboardBtn.textContent = originalText;
+        copyClipboardBtn.innerHTML = originalButtonHTML;
         copyClipboardBtn.disabled = originalDisabled;
       }
     });
@@ -1846,12 +1952,7 @@ function setupEventListeners() {
   initCustomPatternDropdown();
   initCustomExportQualityDropdown();
 
-  // Initialize custom logo position dropdown
-  if (logoPositionSelect) {
-    initCustomLogoPositionDropdown();
-    // Ensure change event listener is attached after dropdown is initialized
-    logoPositionSelect.addEventListener('change', () => updateState());
-  }
+  // Logo X/Y position sliders are handled above with syncSliderInputDebounced
 
   // Initialize custom logo color dropdown
   initCustomLogoColorDropdown((colorKey, colorValue) => {
@@ -2029,8 +2130,11 @@ function setupEventListeners() {
       if (sloganGlow) sloganGlow.checked = Math.random() > 0.5;
 
       // Random logo position
-      if (logoPositionSelect) {
-        logoPositionSelect.value = logoPositions[Math.floor(Math.random() * logoPositions.length)];
+      if (logoXSlider && logoXValue && logoYSlider && logoYValue) {
+        logoXSlider.value = Math.random() * 1200;
+        logoXValue.value = logoXSlider.value;
+        logoYSlider.value = Math.random() * 675;
+        logoYValue.value = logoYSlider.value;
       }
 
       updateState();
@@ -2059,10 +2163,10 @@ function setupEventListeners() {
         return;
       }
 
-      // Store button state
-      const originalText = copyBtn.textContent;
+      // Store button state (preserve HTML including unicode character)
+      const originalButtonHTML = copyBtn.innerHTML;
       const originalDisabled = copyBtn.disabled;
-      copyBtn.textContent = 'Copying...';
+      copyBtn.innerHTML = 'Copying...';
       copyBtn.disabled = true;
 
       // Get parent container to prevent layout shifts
@@ -2551,7 +2655,7 @@ function setupEventListeners() {
           });
 
           // Restore button state
-          copyBtn.textContent = originalText;
+          copyBtn.innerHTML = originalButtonHTML;
           copyBtn.disabled = originalDisabled;
         }
       } catch (err) {
@@ -2583,7 +2687,7 @@ function setupEventListeners() {
         }
 
         // Restore button state
-        copyBtn.textContent = originalText;
+        copyBtn.innerHTML = originalButtonHTML;
         copyBtn.disabled = originalDisabled;
       }
     });
@@ -3252,38 +3356,41 @@ function randomizeAllSettings() {
   if (sloganGlow) sloganGlow.checked = Math.random() > 0.5;
 
   // Randomize logo position
-  if (logoPositionSelect) {
-    logoPositionSelect.value = logoPositions[Math.floor(Math.random() * logoPositions.length)];
+  if (logoXSlider && logoXValue && logoYSlider && logoYValue) {
+    logoXSlider.value = Math.random() * 1200;
+    logoXValue.value = logoXSlider.value;
+    logoYSlider.value = Math.random() * 675;
+    logoYValue.value = logoYSlider.value;
   }
 
-  // Randomize text alignment
+  // Randomize text alignment (absolute positions)
   if (titleXSlider && titleXValue) {
-    const x = -50 + Math.random() * 100;
+    const x = Math.random() * 1200;
     titleXSlider.value = x;
     titleXValue.value = x;
   }
   if (titleYSlider && titleYValue) {
-    const y = -50 + Math.random() * 100;
+    const y = Math.random() * 675;
     titleYSlider.value = y;
     titleYValue.value = y;
   }
   if (subtitleXSlider && subtitleXValue) {
-    const x = -50 + Math.random() * 100;
+    const x = Math.random() * 1200;
     subtitleXSlider.value = x;
     subtitleXValue.value = x;
   }
   if (subtitleYSlider && subtitleYValue) {
-    const y = -50 + Math.random() * 100;
+    const y = Math.random() * 675;
     subtitleYSlider.value = y;
     subtitleYValue.value = y;
   }
   if (sloganXSlider && sloganXValue) {
-    const x = -50 + Math.random() * 100;
+    const x = Math.random() * 1200;
     sloganXSlider.value = x;
     sloganXValue.value = x;
   }
   if (sloganYSlider && sloganYValue) {
-    const y = -50 + Math.random() * 100;
+    const y = Math.random() * 675;
     sloganYSlider.value = y;
     sloganYValue.value = y;
   }
@@ -3372,34 +3479,37 @@ function resetToDefaults() {
   if (sloganGlow) sloganGlow.checked = false;
 
   // Reset logo position
-  if (logoPositionSelect) {
-    logoPositionSelect.value = 'top-left';
+  if (logoXSlider && logoXValue && logoYSlider && logoYValue) {
+    logoXSlider.value = 40;
+    logoXValue.value = 40;
+    logoYSlider.value = 40;
+    logoYValue.value = 40;
   }
 
-  // Reset text alignment
+  // Reset text alignment (to center positions)
   if (titleXSlider && titleXValue) {
-    titleXSlider.value = 0;
-    titleXValue.value = 0;
+    titleXSlider.value = 600;
+    titleXValue.value = 600;
   }
   if (titleYSlider && titleYValue) {
-    titleYSlider.value = 0;
-    titleYValue.value = 0;
+    titleYSlider.value = 315;
+    titleYValue.value = 315;
   }
   if (subtitleXSlider && subtitleXValue) {
-    subtitleXSlider.value = 0;
-    subtitleXValue.value = 0;
+    subtitleXSlider.value = 600;
+    subtitleXValue.value = 600;
   }
   if (subtitleYSlider && subtitleYValue) {
-    subtitleYSlider.value = 0;
-    subtitleYValue.value = 0;
+    subtitleYSlider.value = 395;
+    subtitleYValue.value = 395;
   }
   if (sloganXSlider && sloganXValue) {
-    sloganXSlider.value = 0;
-    sloganXValue.value = 0;
+    sloganXSlider.value = 600;
+    sloganXValue.value = 600;
   }
   if (sloganYSlider && sloganYValue) {
-    sloganYSlider.value = 0;
-    sloganYValue.value = 0;
+    sloganYSlider.value = 455;
+    sloganYValue.value = 455;
   }
 
   // Reset dividers

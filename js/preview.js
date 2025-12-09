@@ -120,85 +120,6 @@ function getHueFromColor(hex) {
 }
 
 /**
- * Apply logo positioning
- * @param {HTMLElement} logo - Logo element
- * @param {string} position - Position key
- * @param {number} size - Logo size
- */
-function applyLogoPosition(logo, position, size) {
-  logo.style.width = `${size}px`;
-  logo.style.height = `${size}px`;
-  logo.style.opacity = '1'; // Reset opacity
-
-  switch (position) {
-    case 'top-left':
-      logo.style.top = '40px';
-      logo.style.left = '40px';
-      logo.style.right = 'auto';
-      logo.style.bottom = 'auto';
-      logo.style.transform = 'none';
-      break;
-    case 'top-center':
-      logo.style.top = '40px';
-      logo.style.left = '50%';
-      logo.style.right = 'auto';
-      logo.style.bottom = 'auto';
-      logo.style.transform = 'translateX(-50%)';
-      break;
-    case 'top-right':
-      logo.style.top = '40px';
-      logo.style.right = '40px';
-      logo.style.left = 'auto';
-      logo.style.bottom = 'auto';
-      logo.style.transform = 'none';
-      break;
-    case 'center-left':
-      logo.style.top = '50%';
-      logo.style.left = '40px';
-      logo.style.right = 'auto';
-      logo.style.bottom = 'auto';
-      logo.style.transform = 'translateY(-50%)';
-      break;
-    case 'center':
-      logo.style.top = '50%';
-      logo.style.left = '50%';
-      logo.style.right = 'auto';
-      logo.style.bottom = 'auto';
-      logo.style.transform = 'translate(-50%, -50%)';
-      logo.style.opacity = '0.3';
-      break;
-    case 'center-right':
-      logo.style.top = '50%';
-      logo.style.right = '40px';
-      logo.style.left = 'auto';
-      logo.style.bottom = 'auto';
-      logo.style.transform = 'translateY(-50%)';
-      break;
-    case 'bottom-left':
-      logo.style.bottom = '40px';
-      logo.style.left = '40px';
-      logo.style.right = 'auto';
-      logo.style.top = 'auto';
-      logo.style.transform = 'none';
-      break;
-    case 'bottom-center':
-      logo.style.bottom = '40px';
-      logo.style.left = '50%';
-      logo.style.right = 'auto';
-      logo.style.top = 'auto';
-      logo.style.transform = 'translateX(-50%)';
-      break;
-    case 'bottom-right':
-      logo.style.bottom = '40px';
-      logo.style.right = '40px';
-      logo.style.left = 'auto';
-      logo.style.top = 'auto';
-      logo.style.transform = 'none';
-      break;
-  }
-}
-
-/**
  * Create background effects
  * @param {HTMLElement} container - Canvas container
  * @param {Object} preset - Preset configuration
@@ -327,7 +248,8 @@ export function updatePreview(state) {
     title,
     subtitle,
     slogan,
-    logoPosition,
+    logoX,
+    logoY,
     logoSize,
     logoColor,
     titleSize,
@@ -554,79 +476,77 @@ export function updatePreview(state) {
   createBackgroundEffects(canvasWrapper, preset, titleColor, subtitleColor);
 
   // Logo
-  if (logoPosition !== 'hidden') {
-    // Use CSS Masking for accurate colorization (100% color fidelity)
-    // This is superior to CSS filters: more accurate, better performance, direct hex support
-    const logoContainer = document.createElement('div');
-    logoContainer.style.cssText = 'position: absolute; z-index: 10;';
+  // Use CSS Masking for accurate colorization (100% color fidelity)
+  // This is superior to CSS filters: more accurate, better performance, direct hex support
+  const logoContainer = document.createElement('div');
+  logoContainer.style.cssText = 'position: absolute; z-index: 10;';
 
-    // Use custom uploaded logo if available, otherwise use default white logo
-    // Logo is in root directory, HTML is in generate/ folder
-    const logoUrl = window.customLogoUrl || '../logo-white.svg';
+  // Use custom uploaded logo if available, otherwise use default white logo
+  // Logo is in root directory, same as index.html
+  const logoUrl = window.customLogoUrl || './logo-white.svg';
 
-    // Only create logo if we have a valid logo URL
-    if (!logoUrl) {
-      console.warn('No logo URL available - logo will not be displayed');
-    } else {
-      // Get logo color hex value
-      let logoColorHex = '#ffffff'; // Default to white
-      if (logoColor && typeof logoColor === 'string') {
-        const colorObj = colorPalette[logoColor];
-        if (colorObj) {
-          logoColorHex = colorObj.hex || (typeof colorObj === 'string' ? colorObj : '#ffffff');
-        }
+  // Only create logo if we have a valid logo URL
+  if (!logoUrl) {
+    console.warn('No logo URL available - logo will not be displayed');
+  } else {
+    // Get logo color hex value
+    let logoColorHex = '#ffffff'; // Default to white
+    if (logoColor && typeof logoColor === 'string') {
+      const colorObj = colorPalette[logoColor];
+      if (colorObj) {
+        logoColorHex = colorObj.hex || (typeof colorObj === 'string' ? colorObj : '#ffffff');
       }
-
-      // Apply CSS Masking technique:
-      // 1. Set background-color to the target hex color (100% accurate)
-      // 2. Use mask-image with the SVG to create a stencil effect
-      // 3. The background color shows through only where the mask is opaque
-      logoContainer.className = 'logo-masked'; // Add class for export identification
-      logoContainer.dataset.logoUrl = logoUrl; // Store logo URL for export
-      logoContainer.dataset.logoColor = logoColorHex; // Store color for export
-      logoContainer.dataset.layer = 'logo'; // Add layer identifier for visibility toggle
-      logoContainer.style.backgroundColor = logoColorHex;
-      logoContainer.style.webkitMaskImage = `url(${logoUrl})`;
-      logoContainer.style.maskImage = `url(${logoUrl})`;
-      logoContainer.style.webkitMaskSize = 'contain';
-      logoContainer.style.maskSize = 'contain';
-      logoContainer.style.webkitMaskRepeat = 'no-repeat';
-      logoContainer.style.maskRepeat = 'no-repeat';
-      logoContainer.style.webkitMaskPosition = 'center';
-      logoContainer.style.maskPosition = 'center';
-
-      // For uploaded logos that might be PNG/JPEG (not SVG), use luminance mode
-      // This interprets white pixels as opaque and black as transparent
-      if (logoUrl && (logoUrl.includes('.png') || logoUrl.includes('.jpg') || logoUrl.includes('.jpeg') || logoUrl.startsWith('data:image/png') || logoUrl.startsWith('data:image/jpeg'))) {
-        logoContainer.style.webkitMaskMode = 'luminance';
-        logoContainer.style.maskMode = 'luminance';
-      }
-      // For SVG files, alpha mode is default (works with transparent backgrounds)
-
-      // Apply positioning and sizing
-      applyLogoPosition(logoContainer, logoPosition, logoSize);
-
-      // Append to DOM
-      canvasWrapper.appendChild(logoContainer);
     }
+
+    // Apply CSS Masking technique:
+    // 1. Set background-color to the target hex color (100% accurate)
+    // 2. Use mask-image with the SVG to create a stencil effect
+    // 3. The background color shows through only where the mask is opaque
+    logoContainer.className = 'logo-masked'; // Add class for export identification
+    logoContainer.dataset.logoUrl = logoUrl; // Store logo URL for export
+    logoContainer.dataset.logoColor = logoColorHex; // Store color for export
+    logoContainer.dataset.layer = 'logo'; // Add layer identifier for visibility toggle
+    logoContainer.style.backgroundColor = logoColorHex;
+    logoContainer.style.webkitMaskImage = `url(${logoUrl})`;
+    logoContainer.style.maskImage = `url(${logoUrl})`;
+    logoContainer.style.webkitMaskSize = 'contain';
+    logoContainer.style.maskSize = 'contain';
+    logoContainer.style.webkitMaskRepeat = 'no-repeat';
+    logoContainer.style.maskRepeat = 'no-repeat';
+    logoContainer.style.webkitMaskPosition = 'center';
+    logoContainer.style.maskPosition = 'center';
+
+    // For uploaded logos that might be PNG/JPEG (not SVG), use luminance mode
+    // This interprets white pixels as opaque and black as transparent
+    if (logoUrl && (logoUrl.includes('.png') || logoUrl.includes('.jpg') || logoUrl.includes('.jpeg') || logoUrl.startsWith('data:image/png') || logoUrl.startsWith('data:image/jpeg'))) {
+      logoContainer.style.webkitMaskMode = 'luminance';
+      logoContainer.style.maskMode = 'luminance';
+    }
+    // For SVG files, alpha mode is default (works with transparent backgrounds)
+
+    // Apply positioning and sizing using absolute X/Y coordinates
+    const logoXValue = logoX !== undefined && logoX !== null ? logoX : 40;
+    const logoYValue = logoY !== undefined && logoY !== null ? logoY : 40;
+    logoContainer.style.width = `${logoSize}px`;
+    logoContainer.style.height = `${logoSize}px`;
+    logoContainer.style.left = `${logoXValue}px`;
+    logoContainer.style.top = `${logoYValue}px`;
+    logoContainer.style.right = 'auto';
+    logoContainer.style.bottom = 'auto';
+    logoContainer.style.transform = 'none';
+    logoContainer.style.opacity = '1';
+
+    // Append to DOM
+    canvasWrapper.appendChild(logoContainer);
   }
 
-  // Calculate positions with alignment offsets
-  const centerY = currentImageType.height / 2;
-  const centerX = currentImageType.width / 2;
-  const titleOffsetX = state.titleOffsetX || 0;
-  const titleOffsetY = state.titleOffsetY || 0;
-  const subtitleOffsetX = state.subtitleOffsetX || 0;
-  const subtitleOffsetY = state.subtitleOffsetY || 0;
-  const sloganOffsetXValue = state.sloganOffsetX || 0;
-  const sloganOffsetYValue = state.sloganOffsetY || 0;
-
-  let titleY = centerY - (currentImageType === IMAGE_TYPES.OG ? 40 : 45) + titleOffsetY;
-  let titleX = centerX + titleOffsetX;
-  let subtitleY = centerY + (currentImageType === IMAGE_TYPES.OG ? 80 : 90) + subtitleOffsetY;
-  let subtitleX = centerX + subtitleOffsetX;
-  let sloganX = centerX + sloganOffsetXValue;
-  let sloganY = centerY + (currentImageType === IMAGE_TYPES.OG ? 140 : 150) + sloganOffsetYValue;
+  // Use absolute positions (0-1200 for X, 0-675 for Y)
+  const titleX = state.titleX !== undefined && state.titleX !== null ? state.titleX : (currentImageType.width / 2);
+  const titleY = state.titleY !== undefined && state.titleY !== null ? state.titleY : (currentImageType.height / 2 - (currentImageType === IMAGE_TYPES.OG ? 40 : 45));
+  const subtitleX = state.subtitleX !== undefined && state.subtitleX !== null ? state.subtitleX : (currentImageType.width / 2);
+  const subtitleY = state.subtitleY !== undefined && state.subtitleY !== null ? state.subtitleY : (currentImageType.height / 2 + (currentImageType === IMAGE_TYPES.OG ? 80 : 90));
+  const sloganX = state.sloganX !== undefined && state.sloganX !== null ? state.sloganX : (currentImageType.width / 2);
+  const sloganY = state.sloganY !== undefined && state.sloganY !== null ? state.sloganY : (currentImageType.height / 2 + (currentImageType === IMAGE_TYPES.OG ? 140 : 150));
 
   // Title
   const titleEl = document.createElement('div');
