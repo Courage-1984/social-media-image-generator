@@ -678,6 +678,11 @@ export function updatePreview(state) {
           updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
         }
 
+        // Update composition overlay dimensions
+        if (window.updateCompositionCanvasDimensions) {
+          window.updateCompositionCanvasDimensions(currentImageType.width, currentImageType.height);
+        }
+
         // Apply layer visibility after rendering
         // Note: applyLayerVisibility is defined in main.js and will be called via global scope
         if (window.applyLayerVisibility) {

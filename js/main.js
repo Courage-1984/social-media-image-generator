@@ -83,6 +83,18 @@ import { createCustomPresetDropdown } from './custom-preset-dropdown.js';
 import { showToast } from './utils/toast.js';
 import { initButtonTooltips } from './button-tooltips.js';
 import { initRulerGuides } from './ruler-guides.js';
+import {
+  initCompositionOverlays,
+  toggleCompositionOverlay,
+  setSafeAreaPlatform,
+  setAspectRatio,
+  setCompositionRotation,
+  updateCompositionCanvasDimensions,
+  getCompositionOverlayState,
+} from './composition-overlays.js';
+
+// Export for preview.js
+window.updateCompositionCanvasDimensions = updateCompositionCanvasDimensions;
 
 // State
 let currentImageType = IMAGE_TYPES.OG;
@@ -152,6 +164,8 @@ let exportBtn, copyBtn, randomBtn, undoBtn, redoBtn, gridToggleBtn, popoutBtn;
 let copyClipboardBtn, fullscreenBtn;
 let rulerToggleBtn, historyTimelineBtn, closeHistoryBtn;
 let contrastToggleBtn, transparencyCheckerBtn, layerVisibilityBtn, closeLayerVisibilityBtn;
+let compositionOverlaysBtn, closeCompositionOverlaysBtn;
+let safeAreaPlatformSelect, aspectRatioSelect;
 let exportQualitySelect;
 let hardRefreshBtn;
 let randomizeBtn, resetBtn, logoUploadBtn, logoUploadInput;
@@ -230,6 +244,10 @@ function initDOMElements() {
   layerVisibilityBtn = document.getElementById('layerVisibilityBtn');
   closeHistoryBtn = document.getElementById('closeHistoryBtn');
   closeLayerVisibilityBtn = document.getElementById('closeLayerVisibilityBtn');
+  compositionOverlaysBtn = document.getElementById('compositionOverlaysBtn');
+  closeCompositionOverlaysBtn = document.getElementById('closeCompositionOverlaysBtn');
+  safeAreaPlatformSelect = document.getElementById('safeAreaPlatform');
+  aspectRatioSelect = document.getElementById('aspectRatioSelect');
   exportQualitySelect = document.getElementById('exportQuality');
   randomizeBtn = document.getElementById('randomizeBtn');
   resetBtn = document.getElementById('resetBtn');
@@ -941,6 +959,7 @@ function setupEventListeners() {
       currentImageType = btn.dataset.mode === 'og' ? IMAGE_TYPES.OG : IMAGE_TYPES.TWITTER;
       setImageType(currentImageType);
       updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
+      updateCompositionCanvasDimensions(currentImageType.width, currentImageType.height);
 
       // Update default sizes based on image type
       if (currentImageType === IMAGE_TYPES.OG) {
@@ -1720,6 +1739,212 @@ function setupEventListeners() {
           historyTimelineBtn.classList.remove('active');
         }
       }
+    });
+  }
+
+  // Composition Overlays Panel
+  let isCompositionOverlaysPanelOpen = false;
+  const compositionOverlaysPanel = document.getElementById('compositionOverlaysPanel');
+  const compositionOverlaysHeader = compositionOverlaysPanel
+    ? compositionOverlaysPanel.querySelector('.composition-overlays-header')
+    : null;
+
+  // Drag functionality for composition overlays panel
+  if (compositionOverlaysPanel && compositionOverlaysHeader) {
+    let isDragging = false;
+    let dragOffset = { x: 0, y: 0 };
+    let panelPosition = { x: null, y: null };
+
+    // Load saved position from localStorage
+    const savedPosition = localStorage.getItem('compositionOverlaysPanelPosition');
+    if (savedPosition && compositionOverlaysPanel) {
+      try {
+        const pos = JSON.parse(savedPosition);
+        panelPosition = pos;
+        compositionOverlaysPanel.style.left = `${pos.x}px`;
+        compositionOverlaysPanel.style.top = `${pos.y}px`;
+        compositionOverlaysPanel.style.transform = 'none';
+      } catch (e) {
+        console.warn('Failed to load composition overlays panel position:', e);
+      }
+    }
+
+    // Drag functionality
+    compositionOverlaysHeader.addEventListener('mousedown', e => {
+      // Don't start dragging if clicking on the close button
+      if (e.target.closest('.preset-btn')) {
+        return;
+      }
+
+      isDragging = true;
+      compositionOverlaysHeader.classList.add('dragging');
+
+      const rect = compositionOverlaysPanel.getBoundingClientRect();
+      dragOffset.x = e.clientX - rect.left;
+      dragOffset.y = e.clientY - rect.top;
+
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (isDragging && compositionOverlaysPanel) {
+        const x = e.clientX - dragOffset.x;
+        const y = e.clientY - dragOffset.y;
+
+        // Constrain to viewport bounds
+        const maxX = window.innerWidth - compositionOverlaysPanel.offsetWidth;
+        const maxY = window.innerHeight - compositionOverlaysPanel.offsetHeight;
+
+        const constrainedX = Math.max(0, Math.min(x, maxX));
+        const constrainedY = Math.max(0, Math.min(y, maxY));
+
+        compositionOverlaysPanel.style.left = `${constrainedX}px`;
+        compositionOverlaysPanel.style.top = `${constrainedY}px`;
+        compositionOverlaysPanel.style.transform = 'none';
+
+        // Save position
+        panelPosition = { x: constrainedX, y: constrainedY };
+        localStorage.setItem('compositionOverlaysPanelPosition', JSON.stringify(panelPosition));
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        if (compositionOverlaysHeader) {
+          compositionOverlaysHeader.classList.remove('dragging');
+        }
+      }
+    });
+
+    if (compositionOverlaysBtn) {
+      compositionOverlaysBtn.addEventListener('click', () => {
+        if (compositionOverlaysPanel) {
+          isCompositionOverlaysPanelOpen = !isCompositionOverlaysPanelOpen;
+          compositionOverlaysPanel.style.display = isCompositionOverlaysPanelOpen ? 'flex' : 'none';
+          compositionOverlaysBtn.classList.toggle('active', isCompositionOverlaysPanelOpen);
+
+          // Restore position if saved, otherwise center
+          if (isCompositionOverlaysPanelOpen) {
+            if (panelPosition.x !== null && panelPosition.y !== null) {
+              compositionOverlaysPanel.style.left = `${panelPosition.x}px`;
+              compositionOverlaysPanel.style.top = `${panelPosition.y}px`;
+              compositionOverlaysPanel.style.transform = 'none';
+            } else {
+              // Center on first open
+              compositionOverlaysPanel.style.left = '50%';
+              compositionOverlaysPanel.style.top = '50%';
+              compositionOverlaysPanel.style.transform = 'translate(-50%, -50%)';
+            }
+          }
+        }
+      });
+    }
+
+    if (closeCompositionOverlaysBtn) {
+      closeCompositionOverlaysBtn.addEventListener('click', () => {
+        if (compositionOverlaysPanel) {
+          compositionOverlaysPanel.style.display = 'none';
+          isCompositionOverlaysPanelOpen = false;
+          if (compositionOverlaysBtn) {
+            compositionOverlaysBtn.classList.remove('active');
+          }
+        }
+      });
+    }
+  } else {
+    // Fallback if header not found
+    if (compositionOverlaysBtn) {
+      compositionOverlaysBtn.addEventListener('click', () => {
+        if (compositionOverlaysPanel) {
+          isCompositionOverlaysPanelOpen = !isCompositionOverlaysPanelOpen;
+          compositionOverlaysPanel.style.display = isCompositionOverlaysPanelOpen ? 'flex' : 'none';
+          compositionOverlaysBtn.classList.toggle('active', isCompositionOverlaysPanelOpen);
+        }
+      });
+    }
+
+    if (closeCompositionOverlaysBtn) {
+      closeCompositionOverlaysBtn.addEventListener('click', () => {
+        if (compositionOverlaysPanel) {
+          compositionOverlaysPanel.style.display = 'none';
+          isCompositionOverlaysPanelOpen = false;
+          if (compositionOverlaysBtn) {
+            compositionOverlaysBtn.classList.remove('active');
+          }
+        }
+      });
+    }
+  }
+
+  // Overlay toggle buttons
+  const overlayButtons = document.querySelectorAll('.overlay-btn[data-overlay]');
+  overlayButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const overlayType = btn.dataset.overlay;
+      toggleCompositionOverlay(overlayType);
+      
+      // Update button active state
+      overlayButtons.forEach(b => b.classList.remove('active'));
+      const state = getCompositionOverlayState();
+      if (state.isActive && state.currentOverlay === overlayType) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  });
+  
+  // Update button states when overlay changes
+  function updateOverlayButtonStates() {
+    const state = getCompositionOverlayState();
+    overlayButtons.forEach(btn => {
+      const overlayType = btn.dataset.overlay;
+      if (state.isActive && state.currentOverlay === overlayType) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+  
+  // Periodically update button states (in case overlay is toggled elsewhere)
+  setInterval(updateOverlayButtonStates, 100);
+
+  // Safe area platform selector
+  if (safeAreaPlatformSelect) {
+    safeAreaPlatformSelect.addEventListener('change', (e) => {
+      setSafeAreaPlatform(e.target.value);
+    });
+  }
+
+  // Aspect ratio selector
+  if (aspectRatioSelect) {
+    aspectRatioSelect.addEventListener('change', (e) => {
+      setAspectRatio(e.target.value);
+    });
+  }
+
+  // Rotation controls
+  const overlayRotationSlider = document.getElementById('overlayRotation');
+  const overlayRotationValue = document.getElementById('overlayRotationValue');
+  
+  function updateRotation(value) {
+    const angle = parseFloat(value) || 0;
+    setCompositionRotation(angle);
+    if (overlayRotationSlider) overlayRotationSlider.value = angle;
+    if (overlayRotationValue) overlayRotationValue.value = angle;
+  }
+
+  if (overlayRotationSlider) {
+    overlayRotationSlider.addEventListener('input', (e) => {
+      updateRotation(e.target.value);
+    });
+  }
+
+  if (overlayRotationValue) {
+    overlayRotationValue.addEventListener('input', (e) => {
+      updateRotation(e.target.value);
     });
   }
 
@@ -2995,6 +3220,48 @@ function applyLayerVisibility() {
 /**
  * Initialize generator
  */
+/**
+ * Initialize collapsible sections
+ */
+function initCollapsibleSections() {
+  const sections = document.querySelectorAll('.collapsible-section');
+  
+  sections.forEach(section => {
+    const label = section.querySelector('.collapsible-label');
+    const icon = section.querySelector('.collapse-icon');
+    if (!label || !icon) return;
+    
+    // Load saved state from localStorage
+    const sectionId = section.dataset.section;
+    const savedState = localStorage.getItem(`collapsible-section-${sectionId}`);
+    if (savedState === 'collapsed') {
+      section.classList.add('collapsed');
+      icon.textContent = '▹';
+    } else {
+      icon.textContent = '▾';
+    }
+    
+    label.addEventListener('click', () => {
+      const isCollapsed = section.classList.contains('collapsed');
+      section.classList.toggle('collapsed');
+      
+      // Update icon
+      if (section.classList.contains('collapsed')) {
+        icon.textContent = '▹';
+      } else {
+        icon.textContent = '▾';
+      }
+      
+      // Save state to localStorage
+      if (section.classList.contains('collapsed')) {
+        localStorage.setItem(`collapsible-section-${sectionId}`, 'collapsed');
+      } else {
+        localStorage.removeItem(`collapsible-section-${sectionId}`);
+      }
+    });
+  });
+}
+
 function init() {
   loadFonts();
   initDOMElements();
@@ -3003,6 +3270,7 @@ function init() {
   populateBackgroundPatterns();
   populateSavedPresets();
   setupEventListeners();
+  initCollapsibleSections();
 
   // Initialize custom pattern dropdown after patterns are populated and event listeners are set up
   if (backgroundPatternSelect) {
@@ -3025,8 +3293,11 @@ function init() {
   // Initialize button tooltips for preview buttons
   initButtonTooltips();
 
-  // Initialize ruler/guides system
+      // Initialize ruler/guides system
   initRulerGuides();
+
+  // Initialize composition overlays system
+  initCompositionOverlays();
 
   // Initialize custom preset dropdown
   if (savedPresetsSelect) {

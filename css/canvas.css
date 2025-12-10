@@ -61,19 +61,19 @@
   margin: 0;
   background: rgba(22, 33, 62, 0.7) !important;
   backdrop-filter: blur(4px);
-  /* CRITICAL: Explicit size constraints to prevent expansion */
-  width: auto !important; /* Use natural button size - override width: 100% */
-  height: auto !important; /* Use natural button size - override height: 100% */
-  min-width: auto !important; /* Reset any min-width */
-  min-height: auto !important; /* Reset any min-height */
-  max-width: none !important; /* Allow natural width */
-  max-height: none !important; /* Allow natural height */
+  /* CRITICAL: Explicit size constraints - ensure consistent sizing */
+  width: 2.5rem !important; /* Fixed width for consistency */
+  height: 2.5rem !important; /* Fixed height for consistency */
+  min-width: 2.5rem !important;
+  min-height: 2.5rem !important;
+  max-width: 2.5rem !important;
+  max-height: 2.5rem !important;
   /* Exact same base styles as preview section buttons */
   font-size: 1.1rem !important; /* Match preview section buttons base size */
   line-height: 1 !important;
-  padding: 0.516rem 0.818rem !important; /* Match preview section buttons padding */
+  padding: 0 !important; /* Remove padding since we have fixed dimensions */
   box-sizing: border-box !important;
-  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, font-size 0.3s ease, padding 0.3s ease !important; /* Smooth transitions matching preview buttons */
+  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, font-size 0.3s ease !important;
   transform-origin: center !important; /* Scale from center */
   will-change: transform !important; /* Optimize GPU-accelerated animations */
   display: inline-flex !important; /* Use inline-flex instead of flex to prevent expansion */
@@ -90,33 +90,36 @@
   color: #ed12ff !important; /* Magenta icon color on hover - matches preview buttons */
   transform: scale(1.1) !important; /* Scale button container up on hover - matches preview buttons */
   font-size: 1.9rem !important; /* Scale unicode symbol (from 1.1rem to 1.9rem = ~73% increase) - matches preview buttons */
-  padding: 0.35rem 0.65rem !important; /* Reduced padding to compensate for larger font-size - matches preview buttons */
+  /* Maintain fixed dimensions on hover */
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  padding: 0 !important;
 }
 
 /* Fullscreen zoom button positioned below fullscreen button */
 /* CRITICAL: More specific selector to override .preview-section .preset-btn rules */
 .canvas-container .fullscreen-zoom-btn {
   position: absolute !important;
-  top: 3rem !important; /* Below fullscreen button */
+  top: calc(0.75rem + 2.5rem + 0.5rem) !important; /* Below fullscreen button: top + button height + spacing */
   right: 0.75rem !important;
   left: auto !important; /* CRITICAL: Override left: 0 from .preview-section .preset-btn */
   z-index: 10;
   margin: 0;
   background: rgba(22, 33, 62, 0.7) !important;
   backdrop-filter: blur(4px);
-  /* CRITICAL: Explicit size constraints to prevent expansion */
-  width: auto !important; /* Use natural button size - override width: 100% */
-  height: auto !important; /* Use natural button size - override height: 100% */
-  min-width: auto !important; /* Reset any min-width */
-  min-height: auto !important; /* Reset any min-height */
-  max-width: none !important; /* Allow natural width */
-  max-height: none !important; /* Allow natural height */
+  /* CRITICAL: Explicit size constraints - ensure same size as fullscreen button */
+  width: 2.5rem !important; /* Fixed width - same as fullscreen button */
+  height: 2.5rem !important; /* Fixed height - same as fullscreen button */
+  min-width: 2.5rem !important;
+  min-height: 2.5rem !important;
+  max-width: 2.5rem !important;
+  max-height: 2.5rem !important;
   /* Exact same base styles as preview section buttons */
   font-size: 1.1rem !important; /* Match preview section buttons base size */
   line-height: 1 !important;
-  padding: 0.516rem 0.818rem !important; /* Match preview section buttons padding */
+  padding: 0 !important; /* Remove padding since we have fixed dimensions */
   box-sizing: border-box !important;
-  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, font-size 0.3s ease, padding 0.3s ease !important; /* Smooth transitions matching preview buttons */
+  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, font-size 0.3s ease !important;
   transform-origin: center !important; /* Scale from center */
   will-change: transform !important; /* Optimize GPU-accelerated animations */
   display: inline-flex !important; /* Use inline-flex instead of flex to prevent expansion */
@@ -132,7 +135,94 @@
   color: #ed12ff !important; /* Magenta icon color on hover */
   transform: scale(1.1) !important; /* Scale button container up on hover */
   font-size: 1.9rem !important; /* Scale unicode symbol (from 1.1rem to 1.9rem = ~73% increase) */
-  padding: 0.35rem 0.65rem !important; /* Reduced padding to compensate for larger font-size */
+  /* Maintain fixed dimensions on hover - same as fullscreen button */
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  padding: 0 !important;
+}
+
+/* Grid Toggle button positioned over preview */
+.canvas-container #gridToggleBtn {
+  position: absolute !important;
+  top: calc(0.75rem + 2.5rem + 0.5rem + 2.5rem + 0.5rem) !important; /* Below zoom button: top + button1 + spacing + button2 + spacing */
+  right: 0.75rem !important;
+  left: auto !important;
+  z-index: 10;
+  margin: 0;
+  background: rgba(22, 33, 62, 0.7) !important;
+  backdrop-filter: blur(4px);
+  /* Fixed dimensions - same as other preview buttons */
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  min-width: 2.5rem !important;
+  min-height: 2.5rem !important;
+  max-width: 2.5rem !important;
+  max-height: 2.5rem !important;
+  font-size: 1.1rem !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, font-size 0.3s ease !important;
+  transform-origin: center !important;
+  will-change: transform !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.canvas-container #gridToggleBtn:hover {
+  border-color: rgba(0, 255, 255, 0.6) !important;
+  background: rgba(0, 255, 255, 0.05) !important;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2) !important;
+  color: #ed12ff !important;
+  transform: scale(1.1) !important;
+  font-size: 1.9rem !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  padding: 0 !important;
+}
+
+/* Transparency Checkerboard button positioned over preview */
+.canvas-container #transparencyCheckerBtn {
+  position: absolute !important;
+  top: calc(0.75rem + 2.5rem + 0.5rem + 2.5rem + 0.5rem + 2.5rem + 0.5rem) !important; /* Below grid button */
+  right: 0.75rem !important;
+  left: auto !important;
+  z-index: 10;
+  margin: 0;
+  background: rgba(22, 33, 62, 0.7) !important;
+  backdrop-filter: blur(4px);
+  /* Fixed dimensions - same as other preview buttons */
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  min-width: 2.5rem !important;
+  min-height: 2.5rem !important;
+  max-width: 2.5rem !important;
+  max-height: 2.5rem !important;
+  font-size: 1.1rem !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, font-size 0.3s ease !important;
+  transform-origin: center !important;
+  will-change: transform !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.canvas-container #transparencyCheckerBtn:hover {
+  border-color: rgba(0, 255, 255, 0.6) !important;
+  background: rgba(0, 255, 255, 0.05) !important;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2) !important;
+  color: #ed12ff !important;
+  transform: scale(1.1) !important;
+  font-size: 1.9rem !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  padding: 0 !important;
 }
 
 /* Zoom indicator in upper left corner of preview */
@@ -646,6 +736,267 @@
 }
 
 .layer-visibility-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+/* Composition Overlays Panel */
+.composition-overlays-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  max-height: 80vh;
+  background: #1a1a2e;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 8px;
+  z-index: 10000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 255, 255, 0.3);
+  user-select: none;
+}
+
+.composition-overlays-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  background: rgba(0, 255, 255, 0.05);
+  cursor: move;
+  user-select: none;
+}
+
+.composition-overlays-header:hover {
+  background: rgba(0, 255, 255, 0.1);
+}
+
+.composition-overlays-header.dragging {
+  cursor: grabbing;
+  background: rgba(0, 255, 255, 0.15);
+}
+
+.composition-overlays-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+  user-select: none;
+}
+
+.composition-overlays-header .preset-btn {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: auto;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.composition-overlays-content {
+  overflow-y: auto;
+  padding: 0.75rem;
+  flex: 1;
+  /* Ensure dark background to mask any white flash */
+  background: #1a1a2e;
+}
+
+.overlay-group {
+  margin-bottom: 1.5rem;
+}
+
+.overlay-group:last-child {
+  margin-bottom: 0;
+}
+
+.overlay-group h4 {
+  margin: 0 0 0.75rem 0;
+  color: #00ffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.overlay-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.overlay-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.overlay-btn:hover {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: rgba(0, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.overlay-btn.active {
+  background: rgba(0, 255, 255, 0.3);
+  border-color: rgba(0, 255, 255, 0.8);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+  color: #00ffff;
+}
+
+.overlay-select {
+  flex: 1;
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300ffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 12px !important;
+  border: 1px solid rgba(0, 255, 255, 0.3) !important;
+  border-radius: 4px;
+  color: #ffffff !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 0.85rem !important;
+  cursor: pointer;
+  transition: none !important; /* Remove transition to prevent FOUC */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  /* Remove inner border/outline */
+  outline: none !important;
+  box-shadow: none !important;
+  /* Force immediate rendering */
+  will-change: auto;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  /* Prevent white flash */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.overlay-select:hover {
+  border-color: rgba(0, 255, 255, 0.5) !important;
+  background: rgba(0, 255, 255, 0.05) !important;
+  background-color: rgba(0, 255, 255, 0.05) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300ffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 12px !important;
+}
+
+.overlay-select:focus {
+  outline: none !important;
+  border-color: rgba(0, 255, 255, 0.8) !important;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.3) !important;
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300ffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 12px !important;
+}
+
+.overlay-select:active {
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300ffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 12px !important;
+}
+
+/* Remove inner border/ring on focus for various browsers */
+.overlay-select:focus::-webkit-focus-ring {
+  outline: none !important;
+  border: none !important;
+}
+
+.overlay-select::-moz-focus-inner {
+  border: 0 !important;
+  outline: none !important;
+}
+
+/* Style dropdown options to match dark theme - apply immediately */
+.overlay-select option {
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+  padding: 0.5rem !important;
+  border: none !important;
+  /* Force immediate rendering */
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Selected option styling - multiple selectors for robustness */
+.overlay-select option:checked,
+.overlay-select option[selected],
+.overlay-select option[selected="selected"] {
+  background: rgba(0, 255, 255, 0.2) !important;
+  background-color: rgba(0, 255, 255, 0.2) !important;
+  color: #00ffff !important;
+}
+
+/* Hover state for options (limited browser support) */
+.overlay-select option:hover,
+.overlay-select option:focus {
+  background: rgba(0, 255, 255, 0.15) !important;
+  background-color: rgba(0, 255, 255, 0.15) !important;
+  color: #00ffff !important;
+}
+
+/* Ensure all options have dark background */
+.overlay-select option:not(:checked):not([selected]) {
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+}
+
+/* For browsers that support styling the dropdown list */
+.overlay-select::-ms-expand {
+  display: none; /* Hide default arrow in IE */
+}
+
+/* Style the dropdown arrow - add to existing .overlay-select rule */
+
+.overlay-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.composition-overlays-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.composition-overlays-content::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.composition-overlays-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.composition-overlays-content::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 255, 255, 0.5);
 }
 

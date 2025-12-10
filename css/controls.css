@@ -60,13 +60,13 @@ label {
 }
 
 .collapsible-label .collapse-icon {
-  font-size: 0.9rem;
-  color: #00ffff;
+  font-size: 1rem;
   transition: color 0.2s;
   display: inline-block;
-  min-width: 1rem;
+  min-width: 1.2rem;
   text-align: center;
   font-family: monospace;
+  margin-right: 0.25rem;
 }
 
 .collapsible-section.collapsed .collapse-icon {
@@ -74,7 +74,7 @@ label {
 }
 
 .collapsible-section:not(.collapsed) .collapse-icon {
-  color: #ff00ff; /* Magenta when expanded */
+  color: #ed12ff; /* Magenta when expanded */
 }
 
 .collapsible-content {
@@ -333,9 +333,15 @@ textarea:focus {
 
 /* Hard refresh button Unicode character - magenta color and scaling on hover */
 .hard-refresh-btn .unicode-char {
-  display: inline-block;
+  display: block;
+  line-height: 1.2rem; /* Match button font-size for proper vertical centering */
+  margin: 0;
+  padding: 0;
   transition: color 0.3s ease, transform 0.3s ease;
   transform-origin: center;
+  text-align: center;
+  /* Adjust for unicode character baseline */
+  margin-top: -0.1em; /* Fine-tune vertical position */
 }
 
 .hard-refresh-btn:hover .unicode-char {
