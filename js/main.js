@@ -1616,11 +1616,11 @@ function setupEventListeners() {
       // Drag functionality
       if (layerVisibilityHeader && layerVisibilityPanel) {
         layerVisibilityHeader.addEventListener('mousedown', e => {
-          // Don't start dragging if clicking on the close button
-          if (e.target === closeLayerVisibilityBtn || e.target.closest('.preset-btn')) {
+          // Prevent dragging if clicking the close button
+          if (e.target.id === 'closeLayerVisibilityBtn' || e.target.closest('#closeLayerVisibilityBtn')) {
             return;
           }
-
+          
           isDragging = true;
           layerVisibilityHeader.classList.add('dragging');
 
@@ -2950,6 +2950,7 @@ function setupEventListeners() {
 
       // Hard refresh: clear cache, storage, and force fresh asset fetches
       // Similar to Ctrl+F5 or Ctrl+Shift+R, but more aggressive
+      // For GitHub Pages, we need a reliable method that bypasses all caches
       try {
         // 1. Clear HTTP Cache via Cache API (if available)
         if ('caches' in window) {
@@ -3041,34 +3042,58 @@ function setupEventListeners() {
         }
 
         // Small delay to ensure all async operations complete
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         console.log('All caches cleared, performing hard reload...');
 
-        // 6. Force hard reload by navigating to cache-busted URL
-        // This is the most reliable way to bypass all caches
+        // 6. Force hard reload - use multiple methods for maximum compatibility
+        // For GitHub Pages, we need to bypass CDN and browser caches
+        
+        // Method 1: Try deprecated but still-working reload(true) first (works in most browsers)
+        try {
+          if (window.location.reload.toString().includes('forceReload') || 
+              typeof window.location.reload === 'function') {
+            // Use replace to avoid adding to history
+            const url = new URL(window.location.href);
+            url.searchParams.set('_hr', Date.now());
+            url.searchParams.set('_r', Math.random().toString(36).substring(2, 15));
+            window.location.replace(url.toString());
+            return; // Exit early if successful
+          }
+        } catch (e) {
+          console.warn('Method 1 failed, trying alternative:', e);
+        }
+
+        // Method 2: Navigate to cache-busted URL (most reliable for GitHub Pages)
         const baseUrl = window.location.origin + window.location.pathname;
         const timestamp = Date.now();
         const randomStr = Math.random().toString(36).substring(2, 15);
-        const newUrl = `${baseUrl}?hr=${timestamp}&r=${randomStr}${window.location.hash || ''}`;
+        const separator = window.location.pathname.includes('?') ? '&' : '?';
+        const newUrl = `${baseUrl}${separator}_hr=${timestamp}&_r=${randomStr}${window.location.hash || ''}`;
 
         console.log('Navigating to:', newUrl);
 
-        // Navigate to new URL - this forces a completely fresh load
-        // Using href instead of replace ensures proper navigation
-        window.location.href = newUrl;
+        // Use replace to avoid adding to history, and force fresh fetch
+        window.location.replace(newUrl);
       } catch (error) {
         console.error('Error during hard refresh:', error);
 
-        // Fallback: Aggressive simple reload
+        // Fallback: Clear storage and use cache-busted URL
         try {
           localStorage.clear();
           sessionStorage.clear();
-          window.location.reload(true);
+          
+          // Use cache-busted URL as fallback
+          const url = new URL(window.location.href);
+          url.searchParams.set('_hr', Date.now());
+          url.searchParams.set('_r', Math.random().toString(36).substring(2, 15));
+          window.location.replace(url.toString());
         } catch (fallbackError) {
           console.error('Fallback hard refresh also failed:', fallbackError);
-          // Last resort: simple reload
-          window.location.reload();
+          // Last resort: simple reload with cache-busting
+          const url = new URL(window.location.href);
+          url.searchParams.set('_hr', Date.now());
+          window.location.href = url.toString();
         }
       }
     });
