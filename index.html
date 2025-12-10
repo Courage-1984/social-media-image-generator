@@ -233,6 +233,10 @@
                     </button>
                   </div>
                 </div>
+                <div class="glow-toggle">
+                  <input type="checkbox" id="logoGlow" />
+                  <label for="logoGlow">Enable Glow</label>
+                </div>
               </div>
             </div>
           </div>
@@ -607,6 +611,113 @@
               </div>
             </div>
           </div>
+          <!-- Layer Visibility Panel -->
+          <div id="layerVisibilityPanel" class="layer-visibility-panel" style="display: none">
+            <div class="layer-visibility-header">
+              <h3>Layer Visibility</h3>
+              <button class="preset-btn" id="closeLayerVisibilityBtn" title="Close">×</button>
+            </div>
+            <div class="layer-visibility-content">
+              <div class="layer-visibility-item">
+                <input type="checkbox" id="layerVisibilityLogo" checked />
+                <label for="layerVisibilityLogo">Logo</label>
+              </div>
+              <div class="layer-visibility-item">
+                <input type="checkbox" id="layerVisibilityTitle" checked />
+                <label for="layerVisibilityTitle">Title</label>
+              </div>
+              <div class="layer-visibility-item">
+                <input type="checkbox" id="layerVisibilitySubtitle" checked />
+                <label for="layerVisibilitySubtitle">Subtitle</label>
+              </div>
+              <div class="layer-visibility-item">
+                <input type="checkbox" id="layerVisibilitySlogan" checked />
+                <label for="layerVisibilitySlogan">Slogan</label>
+              </div>
+              <div class="layer-visibility-item">
+                <input type="checkbox" id="layerVisibilityPattern" checked />
+                <label for="layerVisibilityPattern">Background Pattern</label>
+              </div>
+            </div>
+          </div>
+          <!-- Ruler/Guides Options Panel -->
+          <div id="rulerGuidesPanel" class="ruler-guides-panel" style="display: none">
+            <div class="ruler-guides-header">
+              <h3>Ruler/Guides Options</h3>
+              <button class="preset-btn" id="closeRulerGuidesBtn" title="Close">×</button>
+            </div>
+            <div class="ruler-guides-content">
+              <div class="overlay-group">
+                <h4>Guides</h4>
+                <div class="overlay-controls">
+                  <button class="overlay-btn" id="addHorizontalGuideBtn" title="Add Horizontal Guide at Cursor">
+                    Add Horizontal Guide
+                  </button>
+                  <button class="overlay-btn" id="addVerticalGuideBtn" title="Add Vertical Guide at Cursor">
+                    Add Vertical Guide
+                  </button>
+                </div>
+                <div class="overlay-controls" style="margin-top: 0.5rem;">
+                  <button class="overlay-btn" id="clearAllGuidesBtn" title="Clear All Guides">
+                    Clear All Guides
+                  </button>
+                </div>
+              </div>
+              <div class="overlay-group">
+                <h4>Settings</h4>
+                <div class="overlay-controls">
+                  <label for="snapToGridToggle"
+                    style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="snapToGridToggle" />
+                    <span>Snap to Grid</span>
+                  </label>
+                </div>
+                <div class="overlay-controls" style="margin-top: 0.5rem;">
+                  <label for="gridSizeInput" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="min-width: 80px;">Grid Size:</span>
+                    <input type="number" id="gridSizeInput" min="1" max="100" value="10" step="1"
+                      style="flex: 1; padding: 0.5rem;" />
+                    <span>px</span>
+                  </label>
+                </div>
+                <div class="overlay-controls" style="margin-top: 0.5rem;">
+                  <label for="rulerUnitSelect" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="min-width: 80px;">Unit:</span>
+                    <select id="rulerUnitSelect" class="overlay-select" style="flex: 1;">
+                      <option value="px">Pixels (px)</option>
+                      <option value="%">Percentage (%)</option>
+                      <option value="em">Ems (em)</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+              <div class="overlay-group">
+                <h4>Display</h4>
+                <div class="overlay-controls">
+                  <label for="showCrosshairToggle"
+                    style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="showCrosshairToggle" checked />
+                    <span>Show Crosshair</span>
+                  </label>
+                </div>
+                <div class="overlay-controls" style="margin-top: 0.5rem;">
+                  <label for="showDistanceIndicatorsToggle"
+                    style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="showDistanceIndicatorsToggle" checked />
+                    <span>Show Distance Indicators</span>
+                  </label>
+                </div>
+              </div>
+              <div class="overlay-group">
+                <h4>Keyboard Shortcuts</h4>
+                <div style="font-size: 0.85rem; color: #b0b0b0; line-height: 1.6;">
+                  <div><strong>H</strong> - Add Horizontal Guide</div>
+                  <div><strong>V</strong> - Add Vertical Guide</div>
+                  <div><strong>C</strong> - Clear All Guides</div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="canvas-container" id="canvasContainer">
             <button class="preset-btn fullscreen-btn-preview" id="fullscreenBtn" title="Toggle Fullscreen">
               ⛶
@@ -634,43 +745,14 @@
               <div class="guide-vertical" id="guideVertical"></div>
               <div class="ruler-info" id="rulerInfo"></div>
             </div>
-            <!-- History Timeline -->
-            <div id="historyTimeline" class="history-timeline" style="display: none">
-              <div class="history-timeline-header">
-                <h3>History Timeline</h3>
-                <button class="preset-btn" id="closeHistoryBtn" title="Close">×</button>
-              </div>
-              <div class="history-timeline-content" id="historyTimelineContent"></div>
+          </div>
+          <!-- History Timeline -->
+          <div id="historyTimeline" class="history-timeline" style="display: none">
+            <div class="history-timeline-header">
+              <h3>History Timeline</h3>
+              <button class="preset-btn" id="closeHistoryBtn" title="Close">×</button>
             </div>
-            <!-- Layer Visibility Panel -->
-            <div id="layerVisibilityPanel" class="layer-visibility-panel" style="display: none">
-              <div class="layer-visibility-header">
-                <h3>Layer Visibility</h3>
-                <button class="preset-btn" id="closeLayerVisibilityBtn" title="Close">×</button>
-              </div>
-              <div class="layer-visibility-content">
-                <div class="layer-visibility-item">
-                  <input type="checkbox" id="layerVisibilityLogo" checked />
-                  <label for="layerVisibilityLogo">Logo</label>
-                </div>
-                <div class="layer-visibility-item">
-                  <input type="checkbox" id="layerVisibilityTitle" checked />
-                  <label for="layerVisibilityTitle">Title</label>
-                </div>
-                <div class="layer-visibility-item">
-                  <input type="checkbox" id="layerVisibilitySubtitle" checked />
-                  <label for="layerVisibilitySubtitle">Subtitle</label>
-                </div>
-                <div class="layer-visibility-item">
-                  <input type="checkbox" id="layerVisibilitySlogan" checked />
-                  <label for="layerVisibilitySlogan">Slogan</label>
-                </div>
-                <div class="layer-visibility-item">
-                  <input type="checkbox" id="layerVisibilityPattern" checked />
-                  <label for="layerVisibilityPattern">Background Pattern</label>
-                </div>
-              </div>
-            </div>
+            <div class="history-timeline-content" id="historyTimelineContent"></div>
           </div>
           <div class="grid-2" style="margin-top: 0.5rem; gap: 0.5rem; align-items: center">
             <div class="control-group inline-control" style="margin-bottom: 0">

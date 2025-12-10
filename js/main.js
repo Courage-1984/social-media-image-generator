@@ -58,6 +58,7 @@ import {
   getHistory,
   getStateAt,
   setHistoryIndex,
+  getHistoryIndex,
 } from './history.js';
 import { getAllTemplates, applyTemplate } from './templates.js';
 import { initPatternPreview } from './pattern-preview-tooltip.js';
@@ -109,6 +110,7 @@ let currentState = {
   titleSize: 72,
   subtitleSize: 28,
   sloganSize: 20,
+  logoGlow: false,
   titleGlow: false,
   subtitleGlow: false,
   sloganGlow: false,
@@ -153,7 +155,7 @@ let titleInput, subtitleInput, sloganInput;
 let titleSizeSlider, titleSizeValue, subtitleSizeSlider, subtitleSizeValue;
 let sloganSizeSlider, sloganSizeValue, logoSizeSlider, logoSizeValue;
 let logoXSlider, logoXValue, logoYSlider, logoYValue;
-let titleGlow, subtitleGlow, sloganGlow;
+let logoGlow, titleGlow, subtitleGlow, sloganGlow;
 let dividerAboveTitle, dividerBelowTitle, dividerAboveSubtitle, dividerBelowSubtitle;
 let dividerAboveSlogan, dividerBelowSlogan;
 let dividerWidthSlider, dividerWidthValue;
@@ -211,6 +213,7 @@ function initDOMElements() {
   sloganSizeValue = document.getElementById('sloganSizeValue');
   logoSizeSlider = document.getElementById('logoSize');
   logoSizeValue = document.getElementById('logoSizeValue');
+  logoGlow = document.getElementById('logoGlow');
   titleGlow = document.getElementById('titleGlow');
   subtitleGlow = document.getElementById('subtitleGlow');
   sloganGlow = document.getElementById('sloganGlow');
@@ -391,6 +394,7 @@ function updateState(skipHistory = false) {
   }
 
   currentState = {
+    imageType: currentImageType === IMAGE_TYPES.OG ? 'og' : 'twitter', // Store image type
     title: titleInput.value || '',
     subtitle: subtitleInput.value || '',
     slogan: sloganInput ? sloganInput.value : '',
@@ -398,6 +402,10 @@ function updateState(skipHistory = false) {
     logoY: logoYValue ? parseInt(logoYValue.value) || 40 : 40,
     logoSize: logoSizeValue ? parseInt(logoSizeValue.value) || 120 : 120,
     logoColor: currentState.logoColor || getLogoColorKey() || 'cyan', // Preserve existing logoColor if set
+    logoGlow: logoGlow ? logoGlow.checked : false,
+    titleColor: getSelectedColorKey('titleColorPicker') || 'cyan',
+    subtitleColor: getSelectedColorKey('subtitleColorPicker') || 'text-secondary',
+    sloganColor: getSelectedColorKey('sloganColorPicker') || 'magenta',
     titleSize: titleSizeValue ? parseInt(titleSizeValue.value) || 72 : 72,
     subtitleSize: subtitleSizeValue ? parseInt(subtitleSizeValue.value) || 28 : 28,
     sloganSize: sloganSizeValue ? parseInt(sloganSizeValue.value) || 20 : 20,
@@ -469,25 +477,26 @@ function applyStateToUI(state) {
   if (logoXSlider) logoXSlider.value = state.logoX !== undefined ? state.logoX : 40;
   if (logoYValue) logoYValue.value = state.logoY !== undefined ? state.logoY : 40;
   if (logoYSlider) logoYSlider.value = state.logoY !== undefined ? state.logoY : 40;
-  logoSizeValue.value = state.logoSize || 120;
-  logoSizeSlider.value = state.logoSize || 120;
-  titleSizeValue.value = state.titleSize || 72;
-  titleSizeSlider.value = state.titleSize || 72;
-  subtitleSizeValue.value = state.subtitleSize || 28;
-  subtitleSizeSlider.value = state.subtitleSize || 28;
-  sloganSizeValue.value = state.sloganSize || 20;
-  sloganSizeSlider.value = state.sloganSize || 20;
-  titleGlow.checked = state.titleGlow || false;
-  subtitleGlow.checked = state.subtitleGlow || false;
-  sloganGlow.checked = state.sloganGlow || false;
-  dividerAboveTitle.checked = state.dividerAboveTitle || false;
-  dividerBelowTitle.checked = state.dividerBelowTitle || false;
-  dividerAboveSubtitle.checked = state.dividerAboveSubtitle || false;
-  dividerBelowSubtitle.checked = state.dividerBelowSubtitle || false;
+  if (logoSizeValue) logoSizeValue.value = state.logoSize || 120;
+  if (logoSizeSlider) logoSizeSlider.value = state.logoSize || 120;
+  if (logoGlow) logoGlow.checked = state.logoGlow || false;
+  if (titleSizeValue) titleSizeValue.value = state.titleSize || 72;
+  if (titleSizeSlider) titleSizeSlider.value = state.titleSize || 72;
+  if (subtitleSizeValue) subtitleSizeValue.value = state.subtitleSize || 28;
+  if (subtitleSizeSlider) subtitleSizeSlider.value = state.subtitleSize || 28;
+  if (sloganSizeValue) sloganSizeValue.value = state.sloganSize || 20;
+  if (sloganSizeSlider) sloganSizeSlider.value = state.sloganSize || 20;
+  if (titleGlow) titleGlow.checked = state.titleGlow || false;
+  if (subtitleGlow) subtitleGlow.checked = state.subtitleGlow || false;
+  if (sloganGlow) sloganGlow.checked = state.sloganGlow || false;
+  if (dividerAboveTitle) dividerAboveTitle.checked = state.dividerAboveTitle || false;
+  if (dividerBelowTitle) dividerBelowTitle.checked = state.dividerBelowTitle || false;
+  if (dividerAboveSubtitle) dividerAboveSubtitle.checked = state.dividerAboveSubtitle || false;
+  if (dividerBelowSubtitle) dividerBelowSubtitle.checked = state.dividerBelowSubtitle || false;
   if (dividerAboveSlogan) dividerAboveSlogan.checked = state.dividerAboveSlogan || false;
   if (dividerBelowSlogan) dividerBelowSlogan.checked = state.dividerBelowSlogan || false;
-  dividerWidthValue.value = state.dividerWidth || 2;
-  dividerWidthSlider.value = state.dividerWidth || 2;
+  if (dividerWidthValue) dividerWidthValue.value = state.dividerWidth || 2;
+  if (dividerWidthSlider) dividerWidthSlider.value = state.dividerWidth || 2;
   if (titleDividerWidthValue) {
     titleDividerWidthValue.value = state.titleDividerWidth || 2;
     titleDividerWidthSlider.value = state.titleDividerWidth || 2;
@@ -501,57 +510,65 @@ function applyStateToUI(state) {
     sloganDividerWidthSlider.value = state.sloganDividerWidth || 2;
   }
   // Handle migration from offset to absolute positions
-  if (state.titleX !== undefined) {
-    titleXValue.value = state.titleX;
-    titleXSlider.value = state.titleX;
-  } else if (state.titleOffsetX !== undefined) {
-    // Migrate old offset to absolute position (center + offset)
-    const centerX = IMAGE_TYPES.OG.width / 2;
-    const centerY = IMAGE_TYPES.OG.height / 2;
-    titleXValue.value = centerX + state.titleOffsetX;
-    titleXSlider.value = centerX + state.titleOffsetX;
-  } else {
-    titleXValue.value = 600;
-    titleXSlider.value = 600;
+  if (titleXValue && titleXSlider) {
+    if (state.titleX !== undefined) {
+      titleXValue.value = state.titleX;
+      titleXSlider.value = state.titleX;
+    } else if (state.titleOffsetX !== undefined) {
+      // Migrate old offset to absolute position (center + offset)
+      const centerX = IMAGE_TYPES.OG.width / 2;
+      const centerY = IMAGE_TYPES.OG.height / 2;
+      titleXValue.value = centerX + state.titleOffsetX;
+      titleXSlider.value = centerX + state.titleOffsetX;
+    } else {
+      titleXValue.value = 600;
+      titleXSlider.value = 600;
+    }
   }
 
-  if (state.titleY !== undefined) {
-    titleYValue.value = state.titleY;
-    titleYSlider.value = state.titleY;
-  } else if (state.titleOffsetY !== undefined) {
-    const centerY = IMAGE_TYPES.OG.height / 2;
-    titleYValue.value = centerY - 40 + state.titleOffsetY;
-    titleYSlider.value = centerY - 40 + state.titleOffsetY;
-  } else {
-    titleYValue.value = 315;
-    titleYSlider.value = 315;
+  if (titleYValue && titleYSlider) {
+    if (state.titleY !== undefined) {
+      titleYValue.value = state.titleY;
+      titleYSlider.value = state.titleY;
+    } else if (state.titleOffsetY !== undefined) {
+      const centerY = IMAGE_TYPES.OG.height / 2;
+      titleYValue.value = centerY - 40 + state.titleOffsetY;
+      titleYSlider.value = centerY - 40 + state.titleOffsetY;
+    } else {
+      titleYValue.value = 315;
+      titleYSlider.value = 315;
+    }
   }
 
-  if (state.subtitleX !== undefined) {
-    subtitleXValue.value = state.subtitleX;
-    subtitleXSlider.value = state.subtitleX;
-  } else if (state.subtitleOffsetX !== undefined) {
-    const centerX = IMAGE_TYPES.OG.width / 2;
-    subtitleXValue.value = centerX + state.subtitleOffsetX;
-    subtitleXSlider.value = centerX + state.subtitleOffsetX;
-  } else {
-    subtitleXValue.value = 600;
-    subtitleXSlider.value = 600;
+  if (subtitleXValue && subtitleXSlider) {
+    if (state.subtitleX !== undefined) {
+      subtitleXValue.value = state.subtitleX;
+      subtitleXSlider.value = state.subtitleX;
+    } else if (state.subtitleOffsetX !== undefined) {
+      const centerX = IMAGE_TYPES.OG.width / 2;
+      subtitleXValue.value = centerX + state.subtitleOffsetX;
+      subtitleXSlider.value = centerX + state.subtitleOffsetX;
+    } else {
+      subtitleXValue.value = 600;
+      subtitleXSlider.value = 600;
+    }
   }
 
-  if (state.subtitleY !== undefined) {
-    subtitleYValue.value = state.subtitleY;
-    subtitleYSlider.value = state.subtitleY;
-  } else if (state.subtitleOffsetY !== undefined) {
-    const centerY = IMAGE_TYPES.OG.height / 2;
-    subtitleYValue.value = centerY + 80 + state.subtitleOffsetY;
-    subtitleYSlider.value = centerY + 80 + state.subtitleOffsetY;
-  } else {
-    subtitleYValue.value = 395;
-    subtitleYSlider.value = 395;
+  if (subtitleYValue && subtitleYSlider) {
+    if (state.subtitleY !== undefined) {
+      subtitleYValue.value = state.subtitleY;
+      subtitleYSlider.value = state.subtitleY;
+    } else if (state.subtitleOffsetY !== undefined) {
+      const centerY = IMAGE_TYPES.OG.height / 2;
+      subtitleYValue.value = centerY + 80 + state.subtitleOffsetY;
+      subtitleYSlider.value = centerY + 80 + state.subtitleOffsetY;
+    } else {
+      subtitleYValue.value = 395;
+      subtitleYSlider.value = 395;
+    }
   }
 
-  if (sloganXValue) {
+  if (sloganXValue && sloganXSlider) {
     if (state.sloganX !== undefined) {
       sloganXValue.value = state.sloganX;
       sloganXSlider.value = state.sloganX;
@@ -565,7 +582,7 @@ function applyStateToUI(state) {
     }
   }
 
-  if (sloganYValue) {
+  if (sloganYValue && sloganYSlider) {
     if (state.sloganY !== undefined) {
       sloganYValue.value = state.sloganY;
       sloganYSlider.value = state.sloganY;
@@ -924,6 +941,7 @@ function setupEventListeners() {
 
   // Checkboxes
   [
+    logoGlow,
     titleGlow,
     subtitleGlow,
     sloganGlow,
@@ -1719,11 +1737,30 @@ function setupEventListeners() {
     historyTimelineBtn.addEventListener('click', () => {
       const historyTimeline = document.getElementById('historyTimeline');
       if (historyTimeline) {
-        const isVisible = historyTimeline.style.display !== 'none';
-        historyTimeline.style.display = isVisible ? 'none' : 'block';
+        const isVisible = historyTimeline.style.display !== 'none' && historyTimeline.style.display !== '';
+        historyTimeline.style.display = isVisible ? 'none' : 'flex';
         historyTimelineBtn.classList.toggle('active', !isVisible);
 
         if (!isVisible) {
+          // Center or restore position
+          const savedPosition = localStorage.getItem('historyTimelinePosition');
+          if (savedPosition) {
+            try {
+              const pos = JSON.parse(savedPosition);
+              historyTimeline.style.left = `${pos.x}px`;
+              historyTimeline.style.top = `${pos.y}px`;
+              historyTimeline.style.transform = 'none';
+            } catch (e) {
+              // Center if position load fails
+              historyTimeline.style.left = '50%';
+              historyTimeline.style.top = '50%';
+              historyTimeline.style.transform = 'translate(-50%, -50%)';
+            }
+          } else {
+            historyTimeline.style.left = '50%';
+            historyTimeline.style.top = '50%';
+            historyTimeline.style.transform = 'translate(-50%, -50%)';
+          }
           updateHistoryTimeline();
         }
       }
@@ -1737,6 +1774,76 @@ function setupEventListeners() {
         historyTimeline.style.display = 'none';
         if (historyTimelineBtn) {
           historyTimelineBtn.classList.remove('active');
+        }
+      }
+    });
+  }
+
+  // Make History Timeline draggable
+  const historyTimeline = document.getElementById('historyTimeline');
+  const historyTimelineHeader = historyTimeline?.querySelector('.history-timeline-header');
+  if (historyTimelineHeader && historyTimeline) {
+    let isDragging = false;
+    let dragOffset = { x: 0, y: 0 };
+    let panelPosition = { x: null, y: null };
+
+    // Load saved position from localStorage
+    const savedPosition = localStorage.getItem('historyTimelinePosition');
+    if (savedPosition) {
+      try {
+        const pos = JSON.parse(savedPosition);
+        panelPosition = pos;
+        historyTimeline.style.left = `${pos.x}px`;
+        historyTimeline.style.top = `${pos.y}px`;
+        historyTimeline.style.transform = 'none';
+      } catch (e) {
+        console.warn('Failed to load history timeline position:', e);
+      }
+    }
+
+    historyTimelineHeader.addEventListener('mousedown', e => {
+      // Prevent dragging if clicking the close button
+      if (e.target.id === 'closeHistoryBtn' || e.target.closest('#closeHistoryBtn')) {
+        return;
+      }
+
+      isDragging = true;
+      historyTimelineHeader.classList.add('dragging');
+
+      const rect = historyTimeline.getBoundingClientRect();
+      dragOffset.x = e.clientX - rect.left;
+      dragOffset.y = e.clientY - rect.top;
+
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (isDragging && historyTimeline) {
+        const x = e.clientX - dragOffset.x;
+        const y = e.clientY - dragOffset.y;
+
+        // Constrain to viewport bounds
+        const maxX = window.innerWidth - historyTimeline.offsetWidth;
+        const maxY = window.innerHeight - historyTimeline.offsetHeight;
+
+        const constrainedX = Math.max(0, Math.min(x, maxX));
+        const constrainedY = Math.max(0, Math.min(y, maxY));
+
+        historyTimeline.style.left = `${constrainedX}px`;
+        historyTimeline.style.top = `${constrainedY}px`;
+        historyTimeline.style.transform = 'none';
+
+        // Save position
+        panelPosition = { x: constrainedX, y: constrainedY };
+        localStorage.setItem('historyTimelinePosition', JSON.stringify(panelPosition));
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        if (historyTimelineHeader) {
+          historyTimelineHeader.classList.remove('dragging');
         }
       }
     });
@@ -1948,7 +2055,7 @@ function setupEventListeners() {
     });
   }
 
-  function updateHistoryTimeline() {
+  async function updateHistoryTimeline() {
     const historyTimelineContent = document.getElementById('historyTimelineContent');
     if (!historyTimelineContent) return;
 
@@ -1963,21 +2070,59 @@ function setupEventListeners() {
 
     // Show history in reverse order (newest first)
     const reversedHistory = [...history].reverse();
+    const currentHistoryIndex = getHistoryIndex();
+
+    // Show loading state
+    historyTimelineContent.innerHTML = '<p style="color: #b0b0b0; text-align: center; padding: 1rem;">Generating previews...</p>';
+
+    // Generate thumbnails sequentially to avoid overwhelming the browser
+    // and to ensure each state is properly rendered
+    const thumbnails = [];
+    for (let reverseIndex = 0; reverseIndex < reversedHistory.length; reverseIndex++) {
+      const state = reversedHistory[reverseIndex];
+      const actualIndex = history.length - 1 - reverseIndex;
+      try {
+        console.log(`Generating thumbnail ${reverseIndex + 1}/${reversedHistory.length} for index ${actualIndex}`);
+        const thumbnail = await generateHistoryThumbnail(state, actualIndex);
+        thumbnails.push(thumbnail);
+        console.log(`Thumbnail ${reverseIndex + 1} generated:`, thumbnail ? 'Success' : 'Failed');
+      } catch (err) {
+        console.error(`Error generating thumbnail for index ${actualIndex}:`, err);
+        thumbnails.push(null);
+      }
+    }
+
+    console.log('Generated thumbnails:', thumbnails.filter(t => t !== null).length, 'out of', thumbnails.length);
+
+    // Clear loading state
+    historyTimelineContent.innerHTML = '';
+
     reversedHistory.forEach((state, reverseIndex) => {
       const actualIndex = history.length - 1 - reverseIndex;
       const historyItem = document.createElement('div');
       historyItem.className = 'history-item';
-      if (actualIndex === historyIndex) {
+      if (actualIndex === currentHistoryIndex) {
         historyItem.classList.add('active');
       }
 
-      // Create a simple preview based on state
+      // Get thumbnail or fallback to text preview
+      const thumbnail = thumbnails[reverseIndex];
       const previewText = state.title ? state.title.substring(0, 10) : 'Empty';
       const previewColor = state.titleColor || '#00ffff';
 
+      let previewHTML = '';
+      if (thumbnail) {
+        console.log(`Thumbnail for index ${actualIndex}:`, thumbnail.substring(0, 50) + '...');
+        previewHTML = `<img src="${thumbnail}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" onerror="console.error('Failed to load thumbnail for index ${actualIndex}'); this.parentElement.innerHTML='<div style=\\'background: ${previewColor}; color: #0a0a0a; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: bold; padding: 0.25rem; width: 100%; height: 100%;\\'>${previewText}</div>';" />`;
+      } else {
+        console.warn(`No thumbnail for index ${actualIndex}, using fallback`);
+        // Fallback to text preview if thumbnail generation failed
+        previewHTML = `<div style="background: ${previewColor}; color: #0a0a0a; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: bold; padding: 0.25rem; width: 100%; height: 100%;">${previewText}</div>`;
+      }
+
       historyItem.innerHTML = `
-        <div class="history-item-preview" style="background: ${previewColor}; color: #0a0a0a; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: bold; padding: 0.25rem;">
-          ${previewText}
+        <div class="history-item-preview">
+          ${previewHTML}
         </div>
         <div class="history-item-info">
           <span class="history-item-index">#${actualIndex + 1}</span>
@@ -1986,19 +2131,88 @@ function setupEventListeners() {
       `;
 
       historyItem.addEventListener('click', () => {
-        const state = getStateAt(index);
-        if (state) {
-          setHistoryIndex(index);
-          // Apply state to UI and update
-          applyStateToUI(state);
-          currentState = state;
-          updateState(true); // Skip history to avoid duplicate entry
-          const historyTimeline = document.getElementById('historyTimeline');
-          if (historyTimeline) {
-            historyTimeline.style.display = 'none';
-            if (historyTimelineBtn) {
-              historyTimelineBtn.classList.remove('active');
-            }
+        const state = getStateAt(actualIndex);
+        if (!state) {
+          console.error('History state not found at index:', actualIndex);
+          return;
+        }
+
+        console.log('Restoring history state at index:', actualIndex, state);
+        setHistoryIndex(actualIndex);
+
+        // Restore image type if stored in state
+        if (state.imageType) {
+          const imageType = state.imageType === 'twitter' ? IMAGE_TYPES.TWITTER : IMAGE_TYPES.OG;
+          if (imageType !== currentImageType) {
+            currentImageType = imageType;
+            setImageType(currentImageType);
+            updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
+            updateCompositionCanvasDimensions(currentImageType.width, currentImageType.height);
+
+            // Update mode button active state
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+              btn.classList.remove('active');
+              if ((imageType === IMAGE_TYPES.OG && btn.dataset.mode === 'og') ||
+                (imageType === IMAGE_TYPES.TWITTER && btn.dataset.mode === 'twitter')) {
+                btn.classList.add('active');
+              }
+            });
+          }
+        }
+
+        // Apply state to UI (this sets all input values)
+        // This includes setting colors via setTimeout(0)
+        applyStateToUI(state);
+
+        // Wait for color pickers to be applied, then update state and preview
+        // applyStateToUI uses setTimeout(0) for colors, so we need to wait for that
+        // Use requestAnimationFrame to ensure DOM is ready, then setTimeout for async operations
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              // Force a reflow to ensure DOM updates are complete
+              void document.body.offsetHeight;
+
+              // Verify colors were applied by checking color pickers
+              // If not, apply them again
+              if (state.titleColor && getSelectedColorKey('titleColorPicker') !== state.titleColor) {
+                setSelectedColor('titleColorPicker', state.titleColor);
+              }
+              if (state.subtitleColor && getSelectedColorKey('subtitleColorPicker') !== state.subtitleColor) {
+                setSelectedColor('subtitleColorPicker', state.subtitleColor);
+              }
+              if (state.sloganColor && getSelectedColorKey('sloganColorPicker') !== state.sloganColor) {
+                setSelectedColor('sloganColorPicker', state.sloganColor);
+              }
+              if (state.logoColor && getLogoColorKey() !== state.logoColor) {
+                setLogoColor(state.logoColor);
+              }
+
+              // Small delay to ensure color picker updates are processed
+              setTimeout(() => {
+                console.log('Updating state and preview from restored history state');
+                // Now update state from UI (which will read all the values we just set)
+                // This ensures everything is in sync and calls updatePreview
+                updateState(true); // Skip history to avoid duplicate entry
+
+                // Update undo/redo buttons
+                updateUndoRedoButtons();
+
+                // Update timeline to reflect new active state
+                updateHistoryTimeline();
+
+                console.log('History state restoration complete');
+              }, 50);
+            }, 100); // Wait for initial color application
+          });
+        });
+
+        // Close timeline modal
+        const historyTimeline = document.getElementById('historyTimeline');
+        if (historyTimeline) {
+          historyTimeline.style.display = 'none';
+          if (historyTimelineBtn) {
+            historyTimelineBtn.classList.remove('active');
           }
         }
       });
@@ -2007,11 +2221,144 @@ function setupEventListeners() {
     });
   }
 
-  async function generateHistoryPreview(container, state) {
-    // Simplified preview - just show a placeholder for now
-    // Full preview generation would require applying the state temporarily
-    container.innerHTML =
-      '<div style="color: #666; text-align: center; padding: 0.5rem; font-size: 0.7rem;">Preview</div>';
+  // Thumbnail cache to avoid regenerating thumbnails
+  const thumbnailCache = new Map();
+
+  async function generateHistoryThumbnail(state, index) {
+    // Check cache first
+    const cacheKey = `thumb_${index}`;
+    if (thumbnailCache.has(cacheKey)) {
+      return thumbnailCache.get(cacheKey);
+    }
+
+    // Store current state outside try block for error handling
+    let currentStateBackup = null;
+    let currentImageTypeBackup = null;
+
+    try {
+      const canvasWrapper = document.getElementById('canvasWrapper');
+      if (!canvasWrapper) {
+        console.warn('Canvas wrapper not found for thumbnail generation');
+        return null;
+      }
+
+      // Store current state
+      currentStateBackup = JSON.parse(JSON.stringify(currentState));
+      currentImageTypeBackup = currentImageType;
+
+      // Temporarily apply the history state
+      if (state.imageType) {
+        const imageType = state.imageType === 'twitter' ? IMAGE_TYPES.TWITTER : IMAGE_TYPES.OG;
+        if (imageType !== currentImageType) {
+          currentImageType = imageType;
+          setImageType(currentImageType);
+        }
+      }
+
+      applyStateToUI(state);
+
+      // Wait for color pickers to be applied
+      await new Promise(resolve => {
+        setTimeout(() => {
+          // Verify colors were applied
+          if (state.titleColor && getSelectedColorKey('titleColorPicker') !== state.titleColor) {
+            setSelectedColor('titleColorPicker', state.titleColor);
+          }
+          if (state.subtitleColor && getSelectedColorKey('subtitleColorPicker') !== state.subtitleColor) {
+            setSelectedColor('subtitleColorPicker', state.subtitleColor);
+          }
+          if (state.sloganColor && getSelectedColorKey('sloganColorPicker') !== state.sloganColor) {
+            setSelectedColor('sloganColorPicker', state.sloganColor);
+          }
+          if (state.logoColor && getLogoColorKey() !== state.logoColor) {
+            setLogoColor(state.logoColor);
+          }
+          resolve();
+        }, 100);
+      });
+
+      // Update currentState from the history state for preview rendering
+      // Don't call updateState() as it reads from UI and might add to history
+      // Instead, directly call updatePreview with the state
+      currentState = JSON.parse(JSON.stringify(state));
+      updatePreview(currentState);
+
+      // Wait for preview to render (updatePreview uses requestAnimationFrame)
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              setTimeout(resolve, 300); // Give preview time to fully render
+            });
+          });
+        });
+      });
+
+      // Generate thumbnail using html-to-image (loaded via loadHtml2Canvas)
+      const htmlToImage = await loadHtml2Canvas();
+      if (!htmlToImage || typeof htmlToImage.toCanvas !== 'function') {
+        console.error('html-to-image library not loaded correctly');
+        throw new Error('html-to-image library not available');
+      }
+
+      // Ensure canvas wrapper has correct dimensions for capture
+      // html-to-image needs explicit width/height to capture the full element
+      const thumbnailWidth = currentImageType.width;
+      const thumbnailHeight = currentImageType.height;
+
+      // Temporarily set explicit dimensions on canvas wrapper for capture
+      const originalWidth = canvasWrapper.style.width;
+      const originalHeight = canvasWrapper.style.height;
+      const originalTransform = canvasWrapper.style.transform;
+      canvasWrapper.style.width = `${thumbnailWidth}px`;
+      canvasWrapper.style.height = `${thumbnailHeight}px`;
+      canvasWrapper.style.transform = 'none'; // Remove any scaling transforms
+
+      const thumbnailCanvas = await htmlToImage.toCanvas(canvasWrapper, {
+        width: thumbnailWidth, // Base width
+        height: thumbnailHeight, // Base height
+        pixelRatio: 0.2, // Small scale for thumbnails (20% of original)
+        useCORS: true,
+        backgroundColor: null,
+        cacheBust: false,
+      });
+
+      // Restore original dimensions and transform
+      canvasWrapper.style.width = originalWidth;
+      canvasWrapper.style.height = originalHeight;
+      canvasWrapper.style.transform = originalTransform;
+
+      // Convert to data URL
+      const thumbnailDataUrl = thumbnailCanvas.toDataURL('image/png', 0.8);
+
+      // Restore original state
+      currentState = currentStateBackup;
+      currentImageType = currentImageTypeBackup;
+      applyStateToUI(currentStateBackup);
+      if (currentImageTypeBackup !== currentImageType) {
+        setImageType(currentImageTypeBackup);
+      }
+      // Don't call updateState() here - just call updatePreview directly to avoid any history issues
+      updatePreview(currentStateBackup);
+
+      // Cache the thumbnail
+      thumbnailCache.set(cacheKey, thumbnailDataUrl);
+
+      return thumbnailDataUrl;
+    } catch (error) {
+      console.error('Error generating thumbnail:', error);
+      // Restore original state on error
+      if (currentStateBackup && currentImageTypeBackup !== null) {
+        currentState = JSON.parse(JSON.stringify(currentStateBackup));
+        currentImageType = currentImageTypeBackup;
+        applyStateToUI(currentStateBackup);
+        if (currentImageTypeBackup !== currentImageType) {
+          setImageType(currentImageTypeBackup);
+        }
+        updateState(true);
+      }
+      return null;
+    }
   }
 
   // Background pattern
@@ -2173,9 +2520,9 @@ function setupEventListeners() {
     });
   }
 
-  // Initialize custom dropdown with hover previews
-  initCustomPatternDropdown();
-  initCustomExportQualityDropdown();
+  // Initialize custom dropdown with hover previews (called from init() after setupEventListeners)
+  // initCustomPatternDropdown();
+  // initCustomExportQualityDropdown();
 
   // Logo X/Y position sliders are handled above with syncSliderInputDebounced
 
@@ -3638,6 +3985,7 @@ function randomizeAllSettings() {
   }
 
   // Randomize glow
+  if (logoGlow) logoGlow.checked = Math.random() > 0.5;
   if (titleGlow) titleGlow.checked = Math.random() > 0.5;
   if (subtitleGlow) subtitleGlow.checked = Math.random() > 0.5;
   if (sloganGlow) sloganGlow.checked = Math.random() > 0.5;
@@ -3761,6 +4109,7 @@ function resetToDefaults() {
   }
 
   // Reset glow
+  if (logoGlow) logoGlow.checked = false;
   if (titleGlow) titleGlow.checked = false;
   if (subtitleGlow) subtitleGlow.checked = false;
   if (sloganGlow) sloganGlow.checked = false;

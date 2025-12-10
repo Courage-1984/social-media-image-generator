@@ -115,3 +115,11 @@ export function setHistoryIndex(index) {
   }
 }
 
+/**
+ * Get current history index
+ * @returns {number} Current history index
+ */
+export function getHistoryIndex() {
+  return historyIndex;
+}
+

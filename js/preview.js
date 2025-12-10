@@ -252,6 +252,7 @@ export function updatePreview(state) {
     logoY,
     logoSize,
     logoColor,
+    logoGlow,
     titleSize,
     subtitleSize,
     sloganSize,
@@ -491,40 +492,16 @@ export function updatePreview(state) {
   } else {
     // Get logo color hex value
     let logoColorHex = '#ffffff'; // Default to white
+    let logoColorKey = logoColor || 'cyan';
     if (logoColor && typeof logoColor === 'string') {
       const colorObj = colorPalette[logoColor];
       if (colorObj) {
         logoColorHex = colorObj.hex || (typeof colorObj === 'string' ? colorObj : '#ffffff');
+        logoColorKey = logoColor;
       }
     }
 
-    // Apply CSS Masking technique:
-    // 1. Set background-color to the target hex color (100% accurate)
-    // 2. Use mask-image with the SVG to create a stencil effect
-    // 3. The background color shows through only where the mask is opaque
-    logoContainer.className = 'logo-masked'; // Add class for export identification
-    logoContainer.dataset.logoUrl = logoUrl; // Store logo URL for export
-    logoContainer.dataset.logoColor = logoColorHex; // Store color for export
-    logoContainer.dataset.layer = 'logo'; // Add layer identifier for visibility toggle
-    logoContainer.style.backgroundColor = logoColorHex;
-    logoContainer.style.webkitMaskImage = `url(${logoUrl})`;
-    logoContainer.style.maskImage = `url(${logoUrl})`;
-    logoContainer.style.webkitMaskSize = 'contain';
-    logoContainer.style.maskSize = 'contain';
-    logoContainer.style.webkitMaskRepeat = 'no-repeat';
-    logoContainer.style.maskRepeat = 'no-repeat';
-    logoContainer.style.webkitMaskPosition = 'center';
-    logoContainer.style.maskPosition = 'center';
-
-    // For uploaded logos that might be PNG/JPEG (not SVG), use luminance mode
-    // This interprets white pixels as opaque and black as transparent
-    if (logoUrl && (logoUrl.includes('.png') || logoUrl.includes('.jpg') || logoUrl.includes('.jpeg') || logoUrl.startsWith('data:image/png') || logoUrl.startsWith('data:image/jpeg'))) {
-      logoContainer.style.webkitMaskMode = 'luminance';
-      logoContainer.style.maskMode = 'luminance';
-    }
-    // For SVG files, alpha mode is default (works with transparent backgrounds)
-
-    // Apply positioning and sizing using absolute X/Y coordinates
+    // Apply positioning and sizing to wrapper using absolute X/Y coordinates
     const logoXValue = logoX !== undefined && logoX !== null ? logoX : 40;
     const logoYValue = logoY !== undefined && logoY !== null ? logoY : 40;
     logoContainer.style.width = `${logoSize}px`;
@@ -534,9 +511,51 @@ export function updatePreview(state) {
     logoContainer.style.right = 'auto';
     logoContainer.style.bottom = 'auto';
     logoContainer.style.transform = 'none';
-    logoContainer.style.opacity = '1';
+    logoContainer.dataset.layer = 'logo'; // Add layer identifier for visibility toggle
 
-    // Append to DOM
+    // Create inner container for the masked logo (separate from wrapper to avoid filter/mask conflict)
+    const logoMasked = document.createElement('div');
+    // Apply CSS Masking technique:
+    // 1. Set background-color to the target hex color (100% accurate)
+    // 2. Use mask-image with the SVG to create a stencil effect
+    // 3. The background color shows through only where the mask is opaque
+    logoMasked.className = 'logo-masked'; // Add class for export identification
+    logoMasked.dataset.logoUrl = logoUrl; // Store logo URL for export
+    logoMasked.dataset.logoColor = logoColorHex; // Store color for export
+    logoMasked.style.backgroundColor = logoColorHex;
+    logoMasked.style.webkitMaskImage = `url(${logoUrl})`;
+    logoMasked.style.maskImage = `url(${logoUrl})`;
+    logoMasked.style.webkitMaskSize = 'contain';
+    logoMasked.style.maskSize = 'contain';
+    logoMasked.style.webkitMaskRepeat = 'no-repeat';
+    logoMasked.style.maskRepeat = 'no-repeat';
+    logoMasked.style.webkitMaskPosition = 'center';
+    logoMasked.style.maskPosition = 'center';
+    logoMasked.style.width = '100%';
+    logoMasked.style.height = '100%';
+    logoMasked.style.position = 'relative';
+
+    // For uploaded logos that might be PNG/JPEG (not SVG), use luminance mode
+    // This interprets white pixels as opaque and black as transparent
+    if (logoUrl && (logoUrl.includes('.png') || logoUrl.includes('.jpg') || logoUrl.includes('.jpeg') || logoUrl.startsWith('data:image/png') || logoUrl.startsWith('data:image/jpeg'))) {
+      logoMasked.style.webkitMaskMode = 'luminance';
+      logoMasked.style.maskMode = 'luminance';
+    }
+    // For SVG files, alpha mode is default (works with transparent backgrounds)
+
+    // Apply glow effect to container if enabled (filter on container, mask on inner element)
+    // This prevents filter from interfering with mask rendering
+    if (logoGlow && glowColors[logoColorKey]) {
+      const glowColor = glowColors[logoColorKey];
+      // Use filter: drop-shadow on the container (not the masked element)
+      logoContainer.style.filter = `drop-shadow(0 0 20px ${logoColorHex}80) drop-shadow(0 0 40px ${glowColor}) drop-shadow(0 0 60px ${glowColor})`;
+    } else {
+      logoContainer.style.filter = '';
+    }
+
+    // Append inner masked element to container
+    logoContainer.appendChild(logoMasked);
+    // Append container to DOM
     canvasWrapper.appendChild(logoContainer);
   }
 

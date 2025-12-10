@@ -481,12 +481,53 @@ export function initRulerGuides() {
   // Create enhanced overlay structure
   createEnhancedOverlay();
 
+  // Initialize modal
+  initRulerGuidesModal();
+
   // Event listeners
   rulerToggleBtn.addEventListener('click', (e) => {
     console.log('Ruler button clicked');
     e.preventDefault();
     e.stopPropagation();
-    toggleRuler();
+    
+    // If ruler is already active, open the modal instead of toggling
+    const rulerOverlay = document.getElementById('rulerOverlay');
+    const currentDisplay = rulerOverlay?.style.display || (rulerOverlay ? window.getComputedStyle(rulerOverlay).display : 'none');
+    const isCurrentlyActive = currentDisplay !== 'none' && currentDisplay !== '';
+    
+    if (isCurrentlyActive && RulerState.isActive) {
+      // Open modal
+      const rulerGuidesPanel = document.getElementById('rulerGuidesPanel');
+      if (rulerGuidesPanel) {
+        const isOpen = rulerGuidesPanel.style.display === 'flex';
+        rulerGuidesPanel.style.display = isOpen ? 'none' : 'flex';
+        
+        // Center or restore position
+        if (!isOpen) {
+          const savedPosition = localStorage.getItem('rulerGuidesPanelPosition');
+          if (savedPosition) {
+            try {
+              const pos = JSON.parse(savedPosition);
+              rulerGuidesPanel.style.left = `${pos.x}px`;
+              rulerGuidesPanel.style.top = `${pos.y}px`;
+              rulerGuidesPanel.style.transform = 'none';
+            } catch (e) {
+              // Center if position load fails
+              rulerGuidesPanel.style.left = '50%';
+              rulerGuidesPanel.style.top = '50%';
+              rulerGuidesPanel.style.transform = 'translate(-50%, -50%)';
+            }
+          } else {
+            rulerGuidesPanel.style.left = '50%';
+            rulerGuidesPanel.style.top = '50%';
+            rulerGuidesPanel.style.transform = 'translate(-50%, -50%)';
+          }
+        }
+      }
+    } else {
+      // Toggle ruler
+      toggleRuler();
+    }
   });
 
   // Keyboard shortcuts
@@ -593,6 +634,175 @@ function createEnhancedOverlay() {
   }
 
   console.log('Enhanced overlay structure created successfully');
+}
+
+/**
+ * Initialize ruler/guides modal
+ */
+function initRulerGuidesModal() {
+  const rulerGuidesPanel = document.getElementById('rulerGuidesPanel');
+  const closeRulerGuidesBtn = document.getElementById('closeRulerGuidesBtn');
+  const rulerGuidesHeader = rulerGuidesPanel?.querySelector('.ruler-guides-header');
+
+  if (!rulerGuidesPanel) return;
+
+  let isDragging = false;
+  let dragOffset = { x: 0, y: 0 };
+  let panelPosition = { x: null, y: null };
+
+  // Load saved position from localStorage
+  const savedPosition = localStorage.getItem('rulerGuidesPanelPosition');
+  if (savedPosition && rulerGuidesPanel) {
+    try {
+      const pos = JSON.parse(savedPosition);
+      panelPosition = pos;
+      rulerGuidesPanel.style.left = `${pos.x}px`;
+      rulerGuidesPanel.style.top = `${pos.y}px`;
+      rulerGuidesPanel.style.transform = 'none';
+    } catch (e) {
+      console.warn('Failed to load ruler guides panel position:', e);
+    }
+  }
+
+  // Drag functionality
+  if (rulerGuidesHeader && rulerGuidesPanel) {
+    rulerGuidesHeader.addEventListener('mousedown', e => {
+      // Prevent dragging if clicking the close button
+      if (e.target.id === 'closeRulerGuidesBtn' || e.target.closest('#closeRulerGuidesBtn')) {
+        return;
+      }
+
+      isDragging = true;
+      rulerGuidesHeader.classList.add('dragging');
+
+      const rect = rulerGuidesPanel.getBoundingClientRect();
+      dragOffset.x = e.clientX - rect.left;
+      dragOffset.y = e.clientY - rect.top;
+
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (isDragging && rulerGuidesPanel) {
+        const x = e.clientX - dragOffset.x;
+        const y = e.clientY - dragOffset.y;
+
+        // Constrain to viewport bounds
+        const maxX = window.innerWidth - rulerGuidesPanel.offsetWidth;
+        const maxY = window.innerHeight - rulerGuidesPanel.offsetHeight;
+
+        const constrainedX = Math.max(0, Math.min(x, maxX));
+        const constrainedY = Math.max(0, Math.min(y, maxY));
+
+        rulerGuidesPanel.style.left = `${constrainedX}px`;
+        rulerGuidesPanel.style.top = `${constrainedY}px`;
+        rulerGuidesPanel.style.transform = 'none';
+
+        // Save position
+        panelPosition = { x: constrainedX, y: constrainedY };
+        localStorage.setItem('rulerGuidesPanelPosition', JSON.stringify(panelPosition));
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        if (rulerGuidesHeader) {
+          rulerGuidesHeader.classList.remove('dragging');
+        }
+      }
+    });
+  }
+
+  // Close button
+  if (closeRulerGuidesBtn) {
+    closeRulerGuidesBtn.addEventListener('click', () => {
+      rulerGuidesPanel.style.display = 'none';
+    });
+  }
+
+  // Modal controls
+  const addHorizontalGuideBtn = document.getElementById('addHorizontalGuideBtn');
+  const addVerticalGuideBtn = document.getElementById('addVerticalGuideBtn');
+  const clearAllGuidesBtn = document.getElementById('clearAllGuidesBtn');
+  const snapToGridToggle = document.getElementById('snapToGridToggle');
+  const gridSizeInput = document.getElementById('gridSizeInput');
+  const rulerUnitSelect = document.getElementById('rulerUnitSelect');
+  const showCrosshairToggle = document.getElementById('showCrosshairToggle');
+  const showDistanceIndicatorsToggle = document.getElementById('showDistanceIndicatorsToggle');
+
+  // Add guide buttons - use cursor position
+  if (addHorizontalGuideBtn) {
+    addHorizontalGuideBtn.addEventListener('click', () => {
+      addGuide('H', null, true); // Use cursor position
+    });
+  }
+
+  if (addVerticalGuideBtn) {
+    addVerticalGuideBtn.addEventListener('click', () => {
+      addGuide('V', null, true); // Use cursor position
+    });
+  }
+
+  // Clear all guides
+  if (clearAllGuidesBtn) {
+    clearAllGuidesBtn.addEventListener('click', () => {
+      clearAllGuides();
+    });
+  }
+
+  // Snap to grid toggle
+  if (snapToGridToggle) {
+    snapToGridToggle.checked = RulerState.snapEnabled;
+    snapToGridToggle.addEventListener('change', (e) => {
+      RulerState.snapEnabled = e.target.checked;
+      snapToGrid = RulerState.snapEnabled;
+    });
+  }
+
+  // Grid size input
+  if (gridSizeInput) {
+    gridSizeInput.value = RulerState.gridSize;
+    gridSizeInput.addEventListener('input', (e) => {
+      const value = parseInt(e.target.value) || 10;
+      RulerState.gridSize = Math.max(1, Math.min(100, value));
+      gridSize = RulerState.gridSize;
+    });
+  }
+
+  // Unit select
+  if (rulerUnitSelect) {
+    rulerUnitSelect.value = RulerState.currentUnit;
+    rulerUnitSelect.addEventListener('change', (e) => {
+      RulerState.currentUnit = e.target.value;
+      unitType = RulerState.currentUnit;
+      RulerState.needsRerender = true;
+      // Trigger ruler marks rerender
+      const rulerOverlay = document.getElementById('rulerOverlay');
+      if (rulerOverlay && RulerState.isActive) {
+        renderRulerMarks();
+      }
+    });
+  }
+
+  // Show crosshair toggle
+  if (showCrosshairToggle) {
+    showCrosshairToggle.checked = RulerState.cursorVisible !== false;
+    showCrosshairToggle.addEventListener('change', (e) => {
+      RulerState.cursorVisible = e.target.checked;
+      showCrosshair = RulerState.cursorVisible;
+      RulerState.needsRerender = true;
+    });
+  }
+
+  // Show distance indicators toggle
+  if (showDistanceIndicatorsToggle) {
+    showDistanceIndicatorsToggle.checked = showDistanceIndicators !== false;
+    showDistanceIndicatorsToggle.addEventListener('change', (e) => {
+      showDistanceIndicators = e.target.checked;
+      RulerState.needsRerender = true;
+    });
+  }
 }
 
 /**
@@ -902,8 +1112,11 @@ function snapToGridPosition(position, type) {
 
 /**
  * Add a new guide
+ * @param {string} type - 'H' for horizontal, 'V' for vertical
+ * @param {number|null} positionPx - Position in pixels, or null to use cursor position
+ * @param {boolean} useCursorPosition - If true and positionPx is null, use cursor position instead of center
  */
-function addGuide(type, positionPx = null) {
+function addGuide(type, positionPx = null, useCursorPosition = true) {
   const canvasWrapper = document.getElementById('canvasWrapper');
   if (!canvasWrapper) return;
 
@@ -911,7 +1124,20 @@ function addGuide(type, positionPx = null) {
   const rulerOffsetX = 20;
   const rulerOffsetY = 24;
 
-  // Default to center if no position provided
+  // Use cursor position if available and useCursorPosition is true
+  if (positionPx === null && useCursorPosition && RulerState.cursorVisible) {
+    if (type === 'horizontal' || type === 'H') {
+      // Use cursor Y position (accounting for ruler offset)
+      positionPx = RulerState.cursorY;
+      type = 'H'; // Normalize to 'H'
+    } else if (type === 'vertical' || type === 'V') {
+      // Use cursor X position (accounting for ruler offset)
+      positionPx = RulerState.cursorX;
+      type = 'V'; // Normalize to 'V'
+    }
+  }
+
+  // Default to center if no position provided and cursor not available
   if (positionPx === null) {
     if (type === 'horizontal' || type === 'H') {
       positionPx = (rect.height - rulerOffsetY) / 2;
@@ -1362,11 +1588,11 @@ function setupGuideManagement() {
   const snapToggle = document.getElementById('snapToGridToggle');
 
   if (addHorizontalBtn) {
-    addHorizontalBtn.addEventListener('click', () => addGuide('H'));
+    addHorizontalBtn.addEventListener('click', () => addGuide('H', null, true));
   }
 
   if (addVerticalBtn) {
-    addVerticalBtn.addEventListener('click', () => addGuide('V'));
+    addVerticalBtn.addEventListener('click', () => addGuide('V', null, true));
   }
 
   if (clearAllBtn) {
@@ -1416,16 +1642,16 @@ function handleKeyboardShortcuts(e) {
   // Ignore if typing in input field
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-  // H - Add horizontal guide
+  // H - Add horizontal guide at cursor position
   if ((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.metaKey) {
     e.preventDefault();
-    addGuide('H');
+    addGuide('H', null, true); // Use cursor position
   }
 
-  // V - Add vertical guide
+  // V - Add vertical guide at cursor position
   if ((e.key === 'v' || e.key === 'V') && !e.ctrlKey && !e.metaKey) {
     e.preventDefault();
-    addGuide('V');
+    addGuide('V', null, true); // Use cursor position
   }
 
   // C - Clear all guides (with confirmation)
