@@ -2951,130 +2951,116 @@ function setupEventListeners() {
       // Hard refresh: clear cache, storage, and force fresh asset fetches
       // Similar to Ctrl+F5 or Ctrl+Shift+R, but more aggressive
       // For GitHub Pages, we need a reliable method that bypasses all caches
-      try {
-        // 1. Clear HTTP Cache via Cache API (if available)
-        if ('caches' in window) {
-          try {
-            const cacheNames = await caches.keys();
-            await Promise.all(
+      
+      // Use Promise.allSettled to ensure all operations complete even if some fail
+      const clearOps = [];
+
+      // 1. Clear HTTP Cache via Cache API (if available)
+      if ('caches' in window) {
+        clearOps.push(
+          caches.keys().then(cacheNames => {
+            console.log('Found caches:', cacheNames);
+            return Promise.all(
               cacheNames.map(cacheName => {
                 console.log('Deleting cache:', cacheName);
                 return caches.delete(cacheName);
               })
             );
+          }).then(() => {
             console.log('All caches cleared via Cache API');
-          } catch (cacheError) {
+          }).catch(cacheError => {
             console.warn('Error clearing Cache API:', cacheError);
-          }
-        }
+          })
+        );
+      }
 
-        // 2. Unregister all service workers (if any)
-        if ('serviceWorker' in navigator) {
-          try {
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            for (const registration of registrations) {
-              await registration.unregister();
-              console.log('Unregistered service worker:', registration.scope);
-
-              // Also clear service worker cache
-              if (registration.active) {
-                try {
-                  const cacheNames = await caches.keys();
-                  await Promise.all(cacheNames.map(name => caches.delete(name)));
-                } catch (swCacheError) {
-                  console.warn('Error clearing service worker cache:', swCacheError);
-                }
-              }
-            }
-          } catch (swError) {
-            console.warn('Error unregistering service workers:', swError);
-          }
-        }
-
-        // 3. Clear IndexedDB (if used)
-        if ('indexedDB' in window) {
-          try {
-            const databases = await indexedDB.databases();
-            await Promise.all(
-              databases.map(db => {
-                return new Promise((resolve, reject) => {
-                  const deleteReq = indexedDB.deleteDatabase(db.name);
-                  deleteReq.onsuccess = () => {
-                    console.log('Deleted IndexedDB:', db.name);
-                    resolve();
-                  };
-                  deleteReq.onerror = () => reject(deleteReq.error);
-                  deleteReq.onblocked = () => {
-                    console.warn('IndexedDB delete blocked for:', db.name);
-                    resolve(); // Continue anyway
-                  };
-                });
+      // 2. Unregister all service workers (if any)
+      if ('serviceWorker' in navigator) {
+        clearOps.push(
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            return Promise.all(
+              registrations.map(registration => {
+                console.log('Unregistering service worker:', registration.scope);
+                return registration.unregister();
               })
             );
-          } catch (dbError) {
+          }).then(() => {
+            console.log('All service workers unregistered');
+          }).catch(swError => {
+            console.warn('Error unregistering service workers:', swError);
+          })
+        );
+      }
+
+      // 3. Clear IndexedDB (if used) - with timeout to prevent hanging
+      if ('indexedDB' in window) {
+        clearOps.push(
+          Promise.race([
+            indexedDB.databases().then(databases => {
+              return Promise.all(
+                databases.map(db => {
+                  return new Promise((resolve) => {
+                    const deleteReq = indexedDB.deleteDatabase(db.name);
+                    deleteReq.onsuccess = () => {
+                      console.log('Deleted IndexedDB:', db.name);
+                      resolve();
+                    };
+                    deleteReq.onerror = () => {
+                      console.warn('Error deleting IndexedDB:', db.name);
+                      resolve(); // Continue anyway
+                    };
+                    deleteReq.onblocked = () => {
+                      console.warn('IndexedDB delete blocked for:', db.name);
+                      resolve(); // Continue anyway
+                    };
+                  });
+                })
+              );
+            }),
+            new Promise(resolve => setTimeout(resolve, 1000)) // 1 second timeout
+          ]).catch(dbError => {
             console.warn('Could not clear IndexedDB:', dbError);
-          }
-        }
+          })
+        );
+      }
 
-        // 4. Clear localStorage and sessionStorage
-        try {
-          localStorage.clear();
-          sessionStorage.clear();
-          console.log('Cleared localStorage and sessionStorage');
-        } catch (storageError) {
-          console.warn('Error clearing storage:', storageError);
-        }
+      // 4. Clear localStorage and sessionStorage
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        console.log('Cleared localStorage and sessionStorage');
+      } catch (storageError) {
+        console.warn('Error clearing storage:', storageError);
+      }
 
-        // 5. Force network fetch with no-cache headers to invalidate HTTP cache
-        try {
-          await fetch(window.location.href, {
-            method: 'GET',
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              Pragma: 'no-cache',
-            },
-          }).catch(() => {
-            // Ignore fetch errors - we're just trying to invalidate cache
-          });
-        } catch (fetchError) {
-          // Ignore - this is just cache invalidation attempt
-        }
+      // Wait for all async operations with timeout
+      try {
+        await Promise.race([
+          Promise.allSettled(clearOps),
+          new Promise(resolve => setTimeout(resolve, 2000)) // 2 second max wait
+        ]);
+        console.log('All cache clearing operations completed');
+      } catch (error) {
+        console.warn('Some cache clearing operations failed:', error);
+      }
 
-        // Small delay to ensure all async operations complete
-        await new Promise(resolve => setTimeout(resolve, 100));
+      // Small delay to ensure UI updates
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-        console.log('All caches cleared, performing hard reload...');
+      console.log('All caches cleared, performing hard reload...');
 
-        // 6. Force hard reload - use multiple methods for maximum compatibility
-        // For GitHub Pages, we need to bypass CDN and browser caches
-        
-        // Method 1: Try deprecated but still-working reload(true) first (works in most browsers)
-        try {
-          if (window.location.reload.toString().includes('forceReload') || 
-              typeof window.location.reload === 'function') {
-            // Use replace to avoid adding to history
-            const url = new URL(window.location.href);
-            url.searchParams.set('_hr', Date.now());
-            url.searchParams.set('_r', Math.random().toString(36).substring(2, 15));
-            window.location.replace(url.toString());
-            return; // Exit early if successful
-          }
-        } catch (e) {
-          console.warn('Method 1 failed, trying alternative:', e);
-        }
+      // Force hard reload with cache-busted URL (most reliable for GitHub Pages)
+      const baseUrl = window.location.origin + window.location.pathname;
+      const timestamp = Date.now();
+      const randomStr = Math.random().toString(36).substring(2, 15);
+      const separator = window.location.pathname.includes('?') || window.location.search ? '&' : '?';
+      const newUrl = `${baseUrl}${separator}_hr=${timestamp}&_r=${randomStr}${window.location.hash || ''}`;
 
-        // Method 2: Navigate to cache-busted URL (most reliable for GitHub Pages)
-        const baseUrl = window.location.origin + window.location.pathname;
-        const timestamp = Date.now();
-        const randomStr = Math.random().toString(36).substring(2, 15);
-        const separator = window.location.pathname.includes('?') ? '&' : '?';
-        const newUrl = `${baseUrl}${separator}_hr=${timestamp}&_r=${randomStr}${window.location.hash || ''}`;
+      console.log('Navigating to:', newUrl);
 
-        console.log('Navigating to:', newUrl);
-
-        // Use replace to avoid adding to history, and force fresh fetch
-        window.location.replace(newUrl);
+      // Use replace to avoid adding to history, and force fresh fetch
+      // This will always execute, even if previous operations failed
+      window.location.replace(newUrl);
       } catch (error) {
         console.error('Error during hard refresh:', error);
 
