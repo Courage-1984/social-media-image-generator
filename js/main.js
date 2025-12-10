@@ -514,7 +514,7 @@ function applyStateToUI(state) {
     titleXValue.value = 600;
     titleXSlider.value = 600;
   }
-  
+
   if (state.titleY !== undefined) {
     titleYValue.value = state.titleY;
     titleYSlider.value = state.titleY;
@@ -526,7 +526,7 @@ function applyStateToUI(state) {
     titleYValue.value = 315;
     titleYSlider.value = 315;
   }
-  
+
   if (state.subtitleX !== undefined) {
     subtitleXValue.value = state.subtitleX;
     subtitleXSlider.value = state.subtitleX;
@@ -538,7 +538,7 @@ function applyStateToUI(state) {
     subtitleXValue.value = 600;
     subtitleXSlider.value = 600;
   }
-  
+
   if (state.subtitleY !== undefined) {
     subtitleYValue.value = state.subtitleY;
     subtitleYSlider.value = state.subtitleY;
@@ -550,7 +550,7 @@ function applyStateToUI(state) {
     subtitleYValue.value = 395;
     subtitleYSlider.value = 395;
   }
-  
+
   if (sloganXValue) {
     if (state.sloganX !== undefined) {
       sloganXValue.value = state.sloganX;
@@ -564,7 +564,7 @@ function applyStateToUI(state) {
       sloganXSlider.value = 600;
     }
   }
-  
+
   if (sloganYValue) {
     if (state.sloganY !== undefined) {
       sloganYValue.value = state.sloganY;
@@ -578,7 +578,7 @@ function applyStateToUI(state) {
       sloganYSlider.value = 455;
     }
   }
-  
+
   // Handle logo position migration
   if (state.logoX === undefined && state.logoY === undefined && state.logoPosition) {
     // Migrate old logoPosition to X/Y coordinates
@@ -593,7 +593,7 @@ function applyStateToUI(state) {
     else if (logoPos === 'bottom-center') { x = IMAGE_TYPES.OG.width / 2; y = IMAGE_TYPES.OG.height - 40; }
     else if (logoPos === 'bottom-right') { x = IMAGE_TYPES.OG.width - 40; y = IMAGE_TYPES.OG.height - 40; }
     else if (logoPos === 'hidden') { x = -1000; y = -1000; } // Hide off-screen
-    
+
     if (logoXValue) logoXValue.value = x;
     if (logoXSlider) logoXSlider.value = x;
     if (logoYValue) logoYValue.value = y;
@@ -1362,31 +1362,49 @@ function setupEventListeners() {
   // Zoom Toggle Button
   const fullscreenZoomBtn = document.getElementById('fullscreenZoomBtn');
   if (fullscreenZoomBtn) {
-      const zoomIndicator = document.getElementById('zoomIndicator');
-      const canvasWrapper = document.getElementById('canvasWrapper');
-      const canvasContainer = document.getElementById('canvasContainer');
+    const zoomIndicator = document.getElementById('zoomIndicator');
+    const canvasWrapper = document.getElementById('canvasWrapper');
+    const canvasContainer = document.getElementById('canvasContainer');
 
-      // Make zoom button always visible (not just in fullscreen)
-      fullscreenZoomBtn.style.display = 'block';
+    // Make zoom button always visible (not just in fullscreen)
+    fullscreenZoomBtn.style.display = 'block';
 
-      const updateZoomUI = () => {
-        const level = getZoomLevel();
-        let displayText = '';
-        if (level === 'fit') {
-          displayText = 'Fit';
-          if (zoomIndicator) zoomIndicator.style.display = 'none';
-        } else {
-          displayText = `${Math.round(level * 100)}%`;
-          if (zoomIndicator) {
-            zoomIndicator.textContent = displayText;
-            zoomIndicator.style.display = 'block';
-          }
+    const updateZoomUI = () => {
+      const level = getZoomLevel();
+      let displayText = '';
+      if (level === 'fit') {
+        displayText = 'Fit';
+        if (zoomIndicator) zoomIndicator.style.display = 'none';
+      } else {
+        displayText = `${Math.round(level * 100)}%`;
+        if (zoomIndicator) {
+          zoomIndicator.textContent = displayText;
+          zoomIndicator.style.display = 'block';
         }
-        fullscreenZoomBtn.title = `Zoom: ${displayText}`;
-      };
+      }
+      fullscreenZoomBtn.title = `Zoom: ${displayText}`;
+    };
 
-      const handleZoomClick = () => {
-        cycleZoomLevel();
+    const handleZoomClick = () => {
+      cycleZoomLevel();
+      updateZoomUI();
+
+      // Update grid and rulers if visible
+      const canvasWrapper = document.getElementById('canvasWrapper');
+      if (canvasWrapper && isGridOverlayVisible()) {
+        updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
+      }
+    };
+
+    // Attach zoom functionality to fullscreenZoomBtn
+    fullscreenZoomBtn.addEventListener('click', handleZoomClick);
+
+    // Make zoom indicator clickable to reset to 'fit'
+    if (zoomIndicator) {
+      zoomIndicator.style.cursor = 'pointer';
+      zoomIndicator.title = 'Click to reset zoom to Fit';
+      zoomIndicator.addEventListener('click', () => {
+        setZoomLevel('fit');
         updateZoomUI();
 
         // Update grid and rulers if visible
@@ -1394,325 +1412,307 @@ function setupEventListeners() {
         if (canvasWrapper && isGridOverlayVisible()) {
           updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
         }
+      });
+    }
+
+    // Pan functionality when zoomed in
+    if (canvasWrapper && canvasContainer) {
+      let isPanning = false;
+      let panStartX = 0;
+      let panStartY = 0;
+      let initialPanX = 0;
+      let initialPanY = 0;
+      let touchIdentifier = null;
+
+      const getEventPoint = e => {
+        if (e.touches && e.touches.length > 0) {
+          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
       };
 
-      // Attach zoom functionality to fullscreenZoomBtn
-      fullscreenZoomBtn.addEventListener('click', handleZoomClick);
+      const startPan = e => {
+        const level = getZoomLevel();
+        if (level === 'fit') return; // No panning when fit to container
 
-      // Make zoom indicator clickable to reset to 'fit'
-      if (zoomIndicator) {
-        zoomIndicator.style.cursor = 'pointer';
-        zoomIndicator.title = 'Click to reset zoom to Fit';
-        zoomIndicator.addEventListener('click', () => {
-          setZoomLevel('fit');
-          updateZoomUI();
+        // For touch events, only handle single touch
+        if (e.touches) {
+          if (e.touches.length !== 1) return;
+          touchIdentifier = e.touches[0].identifier;
+        }
 
-          // Update grid and rulers if visible
-          const canvasWrapper = document.getElementById('canvasWrapper');
-          if (canvasWrapper && isGridOverlayVisible()) {
-            updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
-          }
-        });
-      }
+        e.preventDefault();
+        e.stopPropagation();
 
-      // Pan functionality when zoomed in
-      if (canvasWrapper && canvasContainer) {
-        let isPanning = false;
-        let panStartX = 0;
-        let panStartY = 0;
-        let initialPanX = 0;
-        let initialPanY = 0;
-        let touchIdentifier = null;
+        const currentPan = getPan();
+        initialPanX = currentPan.x;
+        initialPanY = currentPan.y;
 
-        const getEventPoint = e => {
-          if (e.touches && e.touches.length > 0) {
-            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-          }
-          return { x: e.clientX, y: e.clientY };
-        };
+        const containerRect = canvasContainer.getBoundingClientRect();
+        const point = getEventPoint(e);
 
-        const startPan = e => {
-          const level = getZoomLevel();
-          if (level === 'fit') return; // No panning when fit to container
+        // Calculate point relative to container
+        panStartX = point.x - containerRect.left;
+        panStartY = point.y - containerRect.top;
 
-          // For touch events, only handle single touch
-          if (e.touches) {
-            if (e.touches.length !== 1) return;
-            touchIdentifier = e.touches[0].identifier;
-          }
+        isPanning = true;
+        canvasWrapper.style.cursor = 'grabbing';
+        canvasWrapper.style.userSelect = 'none';
+      };
 
-          e.preventDefault();
-          e.stopPropagation();
+      const doPan = e => {
+        if (!isPanning) return;
 
-          const currentPan = getPan();
-          initialPanX = currentPan.x;
-          initialPanY = currentPan.y;
+        // For touch events, match the touch identifier
+        if (e.touches) {
+          const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
+          if (!touch) return;
+        }
 
-          const containerRect = canvasContainer.getBoundingClientRect();
-          const point = getEventPoint(e);
+        e.preventDefault();
+        e.stopPropagation();
 
-          // Calculate point relative to container
-          panStartX = point.x - containerRect.left;
-          panStartY = point.y - containerRect.top;
+        const containerRect = canvasContainer.getBoundingClientRect();
+        const point = getEventPoint(e);
 
-          isPanning = true;
-          canvasWrapper.style.cursor = 'grabbing';
-          canvasWrapper.style.userSelect = 'none';
-        };
+        // Calculate current point relative to container
+        const currentX = point.x - containerRect.left;
+        const currentY = point.y - containerRect.top;
 
-        const doPan = e => {
-          if (!isPanning) return;
+        // Calculate delta from start position
+        const deltaX = currentX - panStartX;
+        const deltaY = currentY - panStartY;
 
-          // For touch events, match the touch identifier
-          if (e.touches) {
-            const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
-            if (!touch) return;
-          }
+        // Apply delta to initial pan position
+        let newPanX = initialPanX + deltaX;
+        let newPanY = initialPanY + deltaY;
 
-          e.preventDefault();
-          e.stopPropagation();
+        // Constrain panning to prevent moving too far
+        const level = getZoomLevel();
+        const canvasWidth = currentImageType.width;
+        const canvasHeight = currentImageType.height;
+        const padding = 24;
+        const containerWidth = containerRect.width - padding;
+        const containerHeight = containerRect.height - padding;
 
-          const containerRect = canvasContainer.getBoundingClientRect();
-          const point = getEventPoint(e);
+        const scaledWidth = canvasWidth * level;
+        const scaledHeight = canvasHeight * level;
 
-          // Calculate current point relative to container
-          const currentX = point.x - containerRect.left;
-          const currentY = point.y - containerRect.top;
+        // Calculate bounds: center offset + pan limits
+        const centerOffsetX = (containerWidth - scaledWidth) / 2;
+        const centerOffsetY = (containerHeight - scaledHeight) / 2;
 
-          // Calculate delta from start position
-          const deltaX = currentX - panStartX;
-          const deltaY = currentY - panStartY;
+        // Maximum pan is when edges align with container edges
+        const maxPanX = Math.max(0, (scaledWidth - containerWidth) / 2);
+        const maxPanY = Math.max(0, (scaledHeight - containerHeight) / 2);
 
-          // Apply delta to initial pan position
-          let newPanX = initialPanX + deltaX;
-          let newPanY = initialPanY + deltaY;
+        // Constrain pan within bounds
+        newPanX = Math.max(-maxPanX, Math.min(maxPanX, newPanX));
+        newPanY = Math.max(-maxPanY, Math.min(maxPanY, newPanY));
 
-          // Constrain panning to prevent moving too far
-          const level = getZoomLevel();
-          const canvasWidth = currentImageType.width;
-          const canvasHeight = currentImageType.height;
-          const padding = 24;
-          const containerWidth = containerRect.width - padding;
-          const containerHeight = containerRect.height - padding;
+        setPan(newPanX, newPanY);
+      };
 
-          const scaledWidth = canvasWidth * level;
-          const scaledHeight = canvasHeight * level;
+      const endPan = e => {
+        if (!isPanning) return;
 
-          // Calculate bounds: center offset + pan limits
-          const centerOffsetX = (containerWidth - scaledWidth) / 2;
-          const centerOffsetY = (containerHeight - scaledHeight) / 2;
+        // For touch events, only end if it's the same touch
+        if (e.touches) {
+          const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
+          if (touch) return; // Still touching, don't end
+        }
 
-          // Maximum pan is when edges align with container edges
-          const maxPanX = Math.max(0, (scaledWidth - containerWidth) / 2);
-          const maxPanY = Math.max(0, (scaledHeight - containerHeight) / 2);
+        isPanning = false;
+        touchIdentifier = null;
+        const level = getZoomLevel();
+        canvasWrapper.style.cursor = level === 'fit' ? '' : 'grab';
+        canvasWrapper.style.userSelect = '';
+      };
 
-          // Constrain pan within bounds
-          newPanX = Math.max(-maxPanX, Math.min(maxPanX, newPanX));
-          newPanY = Math.max(-maxPanY, Math.min(maxPanY, newPanY));
+      // Mouse events
+      canvasWrapper.addEventListener('mousedown', startPan);
+      document.addEventListener('mousemove', doPan);
+      document.addEventListener('mouseup', endPan);
+      canvasWrapper.addEventListener('mouseleave', endPan);
 
-          setPan(newPanX, newPanY);
-        };
-
-        const endPan = e => {
-          if (!isPanning) return;
-
-          // For touch events, only end if it's the same touch
-          if (e.touches) {
-            const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
-            if (touch) return; // Still touching, don't end
-          }
-
-          isPanning = false;
-          touchIdentifier = null;
-          const level = getZoomLevel();
-          canvasWrapper.style.cursor = level === 'fit' ? '' : 'grab';
-          canvasWrapper.style.userSelect = '';
-        };
-
-        // Mouse events
-        canvasWrapper.addEventListener('mousedown', startPan);
-        document.addEventListener('mousemove', doPan);
-        document.addEventListener('mouseup', endPan);
-        canvasWrapper.addEventListener('mouseleave', endPan);
-
-        // Touch events
-        canvasWrapper.addEventListener('touchstart', startPan, { passive: false });
-        document.addEventListener('touchmove', doPan, { passive: false });
-        document.addEventListener('touchend', endPan);
-        document.addEventListener('touchcancel', endPan);
-      }
-
-      // Initialize zoom UI
-      updateZoomUI();
+      // Touch events
+      canvasWrapper.addEventListener('touchstart', startPan, { passive: false });
+      document.addEventListener('touchmove', doPan, { passive: false });
+      document.addEventListener('touchend', endPan);
+      document.addEventListener('touchcancel', endPan);
     }
+
+    // Initialize zoom UI
+    updateZoomUI();
+  }
 
   // Contrast / Invert Colors Toggle
   if (contrastToggleBtn) {
-      let isContrastInverted = false;
-      const canvasContainer = document.getElementById('canvasContainer');
+    let isContrastInverted = false;
+    const canvasContainer = document.getElementById('canvasContainer');
 
-      contrastToggleBtn.addEventListener('click', () => {
-        if (canvasContainer) {
-          isContrastInverted = !isContrastInverted;
+    contrastToggleBtn.addEventListener('click', () => {
+      if (canvasContainer) {
+        isContrastInverted = !isContrastInverted;
 
-          if (isContrastInverted) {
-            // Apply invert filter for contrast testing
-            canvasContainer.style.filter = 'invert(1)';
-            canvasContainer.style.transition = 'filter 0.3s ease';
-          } else {
-            // Remove filter
-            canvasContainer.style.filter = '';
-          }
-
-          contrastToggleBtn.classList.toggle('active', isContrastInverted);
+        if (isContrastInverted) {
+          // Apply invert filter for contrast testing
+          canvasContainer.style.filter = 'invert(1)';
+          canvasContainer.style.transition = 'filter 0.3s ease';
+        } else {
+          // Remove filter
+          canvasContainer.style.filter = '';
         }
-      });
-    }
+
+        contrastToggleBtn.classList.toggle('active', isContrastInverted);
+      }
+    });
+  }
 
   if (transparencyCheckerBtn) {
-      let isTransparencyCheckerActive = false;
-      const canvasContainer = document.querySelector('.canvas-container');
+    let isTransparencyCheckerActive = false;
+    const canvasContainer = document.querySelector('.canvas-container');
 
-      transparencyCheckerBtn.addEventListener('click', () => {
-        if (canvasContainer) {
-          isTransparencyCheckerActive = !isTransparencyCheckerActive;
+    transparencyCheckerBtn.addEventListener('click', () => {
+      if (canvasContainer) {
+        isTransparencyCheckerActive = !isTransparencyCheckerActive;
 
-          if (isTransparencyCheckerActive) {
-            // Add transparency checkerboard class
-            canvasContainer.classList.add('transparency-checker');
-          } else {
-            // Remove transparency checkerboard class
-            canvasContainer.classList.remove('transparency-checker');
-          }
-
-          transparencyCheckerBtn.classList.toggle('active', isTransparencyCheckerActive);
+        if (isTransparencyCheckerActive) {
+          // Add transparency checkerboard class
+          canvasContainer.classList.add('transparency-checker');
+        } else {
+          // Remove transparency checkerboard class
+          canvasContainer.classList.remove('transparency-checker');
         }
-      });
-    }
+
+        transparencyCheckerBtn.classList.toggle('active', isTransparencyCheckerActive);
+      }
+    });
+  }
 
   // Layer Visibility Toggle
   if (layerVisibilityBtn) {
-      const layerVisibilityPanel = document.getElementById('layerVisibilityPanel');
-      const layerVisibilityHeader = layerVisibilityPanel?.querySelector('.layer-visibility-header');
-      let isLayerVisibilityPanelOpen = false;
-      let isDragging = false;
-      let dragOffset = { x: 0, y: 0 };
-      let panelPosition = { x: null, y: null };
+    const layerVisibilityPanel = document.getElementById('layerVisibilityPanel');
+    const layerVisibilityHeader = layerVisibilityPanel?.querySelector('.layer-visibility-header');
+    let isLayerVisibilityPanelOpen = false;
+    let isDragging = false;
+    let dragOffset = { x: 0, y: 0 };
+    let panelPosition = { x: null, y: null };
 
-      // Load saved position from localStorage
-      const savedPosition = localStorage.getItem('layerVisibilityPanelPosition');
-      if (savedPosition && layerVisibilityPanel) {
-        try {
-          const pos = JSON.parse(savedPosition);
-          panelPosition = pos;
-          layerVisibilityPanel.style.left = `${pos.x}px`;
-          layerVisibilityPanel.style.top = `${pos.y}px`;
-          layerVisibilityPanel.style.transform = 'none';
-        } catch (e) {
-          console.warn('Failed to load layer visibility panel position:', e);
+    // Load saved position from localStorage
+    const savedPosition = localStorage.getItem('layerVisibilityPanelPosition');
+    if (savedPosition && layerVisibilityPanel) {
+      try {
+        const pos = JSON.parse(savedPosition);
+        panelPosition = pos;
+        layerVisibilityPanel.style.left = `${pos.x}px`;
+        layerVisibilityPanel.style.top = `${pos.y}px`;
+        layerVisibilityPanel.style.transform = 'none';
+      } catch (e) {
+        console.warn('Failed to load layer visibility panel position:', e);
+      }
+    }
+
+    // Drag functionality
+    if (layerVisibilityHeader && layerVisibilityPanel) {
+      layerVisibilityHeader.addEventListener('mousedown', e => {
+        // Prevent dragging if clicking the close button
+        if (e.target.id === 'closeLayerVisibilityBtn' || e.target.closest('#closeLayerVisibilityBtn')) {
+          return;
         }
-      }
 
-      // Drag functionality
-      if (layerVisibilityHeader && layerVisibilityPanel) {
-        layerVisibilityHeader.addEventListener('mousedown', e => {
-          // Prevent dragging if clicking the close button
-          if (e.target.id === 'closeLayerVisibilityBtn' || e.target.closest('#closeLayerVisibilityBtn')) {
-            return;
-          }
-          
-          isDragging = true;
-          layerVisibilityHeader.classList.add('dragging');
+        isDragging = true;
+        layerVisibilityHeader.classList.add('dragging');
 
-          const rect = layerVisibilityPanel.getBoundingClientRect();
-          dragOffset.x = e.clientX - rect.left;
-          dragOffset.y = e.clientY - rect.top;
+        const rect = layerVisibilityPanel.getBoundingClientRect();
+        dragOffset.x = e.clientX - rect.left;
+        dragOffset.y = e.clientY - rect.top;
 
-          e.preventDefault();
-        });
+        e.preventDefault();
+      });
 
-        document.addEventListener('mousemove', e => {
-          if (isDragging && layerVisibilityPanel) {
-            const x = e.clientX - dragOffset.x;
-            const y = e.clientY - dragOffset.y;
+      document.addEventListener('mousemove', e => {
+        if (isDragging && layerVisibilityPanel) {
+          const x = e.clientX - dragOffset.x;
+          const y = e.clientY - dragOffset.y;
 
-            // Constrain to viewport bounds
-            const maxX = window.innerWidth - layerVisibilityPanel.offsetWidth;
-            const maxY = window.innerHeight - layerVisibilityPanel.offsetHeight;
+          // Constrain to viewport bounds
+          const maxX = window.innerWidth - layerVisibilityPanel.offsetWidth;
+          const maxY = window.innerHeight - layerVisibilityPanel.offsetHeight;
 
-            const constrainedX = Math.max(0, Math.min(x, maxX));
-            const constrainedY = Math.max(0, Math.min(y, maxY));
+          const constrainedX = Math.max(0, Math.min(x, maxX));
+          const constrainedY = Math.max(0, Math.min(y, maxY));
 
-            layerVisibilityPanel.style.left = `${constrainedX}px`;
-            layerVisibilityPanel.style.top = `${constrainedY}px`;
-            layerVisibilityPanel.style.transform = 'none';
+          layerVisibilityPanel.style.left = `${constrainedX}px`;
+          layerVisibilityPanel.style.top = `${constrainedY}px`;
+          layerVisibilityPanel.style.transform = 'none';
 
-            // Save position
-            panelPosition = { x: constrainedX, y: constrainedY };
-            localStorage.setItem('layerVisibilityPanelPosition', JSON.stringify(panelPosition));
-          }
-        });
-
-        document.addEventListener('mouseup', () => {
-          if (isDragging) {
-            isDragging = false;
-            if (layerVisibilityHeader) {
-              layerVisibilityHeader.classList.remove('dragging');
-            }
-          }
-        });
-      }
-
-      layerVisibilityBtn.addEventListener('click', () => {
-        if (layerVisibilityPanel) {
-          isLayerVisibilityPanelOpen = !isLayerVisibilityPanelOpen;
-          layerVisibilityPanel.style.display = isLayerVisibilityPanelOpen ? 'flex' : 'none';
-          layerVisibilityBtn.classList.toggle('active', isLayerVisibilityPanelOpen);
-
-          // Restore position if saved, otherwise center
-          if (isLayerVisibilityPanelOpen) {
-            if (panelPosition.x !== null && panelPosition.y !== null) {
-              layerVisibilityPanel.style.left = `${panelPosition.x}px`;
-              layerVisibilityPanel.style.top = `${panelPosition.y}px`;
-              layerVisibilityPanel.style.transform = 'none';
-            } else {
-              // Center on first open
-              layerVisibilityPanel.style.left = '50%';
-              layerVisibilityPanel.style.top = '50%';
-              layerVisibilityPanel.style.transform = 'translate(-50%, -50%)';
-            }
-          }
+          // Save position
+          panelPosition = { x: constrainedX, y: constrainedY };
+          localStorage.setItem('layerVisibilityPanelPosition', JSON.stringify(panelPosition));
         }
       });
 
-      if (closeLayerVisibilityBtn) {
-        closeLayerVisibilityBtn.addEventListener('click', () => {
-          if (layerVisibilityPanel) {
-            layerVisibilityPanel.style.display = 'none';
-            isLayerVisibilityPanelOpen = false;
-            layerVisibilityBtn.classList.remove('active');
+      document.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          if (layerVisibilityHeader) {
+            layerVisibilityHeader.classList.remove('dragging');
           }
-        });
-      }
-
-      // Layer visibility checkboxes
-      const layerCheckboxes = {
-        logo: document.getElementById('layerVisibilityLogo'),
-        title: document.getElementById('layerVisibilityTitle'),
-        subtitle: document.getElementById('layerVisibilitySubtitle'),
-        slogan: document.getElementById('layerVisibilitySlogan'),
-        pattern: document.getElementById('layerVisibilityPattern'),
-      };
-
-      // Apply visibility when checkboxes change
-      Object.entries(layerCheckboxes).forEach(([layerName, checkbox]) => {
-        if (checkbox) {
-          checkbox.addEventListener('change', () => {
-            applyLayerVisibility();
-          });
         }
       });
     }
+
+    layerVisibilityBtn.addEventListener('click', () => {
+      if (layerVisibilityPanel) {
+        isLayerVisibilityPanelOpen = !isLayerVisibilityPanelOpen;
+        layerVisibilityPanel.style.display = isLayerVisibilityPanelOpen ? 'flex' : 'none';
+        layerVisibilityBtn.classList.toggle('active', isLayerVisibilityPanelOpen);
+
+        // Restore position if saved, otherwise center
+        if (isLayerVisibilityPanelOpen) {
+          if (panelPosition.x !== null && panelPosition.y !== null) {
+            layerVisibilityPanel.style.left = `${panelPosition.x}px`;
+            layerVisibilityPanel.style.top = `${panelPosition.y}px`;
+            layerVisibilityPanel.style.transform = 'none';
+          } else {
+            // Center on first open
+            layerVisibilityPanel.style.left = '50%';
+            layerVisibilityPanel.style.top = '50%';
+            layerVisibilityPanel.style.transform = 'translate(-50%, -50%)';
+          }
+        }
+      }
+    });
+
+    if (closeLayerVisibilityBtn) {
+      closeLayerVisibilityBtn.addEventListener('click', () => {
+        if (layerVisibilityPanel) {
+          layerVisibilityPanel.style.display = 'none';
+          isLayerVisibilityPanelOpen = false;
+          layerVisibilityBtn.classList.remove('active');
+        }
+      });
+    }
+
+    // Layer visibility checkboxes
+    const layerCheckboxes = {
+      logo: document.getElementById('layerVisibilityLogo'),
+      title: document.getElementById('layerVisibilityTitle'),
+      subtitle: document.getElementById('layerVisibilitySubtitle'),
+      slogan: document.getElementById('layerVisibilitySlogan'),
+      pattern: document.getElementById('layerVisibilityPattern'),
+    };
+
+    // Apply visibility when checkboxes change
+    Object.entries(layerCheckboxes).forEach(([layerName, checkbox]) => {
+      if (checkbox) {
+        checkbox.addEventListener('change', () => {
+          applyLayerVisibility();
+        });
+      }
+    });
+  }
 
   // History Timeline
   if (historyTimelineBtn) {
@@ -1883,7 +1883,7 @@ function setupEventListeners() {
     btn.addEventListener('click', () => {
       const overlayType = btn.dataset.overlay;
       toggleCompositionOverlay(overlayType);
-      
+
       // Update button active state
       overlayButtons.forEach(b => b.classList.remove('active'));
       const state = getCompositionOverlayState();
@@ -1894,7 +1894,7 @@ function setupEventListeners() {
       }
     });
   });
-  
+
   // Update button states when overlay changes
   function updateOverlayButtonStates() {
     const state = getCompositionOverlayState();
@@ -1907,7 +1907,7 @@ function setupEventListeners() {
       }
     });
   }
-  
+
   // Periodically update button states (in case overlay is toggled elsewhere)
   setInterval(updateOverlayButtonStates, 100);
 
@@ -1928,7 +1928,7 @@ function setupEventListeners() {
   // Rotation controls
   const overlayRotationSlider = document.getElementById('overlayRotation');
   const overlayRotationValue = document.getElementById('overlayRotationValue');
-  
+
   function updateRotation(value) {
     const angle = parseFloat(value) || 0;
     setCompositionRotation(angle);
@@ -2398,15 +2398,15 @@ function setupEventListeners() {
       const canvasContainer = canvasWrapper.parentElement;
       const originalContainerStyles = canvasContainer
         ? {
-            position: canvasContainer.style.position,
-            overflow: canvasContainer.style.overflow,
-            contain: canvasContainer.style.contain,
-            width: canvasContainer.style.width,
-            height: canvasContainer.style.height,
-            aspectRatio: canvasContainer.style.aspectRatio,
-            minHeight: canvasContainer.style.minHeight,
-            maxHeight: canvasContainer.style.maxHeight,
-          }
+          position: canvasContainer.style.position,
+          overflow: canvasContainer.style.overflow,
+          contain: canvasContainer.style.contain,
+          width: canvasContainer.style.width,
+          height: canvasContainer.style.height,
+          aspectRatio: canvasContainer.style.aspectRatio,
+          minHeight: canvasContainer.style.minHeight,
+          maxHeight: canvasContainer.style.maxHeight,
+        }
         : null;
 
       // Store original styles to restore later
@@ -2951,116 +2951,121 @@ function setupEventListeners() {
       // Hard refresh: clear cache, storage, and force fresh asset fetches
       // Similar to Ctrl+F5 or Ctrl+Shift+R, but more aggressive
       // For GitHub Pages, we need a reliable method that bypasses all caches
-      
-      // Use Promise.allSettled to ensure all operations complete even if some fail
-      const clearOps = [];
+      try {
+        // Prepare reload URL first - this will always execute
+        const timestamp = Date.now();
+        const randomStr = Math.random().toString(36).substring(2, 15);
+        const url = new URL(window.location.href);
+        url.searchParams.delete('_hr');
+        url.searchParams.delete('_r');
+        url.searchParams.set('_hr', timestamp);
+        url.searchParams.set('_r', randomStr);
+        const newUrl = url.toString();
 
-      // 1. Clear HTTP Cache via Cache API (if available)
-      if ('caches' in window) {
-        clearOps.push(
-          caches.keys().then(cacheNames => {
-            console.log('Found caches:', cacheNames);
-            return Promise.all(
-              cacheNames.map(cacheName => {
-                console.log('Deleting cache:', cacheName);
-                return caches.delete(cacheName);
-              })
-            );
-          }).then(() => {
-            console.log('All caches cleared via Cache API');
-          }).catch(cacheError => {
-            console.warn('Error clearing Cache API:', cacheError);
-          })
-        );
-      }
+        console.log('Prepared reload URL:', newUrl);
 
-      // 2. Unregister all service workers (if any)
-      if ('serviceWorker' in navigator) {
-        clearOps.push(
-          navigator.serviceWorker.getRegistrations().then(registrations => {
-            return Promise.all(
-              registrations.map(registration => {
-                console.log('Unregistering service worker:', registration.scope);
-                return registration.unregister();
-              })
-            );
-          }).then(() => {
-            console.log('All service workers unregistered');
-          }).catch(swError => {
-            console.warn('Error unregistering service workers:', swError);
-          })
-        );
-      }
+        // Clear caches with timeout to prevent hanging
+        const clearOps = [];
 
-      // 3. Clear IndexedDB (if used) - with timeout to prevent hanging
-      if ('indexedDB' in window) {
-        clearOps.push(
-          Promise.race([
-            indexedDB.databases().then(databases => {
-              return Promise.all(
-                databases.map(db => {
-                  return new Promise((resolve) => {
-                    const deleteReq = indexedDB.deleteDatabase(db.name);
-                    deleteReq.onsuccess = () => {
-                      console.log('Deleted IndexedDB:', db.name);
-                      resolve();
-                    };
-                    deleteReq.onerror = () => {
-                      console.warn('Error deleting IndexedDB:', db.name);
-                      resolve(); // Continue anyway
-                    };
-                    deleteReq.onblocked = () => {
-                      console.warn('IndexedDB delete blocked for:', db.name);
-                      resolve(); // Continue anyway
-                    };
-                  });
+        // 1. Clear HTTP Cache via Cache API (if available) - with timeout
+        if ('caches' in window) {
+          clearOps.push(
+            Promise.race([
+              caches.keys()
+                .then(cacheNames => {
+                  console.log('Found caches:', cacheNames);
+                  return Promise.all(
+                    cacheNames.map(cacheName => {
+                      console.log('Deleting cache:', cacheName);
+                      return caches.delete(cacheName);
+                    })
+                  );
                 })
-              );
-            }),
-            new Promise(resolve => setTimeout(resolve, 1000)) // 1 second timeout
-          ]).catch(dbError => {
-            console.warn('Could not clear IndexedDB:', dbError);
-          })
-        );
-      }
+                .then(() => console.log('All caches cleared via Cache API')),
+              new Promise(resolve => setTimeout(resolve, 500)) // 500ms timeout
+            ]).catch(cacheError => console.warn('Error clearing Cache API:', cacheError))
+          );
+        }
 
-      // 4. Clear localStorage and sessionStorage
-      try {
-        localStorage.clear();
-        sessionStorage.clear();
-        console.log('Cleared localStorage and sessionStorage');
-      } catch (storageError) {
-        console.warn('Error clearing storage:', storageError);
-      }
+        // 2. Unregister all service workers (if any) - with timeout
+        if ('serviceWorker' in navigator) {
+          clearOps.push(
+            Promise.race([
+              navigator.serviceWorker.getRegistrations()
+                .then(registrations => {
+                  return Promise.all(
+                    registrations.map(registration => {
+                      console.log('Unregistering service worker:', registration.scope);
+                      return registration.unregister();
+                    })
+                  );
+                })
+                .then(() => console.log('All service workers unregistered')),
+              new Promise(resolve => setTimeout(resolve, 500)) // 500ms timeout
+            ]).catch(swError => console.warn('Error unregistering service workers:', swError))
+          );
+        }
 
-      // Wait for all async operations with timeout
-      try {
-        await Promise.race([
-          Promise.allSettled(clearOps),
-          new Promise(resolve => setTimeout(resolve, 2000)) // 2 second max wait
-        ]);
-        console.log('All cache clearing operations completed');
-      } catch (error) {
-        console.warn('Some cache clearing operations failed:', error);
-      }
+        // 3. Clear IndexedDB (if used) - with timeout
+        if ('indexedDB' in window) {
+          clearOps.push(
+            Promise.race([
+              indexedDB.databases()
+                .then(databases => {
+                  return Promise.all(
+                    databases.map(db => {
+                      return new Promise((resolve) => {
+                        const deleteReq = indexedDB.deleteDatabase(db.name);
+                        deleteReq.onsuccess = () => {
+                          console.log('Deleted IndexedDB:', db.name);
+                          resolve();
+                        };
+                        deleteReq.onerror = () => {
+                          console.warn('Error deleting IndexedDB:', db.name);
+                          resolve(); // Continue anyway
+                        };
+                        deleteReq.onblocked = () => {
+                          console.warn('IndexedDB delete blocked for:', db.name);
+                          resolve(); // Continue anyway
+                        };
+                      });
+                    })
+                  );
+                }),
+              new Promise(resolve => setTimeout(resolve, 500)) // 500ms timeout
+            ]).catch(dbError => console.warn('Could not clear IndexedDB:', dbError))
+          );
+        }
 
-      // Small delay to ensure UI updates
-      await new Promise(resolve => setTimeout(resolve, 100));
+        // 4. Clear localStorage and sessionStorage (synchronous, no timeout needed)
+        try {
+          localStorage.clear();
+          sessionStorage.clear();
+          console.log('Cleared localStorage and sessionStorage');
+        } catch (storageError) {
+          console.warn('Error clearing storage:', storageError);
+        }
 
-      console.log('All caches cleared, performing hard reload...');
+        // Wait for cache clearing operations with timeout (max 1.5 seconds total)
+        try {
+          await Promise.race([
+            Promise.allSettled(clearOps),
+            new Promise(resolve => setTimeout(resolve, 1500))
+          ]);
+          console.log('Cache clearing operations completed');
+        } catch (error) {
+          console.warn('Some cache clearing operations may have failed:', error);
+        }
 
-      // Force hard reload with cache-busted URL (most reliable for GitHub Pages)
-      const baseUrl = window.location.origin + window.location.pathname;
-      const timestamp = Date.now();
-      const randomStr = Math.random().toString(36).substring(2, 15);
-      const separator = window.location.pathname.includes('?') || window.location.search ? '&' : '?';
-      const newUrl = `${baseUrl}${separator}_hr=${timestamp}&_r=${randomStr}${window.location.hash || ''}`;
+        // Small delay to ensure UI updates
+        await new Promise(resolve => setTimeout(resolve, 50));
 
-      console.log('Navigating to:', newUrl);
+        console.log('All caches cleared, performing hard reload...');
+        console.log('Navigating to:', newUrl);
 
-      // Use replace to avoid adding to history, and force fresh fetch
-      // This will always execute, even if previous operations failed
-      window.location.replace(newUrl);
+        // ALWAYS execute reload - this is the critical part
+        // Use replace to avoid adding to history, and force fresh fetch
+        window.location.replace(newUrl);
       } catch (error) {
         console.error('Error during hard refresh:', error);
 
@@ -3068,7 +3073,7 @@ function setupEventListeners() {
         try {
           localStorage.clear();
           sessionStorage.clear();
-          
+
           // Use cache-busted URL as fallback
           const url = new URL(window.location.href);
           url.searchParams.set('_hr', Date.now());
@@ -3236,12 +3241,12 @@ function applyLayerVisibility() {
  */
 function initCollapsibleSections() {
   const sections = document.querySelectorAll('.collapsible-section');
-  
+
   sections.forEach(section => {
     const label = section.querySelector('.collapsible-label');
     const icon = section.querySelector('.collapse-icon');
     if (!label || !icon) return;
-    
+
     // Load saved state from localStorage
     const sectionId = section.dataset.section;
     const savedState = localStorage.getItem(`collapsible-section-${sectionId}`);
@@ -3251,18 +3256,18 @@ function initCollapsibleSections() {
     } else {
       icon.textContent = '▾';
     }
-    
+
     label.addEventListener('click', () => {
       const isCollapsed = section.classList.contains('collapsed');
       section.classList.toggle('collapsed');
-      
+
       // Update icon
       if (section.classList.contains('collapsed')) {
         icon.textContent = '▹';
       } else {
         icon.textContent = '▾';
       }
-      
+
       // Save state to localStorage
       if (section.classList.contains('collapsed')) {
         localStorage.setItem(`collapsible-section-${sectionId}`, 'collapsed');
@@ -3304,7 +3309,7 @@ function init() {
   // Initialize button tooltips for preview buttons
   initButtonTooltips();
 
-      // Initialize ruler/guides system
+  // Initialize ruler/guides system
   initRulerGuides();
 
   // Initialize composition overlays system
