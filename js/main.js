@@ -92,10 +92,14 @@ import {
   setCompositionRotation,
   updateCompositionCanvasDimensions,
   getCompositionOverlayState,
+  forceReinitializeOverlay,
 } from './composition-overlays.js';
 
 // Export for preview.js
 window.updateCompositionCanvasDimensions = updateCompositionCanvasDimensions;
+window.getCompositionOverlayState = getCompositionOverlayState;
+window.toggleCompositionOverlay = toggleCompositionOverlay;
+window.forceReinitializeOverlay = forceReinitializeOverlay;
 
 // State
 let currentImageType = IMAGE_TYPES.OG;

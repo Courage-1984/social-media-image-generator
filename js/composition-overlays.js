@@ -62,8 +62,19 @@ function initializeCompositionCanvas() {
   CompositionState.canvasWidth = rect.width;
   CompositionState.canvasHeight = rect.height;
 
-  // Create or update overlay canvas
-  if (!CompositionState.overlayCanvas) {
+  // Check if canvas exists and is still in the DOM
+  const canvasExists = CompositionState.overlayCanvas && 
+                       CompositionState.overlayCanvas.parentNode === canvasWrapper;
+
+  // Create or recreate overlay canvas if it doesn't exist or is detached
+  if (!canvasExists) {
+    // If canvas exists but is detached, clear the reference
+    if (CompositionState.overlayCanvas && !CompositionState.overlayCanvas.parentNode) {
+      CompositionState.overlayCanvas = null;
+      CompositionState.overlayCtx = null;
+    }
+    
+    // Create new canvas
     CompositionState.overlayCanvas = document.createElement('canvas');
     CompositionState.overlayCanvas.id = 'compositionOverlayCanvas';
     CompositionState.overlayCanvas.className = 'composition-overlay-canvas';
@@ -1003,12 +1014,22 @@ export function setAspectRatio(ratio) {
 export function updateCompositionCanvasDimensions(width, height) {
   CompositionState.canvasWidth = width;
   CompositionState.canvasHeight = height;
-  if (CompositionState.overlayCanvas) {
+  
+  // Check if canvas exists and is in the DOM
+  const canvasWrapper = document.getElementById('canvasWrapper');
+  const canvasExists = CompositionState.overlayCanvas && 
+                       canvasWrapper &&
+                       CompositionState.overlayCanvas.parentNode === canvasWrapper;
+  
+  if (canvasExists) {
+    // Canvas exists and is in DOM - update dimensions
     CompositionState.overlayCanvas.width = width;
     CompositionState.overlayCanvas.height = height;
-    // Re-initialize to ensure proper scaling
+  } else if (CompositionState.isActive) {
+    // Canvas is missing but overlay is active - reinitialize
     initializeCompositionCanvas();
   }
+  
   if (CompositionState.isActive) {
     renderCompositionOverlay();
   }
@@ -1039,6 +1060,37 @@ export function getCompositionOverlayState() {
     aspectRatio: CompositionState.aspectRatio,
     rotation: CompositionState.rotation,
   };
+}
+
+/**
+ * Force reinitialize overlay canvas (used when canvas is removed from DOM)
+ */
+export function forceReinitializeOverlay() {
+  if (!CompositionState.isActive || !CompositionState.currentOverlay) {
+    return;
+  }
+  
+  // Clear any existing render loop
+  if (CompositionState.rafId) {
+    cancelAnimationFrame(CompositionState.rafId);
+    CompositionState.rafId = null;
+  }
+  
+  // Reset canvas reference if it's detached
+  const canvasWrapper = document.getElementById('canvasWrapper');
+  if (CompositionState.overlayCanvas && 
+      (!canvasWrapper || CompositionState.overlayCanvas.parentNode !== canvasWrapper)) {
+    CompositionState.overlayCanvas = null;
+    CompositionState.overlayCtx = null;
+  }
+  
+  // Reinitialize canvas
+  initializeCompositionCanvas();
+  
+  // Restart render loop
+  if (!CompositionState.rafId) {
+    renderLoop();
+  }
 }
 
 /**

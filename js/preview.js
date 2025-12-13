@@ -357,6 +357,15 @@ export function updatePreview(state) {
   // Check if grid overlay is visible before clearing
   const gridWasVisible = isGridOverlayVisible();
 
+  // Preserve composition overlay state before clearing
+  let compositionOverlayWasActive = false;
+  let compositionOverlayType = null;
+  if (window.getCompositionOverlayState) {
+    const compositionState = window.getCompositionOverlayState();
+    compositionOverlayWasActive = compositionState.isActive;
+    compositionOverlayType = compositionState.currentOverlay;
+  }
+
   // CRITICAL: Preserve container dimensions to prevent CLS during rebuild
   const container = document.getElementById('canvasContainer');
 
@@ -790,9 +799,22 @@ export function updatePreview(state) {
           updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
         }
 
-        // Update composition overlay dimensions
+        // Update composition overlay dimensions and restore if it was active
         if (window.updateCompositionCanvasDimensions) {
           window.updateCompositionCanvasDimensions(currentImageType.width, currentImageType.height);
+        }
+        
+        // Restore composition overlay if it was active before the update
+        // The canvas was removed when innerHTML was cleared, so we need to recreate it
+        if (compositionOverlayWasActive && compositionOverlayType) {
+          // Check if canvas actually exists in DOM
+          const canvasWrapper = document.getElementById('canvasWrapper');
+          const overlayCanvas = canvasWrapper?.querySelector('#compositionOverlayCanvas');
+          
+          // If canvas is missing, force reinitialize the overlay
+          if (!overlayCanvas && window.forceReinitializeOverlay) {
+            window.forceReinitializeOverlay();
+          }
         }
 
         // Apply layer visibility after rendering
