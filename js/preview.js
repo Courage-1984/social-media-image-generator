@@ -575,6 +575,15 @@ export function updatePreview(state) {
     titleGlow && glowColors[titleColorKey]
       ? `0 0 30px ${titleColor}80, 0 0 60px ${titleColor}40, 0 0 90px ${glowColors[titleColorKey]}`
       : '';
+  // Calculate available width based on position to prevent wrapping
+  // When positioned far right, we need to allow more space
+  const padding = currentImageType === IMAGE_TYPES.OG ? 40 : 45;
+  const distanceFromLeft = titleX;
+  const distanceFromRight = currentImageType.width - titleX;
+  const availableWidth = Math.min(
+    Math.max(distanceFromLeft, distanceFromRight) * 2 - padding * 2,
+    currentImageType.width - padding * 2
+  );
   titleEl.style.cssText = `
     position: absolute;
     top: ${titleY}px;
@@ -589,8 +598,10 @@ export function updatePreview(state) {
     letter-spacing: 4px;
     text-align: center;
     z-index: 5;
-    max-width: 1000px;
-    padding: 0 ${currentImageType === IMAGE_TYPES.OG ? 40 : 45}px;
+    max-width: ${availableWidth}px;
+    white-space: nowrap;
+    overflow: visible;
+    padding: 0 ${padding}px;
   `;
   canvasWrapper.appendChild(titleEl);
 
@@ -614,6 +625,14 @@ export function updatePreview(state) {
     subtitleGlow && glowColors[subtitleColorKey]
       ? `0 0 20px ${subtitleColor}60, 0 0 40px ${glowColors[subtitleColorKey]}`
       : '';
+  // Calculate available width based on position to prevent wrapping
+  const subtitlePadding = currentImageType === IMAGE_TYPES.OG ? 40 : 45;
+  const subtitleDistanceFromLeft = subtitleX;
+  const subtitleDistanceFromRight = currentImageType.width - subtitleX;
+  const subtitleAvailableWidth = Math.min(
+    Math.max(subtitleDistanceFromLeft, subtitleDistanceFromRight) * 2 - subtitlePadding * 2,
+    currentImageType.width - subtitlePadding * 2
+  );
   subtitleEl.style.cssText = `
     position: absolute;
     top: ${subtitleY}px;
@@ -626,8 +645,10 @@ export function updatePreview(state) {
     text-shadow: ${subtitleGlowStyle};
     text-align: center;
     z-index: 5;
-    max-width: 900px;
-    padding: 0 ${currentImageType === IMAGE_TYPES.OG ? 40 : 45}px;
+    max-width: ${subtitleAvailableWidth}px;
+    white-space: nowrap;
+    overflow: visible;
+    padding: 0 ${subtitlePadding}px;
   `;
   canvasWrapper.appendChild(subtitleEl);
 
@@ -652,6 +673,14 @@ export function updatePreview(state) {
       sloganGlow && glowColors[sloganColorKey]
         ? `0 0 15px ${sloganColor}50, 0 0 30px ${glowColors[sloganColorKey]}`
         : '';
+    // Calculate available width based on position to prevent wrapping
+    const sloganPadding = currentImageType === IMAGE_TYPES.OG ? 40 : 45;
+    const sloganDistanceFromLeft = sloganX;
+    const sloganDistanceFromRight = currentImageType.width - sloganX;
+    const sloganAvailableWidth = Math.min(
+      Math.max(sloganDistanceFromLeft, sloganDistanceFromRight) * 2 - sloganPadding * 2,
+      currentImageType.width - sloganPadding * 2
+    );
     sloganEl.style.cssText = `
       position: absolute;
       top: ${sloganY}px;
@@ -664,8 +693,10 @@ export function updatePreview(state) {
       text-shadow: ${sloganGlowStyle};
       text-align: center;
       z-index: 5;
-      max-width: 800px;
-      padding: 0 ${currentImageType === IMAGE_TYPES.OG ? 40 : 45}px;
+      max-width: ${sloganAvailableWidth}px;
+      white-space: nowrap;
+      overflow: visible;
+      padding: 0 ${sloganPadding}px;
       font-style: italic;
     `;
     canvasWrapper.appendChild(sloganEl);
