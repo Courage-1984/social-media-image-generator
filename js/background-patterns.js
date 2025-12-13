@@ -488,6 +488,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -496,14 +497,16 @@ export const backgroundPatterns = {
     create: (color, options = {}) => {
       const opacity = options.opacity !== undefined ? options.opacity : 0.3;
       const size = options.size || 60;
+      const spacing = options.spacing !== undefined ? options.spacing : 10;
       const scale = options.scale !== undefined ? options.scale : 1;
-      const tileSize = Math.ceil(size * scale);
+      const tileSize = Math.ceil((size + spacing) * scale);
+      const dotRadius = (size / 2) * scale;
 
       const [r, g, b] = hexToRgb(color);
       const patternUrl = createPatternCanvas(tileSize, tileSize, (ctx, width, height) => {
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
         ctx.beginPath();
-        ctx.arc(width / 2, height / 2, 2 * scale, 0, Math.PI * 2);
+        ctx.arc(width / 2, height / 2, dotRadius, 0, Math.PI * 2);
         ctx.fill();
       });
 
@@ -511,6 +514,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -549,6 +553,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -587,6 +592,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -623,6 +629,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -632,13 +639,10 @@ export const backgroundPatterns = {
       const opacity = options.opacity !== undefined ? options.opacity : 0.15;
       return {
         background: '#0a0a0a',
-        backgroundImage: `
-          radial-gradient(circle at 20% 50%, ${hexToRgba(color, opacity)} 0%, transparent 50%),
-          radial-gradient(circle at 80% 50%, ${hexToRgba(color, opacity)} 0%, transparent 50%),
-          radial-gradient(circle at 50% 20%, ${hexToRgba(color, opacity)} 0%, transparent 50%),
-          radial-gradient(circle at 50% 80%, ${hexToRgba(color, opacity)} 0%, transparent 50%)
-        `,
-        backgroundSize: '100% 100%',
+        backgroundImage: `radial-gradient(circle at 20% 50%, ${hexToRgba(color, opacity)} 0%, transparent 50%), radial-gradient(circle at 80% 50%, ${hexToRgba(color, opacity)} 0%, transparent 50%), radial-gradient(circle at 50% 20%, ${hexToRgba(color, opacity)} 0%, transparent 50%), radial-gradient(circle at 50% 80%, ${hexToRgba(color, opacity)} 0%, transparent 50%)`,
+        backgroundSize: '100% 100%, 100% 100%, 100% 100%, 100% 100%',
+        backgroundPosition: '0% 0%, 100% 0%, 50% 0%, 50% 100%',
+        backgroundRepeat: 'no-repeat',
       };
     },
   },
@@ -689,6 +693,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -740,6 +745,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -780,21 +786,32 @@ export const backgroundPatterns = {
     name: 'Stars',
     create: (color, options = {}) => {
       const opacity = options.opacity !== undefined ? options.opacity : 0.4;
+      const size = options.size || 50;
+      const scale = options.scale !== undefined ? options.scale : 1;
+      const tileSize = Math.ceil(size * scale);
+      
+      const [r, g, b] = hexToRgb(color);
+      const patternUrl = createPatternCanvas(tileSize, tileSize, (ctx, width, height) => {
+        // Create random star positions within the tile
+        const starCount = 8;
+        for (let i = 0; i < starCount; i++) {
+          const x = Math.random() * width;
+          const y = Math.random() * height;
+          const starSize = (Math.random() * 2 + 0.5) * scale;
+          const starOpacity = opacity * (0.5 + Math.random() * 0.5);
+          
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${starOpacity})`;
+          ctx.beginPath();
+          ctx.arc(x, y, starSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
       return {
         background: '#0a0a0a',
-        backgroundImage: `
-          radial-gradient(circle 2px at 20% 30%, ${hexToRgba(color, opacity)}, transparent),
-          radial-gradient(circle 2px at 60% 70%, ${hexToRgba(color, opacity)}, transparent),
-          radial-gradient(circle 1px at 50% 50%, ${hexToRgba(color, opacity * 1.5)}, transparent),
-          radial-gradient(circle 1px at 80% 10%, ${hexToRgba(color, opacity * 1.5)}, transparent),
-          radial-gradient(circle 2px at 90% 60%, ${hexToRgba(color, opacity)}, transparent),
-          radial-gradient(circle 1px at 33% 80%, ${hexToRgba(color, opacity * 1.5)}, transparent),
-          radial-gradient(circle 1px at 70% 40%, ${hexToRgba(color, opacity * 1.5)}, transparent),
-          radial-gradient(circle 1.5px at 10% 50%, ${hexToRgba(color, opacity)}, transparent),
-          radial-gradient(circle 1.5px at 40% 20%, ${hexToRgba(color, opacity)}, transparent),
-          radial-gradient(circle 2px at 75% 90%, ${hexToRgba(color, opacity)}, transparent)
-        `,
-        backgroundSize: '200% 200%',
+        backgroundImage: `url(${patternUrl})`,
+        backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -804,12 +821,10 @@ export const backgroundPatterns = {
       const opacity = options.opacity !== undefined ? options.opacity : 0.2;
       return {
         background: '#0a0a0a',
-        backgroundImage: `
-          radial-gradient(at 0% 0%, ${hexToRgba(color, opacity)} 0px, transparent 50%),
-          radial-gradient(at 100% 0%, ${hexToRgba(color, opacity * 0.75)} 0px, transparent 50%),
-          radial-gradient(at 100% 100%, ${hexToRgba(color, opacity)} 0px, transparent 50%),
-          radial-gradient(at 0% 100%, ${hexToRgba(color, opacity * 0.75)} 0px, transparent 50%)
-        `,
+        backgroundImage: `radial-gradient(at 0% 0%, ${hexToRgba(color, opacity)} 0px, transparent 50%), radial-gradient(at 100% 0%, ${hexToRgba(color, opacity * 0.75)} 0px, transparent 50%), radial-gradient(at 100% 100%, ${hexToRgba(color, opacity)} 0px, transparent 50%), radial-gradient(at 0% 100%, ${hexToRgba(color, opacity * 0.75)} 0px, transparent 50%)`,
+        backgroundSize: '100% 100%, 100% 100%, 100% 100%, 100% 100%',
+        backgroundPosition: '0% 0%, 100% 0%, 100% 100%, 0% 100%',
+        backgroundRepeat: 'no-repeat',
       };
     },
   },
@@ -834,6 +849,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -858,6 +874,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -887,6 +904,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -896,11 +914,10 @@ export const backgroundPatterns = {
       const opacity = options.opacity !== undefined ? options.opacity : 0.15;
       return {
         background: '#0a0a0a',
-        backgroundImage: `
-          radial-gradient(circle at 25% 25%, ${hexToRgba(color, opacity)} 0%, transparent 50%),
-          radial-gradient(circle at 75% 75%, ${hexToRgba(color, opacity)} 0%, transparent 50%)
-        `,
-        backgroundSize: '100% 100%',
+        backgroundImage: `radial-gradient(circle at 25% 25%, ${hexToRgba(color, opacity)} 0%, transparent 50%), radial-gradient(circle at 75% 75%, ${hexToRgba(color, opacity)} 0%, transparent 50%)`,
+        backgroundSize: '100% 100%, 100% 100%',
+        backgroundPosition: '0% 0%, 100% 100%',
+        backgroundRepeat: 'no-repeat',
       };
     },
   },
@@ -924,6 +941,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -961,6 +979,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -1009,6 +1028,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -1040,6 +1060,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -1061,13 +1082,10 @@ export const backgroundPatterns = {
 
       return {
         background: '#0a0a0a',
-        backgroundImage: `
-          repeating-linear-gradient(45deg, ${color1} 0%, ${color2} 20%, ${color3} 40%, ${color4} 60%, ${color1} 80%, ${color1} 100%),
-          repeating-linear-gradient(135deg, ${color2} 0%, ${color3} 20%, ${color4} 40%, ${color1} 60%, ${color2} 80%, ${color2} 100%),
-          repeating-linear-gradient(90deg, ${color1} 0%, transparent 2%, ${color2} 4%, transparent 6%, ${color3} 8%, transparent 10%)
-        `,
+        backgroundImage: `repeating-linear-gradient(45deg, ${color1} 0%, ${color2} 20%, ${color3} 40%, ${color4} 60%, ${color1} 80%, ${color1} 100%), repeating-linear-gradient(135deg, ${color2} 0%, ${color3} 20%, ${color4} 40%, ${color1} 60%, ${color2} 80%, ${color2} 100%), repeating-linear-gradient(90deg, ${color1} 0%, transparent 2%, ${color2} 4%, transparent 6%, ${color3} 8%, transparent 10%)`,
         backgroundSize: '150px 150px, 150px 150px, 100px 100px',
         backgroundPosition: '0 0, 75px 75px, 0 0',
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -1076,16 +1094,33 @@ export const backgroundPatterns = {
     create: (color, options = {}) => {
       const opacity = options.opacity !== undefined ? options.opacity : 0.4;
       const size = options.size || 20;
+      const scale = options.scale !== undefined ? options.scale : 1;
+      const tileSize = Math.ceil(size * scale);
+      const dotSize = Math.max(1, size / 10) * scale;
+      
+      const [r, g, b] = hexToRgb(color);
+      const patternUrl = createPatternCanvas(tileSize, tileSize, (ctx, width, height) => {
+        // Create a grid of small dots
+        const spacing = tileSize / 4;
+        for (let x = spacing; x < width; x += spacing) {
+          for (let y = spacing; y < height; y += spacing) {
+            // Randomly show some dots for organic feel
+            if (Math.random() > 0.3) {
+              const dotOpacity = opacity * (0.7 + Math.random() * 0.3);
+              ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${dotOpacity})`;
+              ctx.beginPath();
+              ctx.arc(x, y, dotSize, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+      });
+
       return {
         background: '#0a0a0a',
-        backgroundImage: `
-          radial-gradient(circle at 10% 20%, ${hexToRgba(color, opacity)} 1px, transparent 1px),
-          radial-gradient(circle at 30% 40%, ${hexToRgba(color, opacity)} 1px, transparent 1px),
-          radial-gradient(circle at 50% 60%, ${hexToRgba(color, opacity)} 1px, transparent 1px),
-          radial-gradient(circle at 70% 80%, ${hexToRgba(color, opacity)} 1px, transparent 1px),
-          radial-gradient(circle at 90% 30%, ${hexToRgba(color, opacity)} 1px, transparent 1px)
-        `,
-        backgroundSize: `${size * 2}px ${size * 2}px`,
+        backgroundImage: `url(${patternUrl})`,
+        backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -1101,6 +1136,7 @@ export const backgroundPatterns = {
           radial-gradient(ellipse at 50% 50%, ${hexToRgba(color, opacity * 0.7)} 0%, transparent 70%)
         `,
         backgroundSize: '150% 150%, 150% 150%, 200% 200%',
+        backgroundRepeat: 'no-repeat',
       };
     },
   },
@@ -1130,6 +1166,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -1175,6 +1212,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },
@@ -1184,12 +1222,10 @@ export const backgroundPatterns = {
       const opacity = options.opacity !== undefined ? options.opacity : 0.2;
       return {
         background: '#0a0a0a',
-        backgroundImage: `
-          radial-gradient(circle at 20% 30%, ${hexToRgba(color, opacity)} 0%, transparent 40%),
-          radial-gradient(circle at 80% 70%, ${hexToRgba(color, opacity)} 0%, transparent 40%),
-          radial-gradient(circle at 50% 50%, ${hexToRgba(color, opacity * 0.6)} 0%, transparent 60%)
-        `,
-        backgroundSize: '100% 100%',
+        backgroundImage: `radial-gradient(circle at 20% 30%, ${hexToRgba(color, opacity)} 0%, transparent 40%), radial-gradient(circle at 80% 70%, ${hexToRgba(color, opacity)} 0%, transparent 40%), radial-gradient(circle at 50% 50%, ${hexToRgba(color, opacity * 0.6)} 0%, transparent 60%)`,
+        backgroundSize: '100% 100%, 100% 100%, 100% 100%',
+        backgroundPosition: '20% 30%, 80% 70%, 50% 50%',
+        backgroundRepeat: 'no-repeat',
       };
     },
   },
@@ -1272,6 +1308,7 @@ export const backgroundPatterns = {
         background: '#0a0a0a',
         backgroundImage: `url(${patternUrl})`,
         backgroundSize: `${tileSize}px ${tileSize}px`,
+        backgroundRepeat: 'repeat',
       };
     },
   },

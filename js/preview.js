@@ -37,23 +37,49 @@ export function setPreset(preset) {
 
 /**
  * Create divider element
+ * @param {number} x - X position (if null/undefined, centers at 50%)
  * @param {number} y - Y position
  * @param {number} width - Divider width
  * @param {string} color - Divider color
  * @param {number} strokeWidth - Stroke width
+ * @param {boolean} glow - Whether to enable glow effect
+ * @param {string} glowColor - Glow color key (for glow effect)
  * @returns {HTMLElement} Divider element
  */
-function createDivider(y, width, color, strokeWidth) {
+function createDivider(x, y, width, color, strokeWidth, glow = false, glowColor = null) {
   const divider = document.createElement('div');
+  
+  // Determine positioning
+  let leftStyle, transformStyle;
+  if (x !== null && x !== undefined) {
+    // Use absolute X position
+    leftStyle = `${x}px`;
+    transformStyle = 'translateX(-50%)';
+  } else {
+    // Center horizontally
+    leftStyle = '50%';
+    transformStyle = 'translateX(-50%)';
+  }
+  
+  // Build glow effect
+  let boxShadowStyle = '';
+  if (glow && glowColor && glowColors[glowColor]) {
+    const glowColorValue = glowColors[glowColor];
+    boxShadowStyle = `0 0 20px ${color}80, 0 0 40px ${glowColorValue}, 0 0 60px ${glowColorValue}`;
+  } else {
+    // Default subtle shadow
+    boxShadowStyle = `0 0 10px ${color}80`;
+  }
+  
   divider.style.cssText = `
     position: absolute;
-    left: 50%;
+    left: ${leftStyle};
     top: ${y}px;
-    transform: translateX(-50%);
+    transform: ${transformStyle};
     width: ${width}px;
     height: ${strokeWidth}px;
     background: ${color};
-    box-shadow: 0 0 10px ${color}80;
+    box-shadow: ${boxShadowStyle};
     z-index: 6;
   `;
   return divider;
@@ -272,6 +298,24 @@ export function updatePreview(state) {
     titleDividerColor,
     subtitleDividerColor,
     sloganDividerColor,
+    titleDividerGlow,
+    subtitleDividerGlow,
+    sloganDividerGlow,
+    titleDividerGap,
+    subtitleDividerGap,
+    sloganDividerGap,
+    dividerAboveTitleX,
+    dividerAboveTitleY,
+    dividerBelowTitleX,
+    dividerBelowTitleY,
+    dividerAboveSubtitleX,
+    dividerAboveSubtitleY,
+    dividerBelowSubtitleX,
+    dividerBelowSubtitleY,
+    dividerAboveSloganX,
+    dividerAboveSloganY,
+    dividerBelowSloganX,
+    dividerBelowSloganY,
     sloganOffsetX,
     sloganOffsetY,
     backgroundPattern,
@@ -607,12 +651,18 @@ export function updatePreview(state) {
 
   // Dividers for title
   if (dividerAboveTitle) {
-    const divider = createDivider(titleY - (currentImageType === IMAGE_TYPES.OG ? 30 : 35), 400, titleDividerColorValue, titleDividerWidthValue);
+    const gap = titleDividerGap !== undefined ? titleDividerGap : (currentImageType === IMAGE_TYPES.OG ? 30 : 35);
+    const dividerX = dividerAboveTitleX !== null && dividerAboveTitleX !== undefined ? dividerAboveTitleX : null;
+    const dividerY = dividerAboveTitleY !== null && dividerAboveTitleY !== undefined ? dividerAboveTitleY : (titleY - gap);
+    const divider = createDivider(dividerX, dividerY, 400, titleDividerColorValue, titleDividerWidthValue, titleDividerGlow, titleDividerColor);
     divider.dataset.layer = 'title'; // Add layer identifier for visibility toggle
     canvasWrapper.appendChild(divider);
   }
   if (dividerBelowTitle) {
-    const divider = createDivider(titleY + (currentImageType === IMAGE_TYPES.OG ? 30 : 35), 400, titleDividerColorValue, titleDividerWidthValue);
+    const gap = titleDividerGap !== undefined ? titleDividerGap : (currentImageType === IMAGE_TYPES.OG ? 30 : 35);
+    const dividerX = dividerBelowTitleX !== null && dividerBelowTitleX !== undefined ? dividerBelowTitleX : null;
+    const dividerY = dividerBelowTitleY !== null && dividerBelowTitleY !== undefined ? dividerBelowTitleY : (titleY + gap);
+    const divider = createDivider(dividerX, dividerY, 400, titleDividerColorValue, titleDividerWidthValue, titleDividerGlow, titleDividerColor);
     divider.dataset.layer = 'title'; // Add layer identifier for visibility toggle
     canvasWrapper.appendChild(divider);
   }
@@ -654,12 +704,18 @@ export function updatePreview(state) {
 
   // Dividers for subtitle
   if (dividerAboveSubtitle) {
-    const divider = createDivider(subtitleY - (currentImageType === IMAGE_TYPES.OG ? 20 : 25), 350, subtitleDividerColorValue, subtitleDividerWidthValue);
+    const gap = subtitleDividerGap !== undefined ? subtitleDividerGap : (currentImageType === IMAGE_TYPES.OG ? 20 : 25);
+    const dividerX = dividerAboveSubtitleX !== null && dividerAboveSubtitleX !== undefined ? dividerAboveSubtitleX : null;
+    const dividerY = dividerAboveSubtitleY !== null && dividerAboveSubtitleY !== undefined ? dividerAboveSubtitleY : (subtitleY - gap);
+    const divider = createDivider(dividerX, dividerY, 350, subtitleDividerColorValue, subtitleDividerWidthValue, subtitleDividerGlow, subtitleDividerColor);
     divider.dataset.layer = 'subtitle'; // Add layer identifier for visibility toggle
     canvasWrapper.appendChild(divider);
   }
   if (dividerBelowSubtitle) {
-    const divider = createDivider(subtitleY + (currentImageType === IMAGE_TYPES.OG ? 20 : 25), 350, subtitleDividerColorValue, subtitleDividerWidthValue);
+    const gap = subtitleDividerGap !== undefined ? subtitleDividerGap : (currentImageType === IMAGE_TYPES.OG ? 20 : 25);
+    const dividerX = dividerBelowSubtitleX !== null && dividerBelowSubtitleX !== undefined ? dividerBelowSubtitleX : null;
+    const dividerY = dividerBelowSubtitleY !== null && dividerBelowSubtitleY !== undefined ? dividerBelowSubtitleY : (subtitleY + gap);
+    const divider = createDivider(dividerX, dividerY, 350, subtitleDividerColorValue, subtitleDividerWidthValue, subtitleDividerGlow, subtitleDividerColor);
     divider.dataset.layer = 'subtitle'; // Add layer identifier for visibility toggle
     canvasWrapper.appendChild(divider);
   }
@@ -703,12 +759,18 @@ export function updatePreview(state) {
 
     // Dividers for slogan
     if (dividerAboveSlogan) {
-      const divider = createDivider(sloganY - (currentImageType === IMAGE_TYPES.OG ? 15 : 20), 300, sloganDividerColorValue, sloganDividerWidthValue);
+      const gap = sloganDividerGap !== undefined ? sloganDividerGap : (currentImageType === IMAGE_TYPES.OG ? 15 : 20);
+      const dividerX = dividerAboveSloganX !== null && dividerAboveSloganX !== undefined ? dividerAboveSloganX : null;
+      const dividerY = dividerAboveSloganY !== null && dividerAboveSloganY !== undefined ? dividerAboveSloganY : (sloganY - gap);
+      const divider = createDivider(dividerX, dividerY, 300, sloganDividerColorValue, sloganDividerWidthValue, sloganDividerGlow, sloganDividerColor);
       divider.dataset.layer = 'slogan'; // Add layer identifier for visibility toggle
       canvasWrapper.appendChild(divider);
     }
     if (dividerBelowSlogan) {
-      const divider = createDivider(sloganY + (currentImageType === IMAGE_TYPES.OG ? 15 : 20), 300, sloganDividerColorValue, sloganDividerWidthValue);
+      const gap = sloganDividerGap !== undefined ? sloganDividerGap : (currentImageType === IMAGE_TYPES.OG ? 15 : 20);
+      const dividerX = dividerBelowSloganX !== null && dividerBelowSloganX !== undefined ? dividerBelowSloganX : null;
+      const dividerY = dividerBelowSloganY !== null && dividerBelowSloganY !== undefined ? dividerBelowSloganY : (sloganY + gap);
+      const divider = createDivider(dividerX, dividerY, 300, sloganDividerColorValue, sloganDividerWidthValue, sloganDividerGlow, sloganDividerColor);
       divider.dataset.layer = 'slogan'; // Add layer identifier for visibility toggle
       canvasWrapper.appendChild(divider);
     }

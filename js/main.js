@@ -127,6 +127,24 @@ let currentState = {
   titleDividerColor: 'cyan',
   subtitleDividerColor: 'cyan',
   sloganDividerColor: 'cyan',
+  titleDividerGlow: false,
+  subtitleDividerGlow: false,
+  sloganDividerGlow: false,
+  titleDividerGap: 30,
+  subtitleDividerGap: 20,
+  sloganDividerGap: 15,
+  dividerAboveTitleX: null,
+  dividerAboveTitleY: null,
+  dividerBelowTitleX: null,
+  dividerBelowTitleY: null,
+  dividerAboveSubtitleX: null,
+  dividerAboveSubtitleY: null,
+  dividerBelowSubtitleX: null,
+  dividerBelowSubtitleY: null,
+  dividerAboveSloganX: null,
+  dividerAboveSloganY: null,
+  dividerBelowSloganX: null,
+  dividerBelowSloganY: null,
   titleX: 600,
   titleY: 315,
   subtitleX: 600,
@@ -162,6 +180,16 @@ let dividerWidthSlider, dividerWidthValue;
 let titleDividerWidthSlider, titleDividerWidthValue;
 let subtitleDividerWidthSlider, subtitleDividerWidthValue;
 let sloganDividerWidthSlider, sloganDividerWidthValue;
+let titleDividerGlow, subtitleDividerGlow, sloganDividerGlow;
+let titleDividerGapSlider, titleDividerGapValue;
+let subtitleDividerGapSlider, subtitleDividerGapValue;
+let sloganDividerGapSlider, sloganDividerGapValue;
+let dividerAboveTitleXSlider, dividerAboveTitleXValue, dividerAboveTitleYSlider, dividerAboveTitleYValue;
+let dividerBelowTitleXSlider, dividerBelowTitleXValue, dividerBelowTitleYSlider, dividerBelowTitleYValue;
+let dividerAboveSubtitleXSlider, dividerAboveSubtitleXValue, dividerAboveSubtitleYSlider, dividerAboveSubtitleYValue;
+let dividerBelowSubtitleXSlider, dividerBelowSubtitleXValue, dividerBelowSubtitleYSlider, dividerBelowSubtitleYValue;
+let dividerAboveSloganXSlider, dividerAboveSloganXValue, dividerAboveSloganYSlider, dividerAboveSloganYValue;
+let dividerBelowSloganXSlider, dividerBelowSloganXValue, dividerBelowSloganYSlider, dividerBelowSloganYValue;
 let exportBtn, copyBtn, randomBtn, undoBtn, redoBtn, gridToggleBtn, popoutBtn;
 let copyClipboardBtn, fullscreenBtn;
 let rulerToggleBtn, historyTimelineBtn, closeHistoryBtn;
@@ -231,6 +259,39 @@ function initDOMElements() {
   subtitleDividerWidthValue = document.getElementById('subtitleDividerWidthValue');
   sloganDividerWidthSlider = document.getElementById('sloganDividerWidth');
   sloganDividerWidthValue = document.getElementById('sloganDividerWidthValue');
+  titleDividerGlow = document.getElementById('titleDividerGlow');
+  subtitleDividerGlow = document.getElementById('subtitleDividerGlow');
+  sloganDividerGlow = document.getElementById('sloganDividerGlow');
+  titleDividerGapSlider = document.getElementById('titleDividerGap');
+  titleDividerGapValue = document.getElementById('titleDividerGapValue');
+  subtitleDividerGapSlider = document.getElementById('subtitleDividerGap');
+  subtitleDividerGapValue = document.getElementById('subtitleDividerGapValue');
+  sloganDividerGapSlider = document.getElementById('sloganDividerGap');
+  sloganDividerGapValue = document.getElementById('sloganDividerGapValue');
+  dividerAboveTitleXSlider = document.getElementById('dividerAboveTitleX');
+  dividerAboveTitleXValue = document.getElementById('dividerAboveTitleXValue');
+  dividerAboveTitleYSlider = document.getElementById('dividerAboveTitleY');
+  dividerAboveTitleYValue = document.getElementById('dividerAboveTitleYValue');
+  dividerBelowTitleXSlider = document.getElementById('dividerBelowTitleX');
+  dividerBelowTitleXValue = document.getElementById('dividerBelowTitleXValue');
+  dividerBelowTitleYSlider = document.getElementById('dividerBelowTitleY');
+  dividerBelowTitleYValue = document.getElementById('dividerBelowTitleYValue');
+  dividerAboveSubtitleXSlider = document.getElementById('dividerAboveSubtitleX');
+  dividerAboveSubtitleXValue = document.getElementById('dividerAboveSubtitleXValue');
+  dividerAboveSubtitleYSlider = document.getElementById('dividerAboveSubtitleY');
+  dividerAboveSubtitleYValue = document.getElementById('dividerAboveSubtitleYValue');
+  dividerBelowSubtitleXSlider = document.getElementById('dividerBelowSubtitleX');
+  dividerBelowSubtitleXValue = document.getElementById('dividerBelowSubtitleXValue');
+  dividerBelowSubtitleYSlider = document.getElementById('dividerBelowSubtitleY');
+  dividerBelowSubtitleYValue = document.getElementById('dividerBelowSubtitleYValue');
+  dividerAboveSloganXSlider = document.getElementById('dividerAboveSloganX');
+  dividerAboveSloganXValue = document.getElementById('dividerAboveSloganXValue');
+  dividerAboveSloganYSlider = document.getElementById('dividerAboveSloganY');
+  dividerAboveSloganYValue = document.getElementById('dividerAboveSloganYValue');
+  dividerBelowSloganXSlider = document.getElementById('dividerBelowSloganX');
+  dividerBelowSloganXValue = document.getElementById('dividerBelowSloganXValue');
+  dividerBelowSloganYSlider = document.getElementById('dividerBelowSloganY');
+  dividerBelowSloganYValue = document.getElementById('dividerBelowSloganYValue');
   exportBtn = document.getElementById('exportBtn');
   copyBtn = document.getElementById('copyBtn');
   randomBtn = document.getElementById('randomBtn');
@@ -427,6 +488,24 @@ function updateState(skipHistory = false) {
     titleDividerColor: getSelectedColorKey('titleDividerColorPicker') || 'cyan',
     subtitleDividerColor: getSelectedColorKey('subtitleDividerColorPicker') || 'cyan',
     sloganDividerColor: getSelectedColorKey('sloganDividerColorPicker') || 'cyan',
+    titleDividerGlow: titleDividerGlow ? titleDividerGlow.checked : false,
+    subtitleDividerGlow: subtitleDividerGlow ? subtitleDividerGlow.checked : false,
+    sloganDividerGlow: sloganDividerGlow ? sloganDividerGlow.checked : false,
+    titleDividerGap: titleDividerGapValue ? parseInt(titleDividerGapValue.value) || 30 : 30,
+    subtitleDividerGap: subtitleDividerGapValue ? parseInt(subtitleDividerGapValue.value) || 20 : 20,
+    sloganDividerGap: sloganDividerGapValue ? parseInt(sloganDividerGapValue.value) || 15 : 15,
+    dividerAboveTitleX: dividerAboveTitleXValue ? (dividerAboveTitleXValue.value === '' ? null : parseInt(dividerAboveTitleXValue.value)) : null,
+    dividerAboveTitleY: dividerAboveTitleYValue ? (dividerAboveTitleYValue.value === '' ? null : parseInt(dividerAboveTitleYValue.value)) : null,
+    dividerBelowTitleX: dividerBelowTitleXValue ? (dividerBelowTitleXValue.value === '' ? null : parseInt(dividerBelowTitleXValue.value)) : null,
+    dividerBelowTitleY: dividerBelowTitleYValue ? (dividerBelowTitleYValue.value === '' ? null : parseInt(dividerBelowTitleYValue.value)) : null,
+    dividerAboveSubtitleX: dividerAboveSubtitleXValue ? (dividerAboveSubtitleXValue.value === '' ? null : parseInt(dividerAboveSubtitleXValue.value)) : null,
+    dividerAboveSubtitleY: dividerAboveSubtitleYValue ? (dividerAboveSubtitleYValue.value === '' ? null : parseInt(dividerAboveSubtitleYValue.value)) : null,
+    dividerBelowSubtitleX: dividerBelowSubtitleXValue ? (dividerBelowSubtitleXValue.value === '' ? null : parseInt(dividerBelowSubtitleXValue.value)) : null,
+    dividerBelowSubtitleY: dividerBelowSubtitleYValue ? (dividerBelowSubtitleYValue.value === '' ? null : parseInt(dividerBelowSubtitleYValue.value)) : null,
+    dividerAboveSloganX: dividerAboveSloganXValue ? (dividerAboveSloganXValue.value === '' ? null : parseInt(dividerAboveSloganXValue.value)) : null,
+    dividerAboveSloganY: dividerAboveSloganYValue ? (dividerAboveSloganYValue.value === '' ? null : parseInt(dividerAboveSloganYValue.value)) : null,
+    dividerBelowSloganX: dividerBelowSloganXValue ? (dividerBelowSloganXValue.value === '' ? null : parseInt(dividerBelowSloganXValue.value)) : null,
+    dividerBelowSloganY: dividerBelowSloganYValue ? (dividerBelowSloganYValue.value === '' ? null : parseInt(dividerBelowSloganYValue.value)) : null,
     titleX: titleXValue ? parseInt(titleXValue.value) || 600 : 600,
     titleY: titleYValue ? parseInt(titleYValue.value) || 315 : 315,
     subtitleX: subtitleXValue ? parseInt(subtitleXValue.value) || 600 : 600,
@@ -509,65 +588,104 @@ function applyStateToUI(state) {
     sloganDividerWidthValue.value = state.sloganDividerWidth || 2;
     sloganDividerWidthSlider.value = state.sloganDividerWidth || 2;
   }
+  if (titleDividerGlow) titleDividerGlow.checked = state.titleDividerGlow || false;
+  if (subtitleDividerGlow) subtitleDividerGlow.checked = state.subtitleDividerGlow || false;
+  if (sloganDividerGlow) sloganDividerGlow.checked = state.sloganDividerGlow || false;
+  if (titleDividerGapValue) {
+    titleDividerGapValue.value = state.titleDividerGap !== undefined ? state.titleDividerGap : 30;
+    if (titleDividerGapSlider) titleDividerGapSlider.value = state.titleDividerGap !== undefined ? state.titleDividerGap : 30;
+  }
+  if (subtitleDividerGapValue) {
+    subtitleDividerGapValue.value = state.subtitleDividerGap !== undefined ? state.subtitleDividerGap : 20;
+    if (subtitleDividerGapSlider) subtitleDividerGapSlider.value = state.subtitleDividerGap !== undefined ? state.subtitleDividerGap : 20;
+  }
+  if (sloganDividerGapValue) {
+    sloganDividerGapValue.value = state.sloganDividerGap !== undefined ? state.sloganDividerGap : 15;
+    if (sloganDividerGapSlider) sloganDividerGapSlider.value = state.sloganDividerGap !== undefined ? state.sloganDividerGap : 15;
+  }
+  if (dividerAboveTitleXValue) dividerAboveTitleXValue.value = state.dividerAboveTitleX !== null && state.dividerAboveTitleX !== undefined ? state.dividerAboveTitleX : '';
+  if (dividerAboveTitleXSlider) dividerAboveTitleXSlider.value = state.dividerAboveTitleX !== null && state.dividerAboveTitleX !== undefined ? state.dividerAboveTitleX : '';
+  if (dividerAboveTitleYValue) dividerAboveTitleYValue.value = state.dividerAboveTitleY !== null && state.dividerAboveTitleY !== undefined ? state.dividerAboveTitleY : '';
+  if (dividerAboveTitleYSlider) dividerAboveTitleYSlider.value = state.dividerAboveTitleY !== null && state.dividerAboveTitleY !== undefined ? state.dividerAboveTitleY : '';
+  if (dividerBelowTitleXValue) dividerBelowTitleXValue.value = state.dividerBelowTitleX !== null && state.dividerBelowTitleX !== undefined ? state.dividerBelowTitleX : '';
+  if (dividerBelowTitleXSlider) dividerBelowTitleXSlider.value = state.dividerBelowTitleX !== null && state.dividerBelowTitleX !== undefined ? state.dividerBelowTitleX : '';
+  if (dividerBelowTitleYValue) dividerBelowTitleYValue.value = state.dividerBelowTitleY !== null && state.dividerBelowTitleY !== undefined ? state.dividerBelowTitleY : '';
+  if (dividerBelowTitleYSlider) dividerBelowTitleYSlider.value = state.dividerBelowTitleY !== null && state.dividerBelowTitleY !== undefined ? state.dividerBelowTitleY : '';
+  if (dividerAboveSubtitleXValue) dividerAboveSubtitleXValue.value = state.dividerAboveSubtitleX !== null && state.dividerAboveSubtitleX !== undefined ? state.dividerAboveSubtitleX : '';
+  if (dividerAboveSubtitleXSlider) dividerAboveSubtitleXSlider.value = state.dividerAboveSubtitleX !== null && state.dividerAboveSubtitleX !== undefined ? state.dividerAboveSubtitleX : '';
+  if (dividerAboveSubtitleYValue) dividerAboveSubtitleYValue.value = state.dividerAboveSubtitleY !== null && state.dividerAboveSubtitleY !== undefined ? state.dividerAboveSubtitleY : '';
+  if (dividerAboveSubtitleYSlider) dividerAboveSubtitleYSlider.value = state.dividerAboveSubtitleY !== null && state.dividerAboveSubtitleY !== undefined ? state.dividerAboveSubtitleY : '';
+  if (dividerBelowSubtitleXValue) dividerBelowSubtitleXValue.value = state.dividerBelowSubtitleX !== null && state.dividerBelowSubtitleX !== undefined ? state.dividerBelowSubtitleX : '';
+  if (dividerBelowSubtitleXSlider) dividerBelowSubtitleXSlider.value = state.dividerBelowSubtitleX !== null && state.dividerBelowSubtitleX !== undefined ? state.dividerBelowSubtitleX : '';
+  if (dividerBelowSubtitleYValue) dividerBelowSubtitleYValue.value = state.dividerBelowSubtitleY !== null && state.dividerBelowSubtitleY !== undefined ? state.dividerBelowSubtitleY : '';
+  if (dividerBelowSubtitleYSlider) dividerBelowSubtitleYSlider.value = state.dividerBelowSubtitleY !== null && state.dividerBelowSubtitleY !== undefined ? state.dividerBelowSubtitleY : '';
+  if (dividerAboveSloganXValue) dividerAboveSloganXValue.value = state.dividerAboveSloganX !== null && state.dividerAboveSloganX !== undefined ? state.dividerAboveSloganX : '';
+  if (dividerAboveSloganXSlider) dividerAboveSloganXSlider.value = state.dividerAboveSloganX !== null && state.dividerAboveSloganX !== undefined ? state.dividerAboveSloganX : '';
+  if (dividerAboveSloganYValue) dividerAboveSloganYValue.value = state.dividerAboveSloganY !== null && state.dividerAboveSloganY !== undefined ? state.dividerAboveSloganY : '';
+  if (dividerAboveSloganYSlider) dividerAboveSloganYSlider.value = state.dividerAboveSloganY !== null && state.dividerAboveSloganY !== undefined ? state.dividerAboveSloganY : '';
+  if (dividerBelowSloganXValue) dividerBelowSloganXValue.value = state.dividerBelowSloganX !== null && state.dividerBelowSloganX !== undefined ? state.dividerBelowSloganX : '';
+  if (dividerBelowSloganXSlider) dividerBelowSloganXSlider.value = state.dividerBelowSloganX !== null && state.dividerBelowSloganX !== undefined ? state.dividerBelowSloganX : '';
+  if (dividerBelowSloganYValue) dividerBelowSloganYValue.value = state.dividerBelowSloganY !== null && state.dividerBelowSloganY !== undefined ? state.dividerBelowSloganY : '';
+  if (dividerBelowSloganYSlider) dividerBelowSloganYSlider.value = state.dividerBelowSloganY !== null && state.dividerBelowSloganY !== undefined ? state.dividerBelowSloganY : '';
   // Handle migration from offset to absolute positions
   if (titleXValue && titleXSlider) {
-    if (state.titleX !== undefined) {
-      titleXValue.value = state.titleX;
-      titleXSlider.value = state.titleX;
-    } else if (state.titleOffsetX !== undefined) {
-      // Migrate old offset to absolute position (center + offset)
-      const centerX = IMAGE_TYPES.OG.width / 2;
-      const centerY = IMAGE_TYPES.OG.height / 2;
-      titleXValue.value = centerX + state.titleOffsetX;
-      titleXSlider.value = centerX + state.titleOffsetX;
-    } else {
-      titleXValue.value = 600;
-      titleXSlider.value = 600;
+  if (state.titleX !== undefined) {
+    titleXValue.value = state.titleX;
+    titleXSlider.value = state.titleX;
+  } else if (state.titleOffsetX !== undefined) {
+    // Migrate old offset to absolute position (center + offset)
+    const centerX = IMAGE_TYPES.OG.width / 2;
+    const centerY = IMAGE_TYPES.OG.height / 2;
+    titleXValue.value = centerX + state.titleOffsetX;
+    titleXSlider.value = centerX + state.titleOffsetX;
+  } else {
+    titleXValue.value = 600;
+    titleXSlider.value = 600;
     }
   }
-
+  
   if (titleYValue && titleYSlider) {
-    if (state.titleY !== undefined) {
-      titleYValue.value = state.titleY;
-      titleYSlider.value = state.titleY;
-    } else if (state.titleOffsetY !== undefined) {
-      const centerY = IMAGE_TYPES.OG.height / 2;
-      titleYValue.value = centerY - 40 + state.titleOffsetY;
-      titleYSlider.value = centerY - 40 + state.titleOffsetY;
-    } else {
-      titleYValue.value = 315;
-      titleYSlider.value = 315;
+  if (state.titleY !== undefined) {
+    titleYValue.value = state.titleY;
+    titleYSlider.value = state.titleY;
+  } else if (state.titleOffsetY !== undefined) {
+    const centerY = IMAGE_TYPES.OG.height / 2;
+    titleYValue.value = centerY - 40 + state.titleOffsetY;
+    titleYSlider.value = centerY - 40 + state.titleOffsetY;
+  } else {
+    titleYValue.value = 315;
+    titleYSlider.value = 315;
     }
   }
-
+  
   if (subtitleXValue && subtitleXSlider) {
-    if (state.subtitleX !== undefined) {
-      subtitleXValue.value = state.subtitleX;
-      subtitleXSlider.value = state.subtitleX;
-    } else if (state.subtitleOffsetX !== undefined) {
-      const centerX = IMAGE_TYPES.OG.width / 2;
-      subtitleXValue.value = centerX + state.subtitleOffsetX;
-      subtitleXSlider.value = centerX + state.subtitleOffsetX;
-    } else {
-      subtitleXValue.value = 600;
-      subtitleXSlider.value = 600;
+  if (state.subtitleX !== undefined) {
+    subtitleXValue.value = state.subtitleX;
+    subtitleXSlider.value = state.subtitleX;
+  } else if (state.subtitleOffsetX !== undefined) {
+    const centerX = IMAGE_TYPES.OG.width / 2;
+    subtitleXValue.value = centerX + state.subtitleOffsetX;
+    subtitleXSlider.value = centerX + state.subtitleOffsetX;
+  } else {
+    subtitleXValue.value = 600;
+    subtitleXSlider.value = 600;
     }
   }
-
+  
   if (subtitleYValue && subtitleYSlider) {
-    if (state.subtitleY !== undefined) {
-      subtitleYValue.value = state.subtitleY;
-      subtitleYSlider.value = state.subtitleY;
-    } else if (state.subtitleOffsetY !== undefined) {
-      const centerY = IMAGE_TYPES.OG.height / 2;
-      subtitleYValue.value = centerY + 80 + state.subtitleOffsetY;
-      subtitleYSlider.value = centerY + 80 + state.subtitleOffsetY;
-    } else {
-      subtitleYValue.value = 395;
-      subtitleYSlider.value = 395;
+  if (state.subtitleY !== undefined) {
+    subtitleYValue.value = state.subtitleY;
+    subtitleYSlider.value = state.subtitleY;
+  } else if (state.subtitleOffsetY !== undefined) {
+    const centerY = IMAGE_TYPES.OG.height / 2;
+    subtitleYValue.value = centerY + 80 + state.subtitleOffsetY;
+    subtitleYSlider.value = centerY + 80 + state.subtitleOffsetY;
+  } else {
+    subtitleYValue.value = 395;
+    subtitleYSlider.value = 395;
     }
   }
-
+  
   if (sloganXValue && sloganXSlider) {
     if (state.sloganX !== undefined) {
       sloganXValue.value = state.sloganX;
@@ -581,7 +699,7 @@ function applyStateToUI(state) {
       sloganXSlider.value = 600;
     }
   }
-
+  
   if (sloganYValue && sloganYSlider) {
     if (state.sloganY !== undefined) {
       sloganYValue.value = state.sloganY;
@@ -595,7 +713,7 @@ function applyStateToUI(state) {
       sloganYSlider.value = 455;
     }
   }
-
+  
   // Handle logo position migration
   if (state.logoX === undefined && state.logoY === undefined && state.logoPosition) {
     // Migrate old logoPosition to X/Y coordinates
@@ -610,7 +728,7 @@ function applyStateToUI(state) {
     else if (logoPos === 'bottom-center') { x = IMAGE_TYPES.OG.width / 2; y = IMAGE_TYPES.OG.height - 40; }
     else if (logoPos === 'bottom-right') { x = IMAGE_TYPES.OG.width - 40; y = IMAGE_TYPES.OG.height - 40; }
     else if (logoPos === 'hidden') { x = -1000; y = -1000; } // Hide off-screen
-
+    
     if (logoXValue) logoXValue.value = x;
     if (logoXSlider) logoXSlider.value = x;
     if (logoYValue) logoYValue.value = y;
@@ -784,6 +902,66 @@ function setupEventListeners() {
   }
   if (sloganDividerWidthSlider && sloganDividerWidthValue) {
     syncSliderInputDebounced(sloganDividerWidthSlider, sloganDividerWidthValue, () => debouncedUpdateState());
+  }
+
+  // Divider glow controls
+  if (titleDividerGlow) {
+    titleDividerGlow.addEventListener('change', () => updateState());
+  }
+  if (subtitleDividerGlow) {
+    subtitleDividerGlow.addEventListener('change', () => updateState());
+  }
+  if (sloganDividerGlow) {
+    sloganDividerGlow.addEventListener('change', () => updateState());
+  }
+
+  // Divider gap controls
+  if (titleDividerGapSlider && titleDividerGapValue) {
+    syncSliderInputDebounced(titleDividerGapSlider, titleDividerGapValue, () => debouncedUpdateState());
+  }
+  if (subtitleDividerGapSlider && subtitleDividerGapValue) {
+    syncSliderInputDebounced(subtitleDividerGapSlider, subtitleDividerGapValue, () => debouncedUpdateState());
+  }
+  if (sloganDividerGapSlider && sloganDividerGapValue) {
+    syncSliderInputDebounced(sloganDividerGapSlider, sloganDividerGapValue, () => debouncedUpdateState());
+  }
+
+  // Divider position controls
+  if (dividerAboveTitleXSlider && dividerAboveTitleXValue) {
+    syncSliderInputDebounced(dividerAboveTitleXSlider, dividerAboveTitleXValue, () => debouncedUpdateState());
+  }
+  if (dividerAboveTitleYSlider && dividerAboveTitleYValue) {
+    syncSliderInputDebounced(dividerAboveTitleYSlider, dividerAboveTitleYValue, () => debouncedUpdateState());
+  }
+  if (dividerBelowTitleXSlider && dividerBelowTitleXValue) {
+    syncSliderInputDebounced(dividerBelowTitleXSlider, dividerBelowTitleXValue, () => debouncedUpdateState());
+  }
+  if (dividerBelowTitleYSlider && dividerBelowTitleYValue) {
+    syncSliderInputDebounced(dividerBelowTitleYSlider, dividerBelowTitleYValue, () => debouncedUpdateState());
+  }
+  if (dividerAboveSubtitleXSlider && dividerAboveSubtitleXValue) {
+    syncSliderInputDebounced(dividerAboveSubtitleXSlider, dividerAboveSubtitleXValue, () => debouncedUpdateState());
+  }
+  if (dividerAboveSubtitleYSlider && dividerAboveSubtitleYValue) {
+    syncSliderInputDebounced(dividerAboveSubtitleYSlider, dividerAboveSubtitleYValue, () => debouncedUpdateState());
+  }
+  if (dividerBelowSubtitleXSlider && dividerBelowSubtitleXValue) {
+    syncSliderInputDebounced(dividerBelowSubtitleXSlider, dividerBelowSubtitleXValue, () => debouncedUpdateState());
+  }
+  if (dividerBelowSubtitleYSlider && dividerBelowSubtitleYValue) {
+    syncSliderInputDebounced(dividerBelowSubtitleYSlider, dividerBelowSubtitleYValue, () => debouncedUpdateState());
+  }
+  if (dividerAboveSloganXSlider && dividerAboveSloganXValue) {
+    syncSliderInputDebounced(dividerAboveSloganXSlider, dividerAboveSloganXValue, () => debouncedUpdateState());
+  }
+  if (dividerAboveSloganYSlider && dividerAboveSloganYValue) {
+    syncSliderInputDebounced(dividerAboveSloganYSlider, dividerAboveSloganYValue, () => debouncedUpdateState());
+  }
+  if (dividerBelowSloganXSlider && dividerBelowSloganXValue) {
+    syncSliderInputDebounced(dividerBelowSloganXSlider, dividerBelowSloganXValue, () => debouncedUpdateState());
+  }
+  if (dividerBelowSloganYSlider && dividerBelowSloganYValue) {
+    syncSliderInputDebounced(dividerBelowSloganYSlider, dividerBelowSloganYValue, () => debouncedUpdateState());
   }
 
   // Text alignment controls - use debounced updates to prevent CLS during rapid slider changes
@@ -1380,49 +1558,31 @@ function setupEventListeners() {
   // Zoom Toggle Button
   const fullscreenZoomBtn = document.getElementById('fullscreenZoomBtn');
   if (fullscreenZoomBtn) {
-    const zoomIndicator = document.getElementById('zoomIndicator');
-    const canvasWrapper = document.getElementById('canvasWrapper');
-    const canvasContainer = document.getElementById('canvasContainer');
-
-    // Make zoom button always visible (not just in fullscreen)
-    fullscreenZoomBtn.style.display = 'block';
-
-    const updateZoomUI = () => {
-      const level = getZoomLevel();
-      let displayText = '';
-      if (level === 'fit') {
-        displayText = 'Fit';
-        if (zoomIndicator) zoomIndicator.style.display = 'none';
-      } else {
-        displayText = `${Math.round(level * 100)}%`;
-        if (zoomIndicator) {
-          zoomIndicator.textContent = displayText;
-          zoomIndicator.style.display = 'block';
-        }
-      }
-      fullscreenZoomBtn.title = `Zoom: ${displayText}`;
-    };
-
-    const handleZoomClick = () => {
-      cycleZoomLevel();
-      updateZoomUI();
-
-      // Update grid and rulers if visible
+      const zoomIndicator = document.getElementById('zoomIndicator');
       const canvasWrapper = document.getElementById('canvasWrapper');
-      if (canvasWrapper && isGridOverlayVisible()) {
-        updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
-      }
-    };
+      const canvasContainer = document.getElementById('canvasContainer');
 
-    // Attach zoom functionality to fullscreenZoomBtn
-    fullscreenZoomBtn.addEventListener('click', handleZoomClick);
+      // Make zoom button always visible (not just in fullscreen)
+      fullscreenZoomBtn.style.display = 'block';
 
-    // Make zoom indicator clickable to reset to 'fit'
-    if (zoomIndicator) {
-      zoomIndicator.style.cursor = 'pointer';
-      zoomIndicator.title = 'Click to reset zoom to Fit';
-      zoomIndicator.addEventListener('click', () => {
-        setZoomLevel('fit');
+      const updateZoomUI = () => {
+        const level = getZoomLevel();
+        let displayText = '';
+        if (level === 'fit') {
+          displayText = 'Fit';
+          if (zoomIndicator) zoomIndicator.style.display = 'none';
+        } else {
+          displayText = `${Math.round(level * 100)}%`;
+          if (zoomIndicator) {
+            zoomIndicator.textContent = displayText;
+            zoomIndicator.style.display = 'block';
+          }
+        }
+        fullscreenZoomBtn.title = `Zoom: ${displayText}`;
+      };
+
+      const handleZoomClick = () => {
+        cycleZoomLevel();
         updateZoomUI();
 
         // Update grid and rulers if visible
@@ -1430,307 +1590,325 @@ function setupEventListeners() {
         if (canvasWrapper && isGridOverlayVisible()) {
           updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
         }
-      });
+      };
+
+      // Attach zoom functionality to fullscreenZoomBtn
+      fullscreenZoomBtn.addEventListener('click', handleZoomClick);
+
+      // Make zoom indicator clickable to reset to 'fit'
+      if (zoomIndicator) {
+        zoomIndicator.style.cursor = 'pointer';
+        zoomIndicator.title = 'Click to reset zoom to Fit';
+        zoomIndicator.addEventListener('click', () => {
+          setZoomLevel('fit');
+          updateZoomUI();
+
+          // Update grid and rulers if visible
+          const canvasWrapper = document.getElementById('canvasWrapper');
+          if (canvasWrapper && isGridOverlayVisible()) {
+            updateGridOverlayDimensions(currentImageType.width, currentImageType.height);
+          }
+        });
+      }
+
+      // Pan functionality when zoomed in
+      if (canvasWrapper && canvasContainer) {
+        let isPanning = false;
+        let panStartX = 0;
+        let panStartY = 0;
+        let initialPanX = 0;
+        let initialPanY = 0;
+        let touchIdentifier = null;
+
+        const getEventPoint = e => {
+          if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          }
+          return { x: e.clientX, y: e.clientY };
+        };
+
+        const startPan = e => {
+          const level = getZoomLevel();
+          if (level === 'fit') return; // No panning when fit to container
+
+          // For touch events, only handle single touch
+          if (e.touches) {
+            if (e.touches.length !== 1) return;
+            touchIdentifier = e.touches[0].identifier;
+          }
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          const currentPan = getPan();
+          initialPanX = currentPan.x;
+          initialPanY = currentPan.y;
+
+          const containerRect = canvasContainer.getBoundingClientRect();
+          const point = getEventPoint(e);
+
+          // Calculate point relative to container
+          panStartX = point.x - containerRect.left;
+          panStartY = point.y - containerRect.top;
+
+          isPanning = true;
+          canvasWrapper.style.cursor = 'grabbing';
+          canvasWrapper.style.userSelect = 'none';
+        };
+
+        const doPan = e => {
+          if (!isPanning) return;
+
+          // For touch events, match the touch identifier
+          if (e.touches) {
+            const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
+            if (!touch) return;
+          }
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          const containerRect = canvasContainer.getBoundingClientRect();
+          const point = getEventPoint(e);
+
+          // Calculate current point relative to container
+          const currentX = point.x - containerRect.left;
+          const currentY = point.y - containerRect.top;
+
+          // Calculate delta from start position
+          const deltaX = currentX - panStartX;
+          const deltaY = currentY - panStartY;
+
+          // Apply delta to initial pan position
+          let newPanX = initialPanX + deltaX;
+          let newPanY = initialPanY + deltaY;
+
+          // Constrain panning to prevent moving too far
+          const level = getZoomLevel();
+          const canvasWidth = currentImageType.width;
+          const canvasHeight = currentImageType.height;
+          const padding = 24;
+          const containerWidth = containerRect.width - padding;
+          const containerHeight = containerRect.height - padding;
+
+          const scaledWidth = canvasWidth * level;
+          const scaledHeight = canvasHeight * level;
+
+          // Calculate bounds: center offset + pan limits
+          const centerOffsetX = (containerWidth - scaledWidth) / 2;
+          const centerOffsetY = (containerHeight - scaledHeight) / 2;
+
+          // Maximum pan is when edges align with container edges
+          const maxPanX = Math.max(0, (scaledWidth - containerWidth) / 2);
+          const maxPanY = Math.max(0, (scaledHeight - containerHeight) / 2);
+
+          // Constrain pan within bounds
+          newPanX = Math.max(-maxPanX, Math.min(maxPanX, newPanX));
+          newPanY = Math.max(-maxPanY, Math.min(maxPanY, newPanY));
+
+          setPan(newPanX, newPanY);
+        };
+
+        const endPan = e => {
+          if (!isPanning) return;
+
+          // For touch events, only end if it's the same touch
+          if (e.touches) {
+            const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
+            if (touch) return; // Still touching, don't end
+          }
+
+          isPanning = false;
+          touchIdentifier = null;
+          const level = getZoomLevel();
+          canvasWrapper.style.cursor = level === 'fit' ? '' : 'grab';
+          canvasWrapper.style.userSelect = '';
+        };
+
+        // Mouse events
+        canvasWrapper.addEventListener('mousedown', startPan);
+        document.addEventListener('mousemove', doPan);
+        document.addEventListener('mouseup', endPan);
+        canvasWrapper.addEventListener('mouseleave', endPan);
+
+        // Touch events
+        canvasWrapper.addEventListener('touchstart', startPan, { passive: false });
+        document.addEventListener('touchmove', doPan, { passive: false });
+        document.addEventListener('touchend', endPan);
+        document.addEventListener('touchcancel', endPan);
+      }
+
+      // Initialize zoom UI
+      updateZoomUI();
     }
-
-    // Pan functionality when zoomed in
-    if (canvasWrapper && canvasContainer) {
-      let isPanning = false;
-      let panStartX = 0;
-      let panStartY = 0;
-      let initialPanX = 0;
-      let initialPanY = 0;
-      let touchIdentifier = null;
-
-      const getEventPoint = e => {
-        if (e.touches && e.touches.length > 0) {
-          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }
-        return { x: e.clientX, y: e.clientY };
-      };
-
-      const startPan = e => {
-        const level = getZoomLevel();
-        if (level === 'fit') return; // No panning when fit to container
-
-        // For touch events, only handle single touch
-        if (e.touches) {
-          if (e.touches.length !== 1) return;
-          touchIdentifier = e.touches[0].identifier;
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        const currentPan = getPan();
-        initialPanX = currentPan.x;
-        initialPanY = currentPan.y;
-
-        const containerRect = canvasContainer.getBoundingClientRect();
-        const point = getEventPoint(e);
-
-        // Calculate point relative to container
-        panStartX = point.x - containerRect.left;
-        panStartY = point.y - containerRect.top;
-
-        isPanning = true;
-        canvasWrapper.style.cursor = 'grabbing';
-        canvasWrapper.style.userSelect = 'none';
-      };
-
-      const doPan = e => {
-        if (!isPanning) return;
-
-        // For touch events, match the touch identifier
-        if (e.touches) {
-          const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
-          if (!touch) return;
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        const containerRect = canvasContainer.getBoundingClientRect();
-        const point = getEventPoint(e);
-
-        // Calculate current point relative to container
-        const currentX = point.x - containerRect.left;
-        const currentY = point.y - containerRect.top;
-
-        // Calculate delta from start position
-        const deltaX = currentX - panStartX;
-        const deltaY = currentY - panStartY;
-
-        // Apply delta to initial pan position
-        let newPanX = initialPanX + deltaX;
-        let newPanY = initialPanY + deltaY;
-
-        // Constrain panning to prevent moving too far
-        const level = getZoomLevel();
-        const canvasWidth = currentImageType.width;
-        const canvasHeight = currentImageType.height;
-        const padding = 24;
-        const containerWidth = containerRect.width - padding;
-        const containerHeight = containerRect.height - padding;
-
-        const scaledWidth = canvasWidth * level;
-        const scaledHeight = canvasHeight * level;
-
-        // Calculate bounds: center offset + pan limits
-        const centerOffsetX = (containerWidth - scaledWidth) / 2;
-        const centerOffsetY = (containerHeight - scaledHeight) / 2;
-
-        // Maximum pan is when edges align with container edges
-        const maxPanX = Math.max(0, (scaledWidth - containerWidth) / 2);
-        const maxPanY = Math.max(0, (scaledHeight - containerHeight) / 2);
-
-        // Constrain pan within bounds
-        newPanX = Math.max(-maxPanX, Math.min(maxPanX, newPanX));
-        newPanY = Math.max(-maxPanY, Math.min(maxPanY, newPanY));
-
-        setPan(newPanX, newPanY);
-      };
-
-      const endPan = e => {
-        if (!isPanning) return;
-
-        // For touch events, only end if it's the same touch
-        if (e.touches) {
-          const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
-          if (touch) return; // Still touching, don't end
-        }
-
-        isPanning = false;
-        touchIdentifier = null;
-        const level = getZoomLevel();
-        canvasWrapper.style.cursor = level === 'fit' ? '' : 'grab';
-        canvasWrapper.style.userSelect = '';
-      };
-
-      // Mouse events
-      canvasWrapper.addEventListener('mousedown', startPan);
-      document.addEventListener('mousemove', doPan);
-      document.addEventListener('mouseup', endPan);
-      canvasWrapper.addEventListener('mouseleave', endPan);
-
-      // Touch events
-      canvasWrapper.addEventListener('touchstart', startPan, { passive: false });
-      document.addEventListener('touchmove', doPan, { passive: false });
-      document.addEventListener('touchend', endPan);
-      document.addEventListener('touchcancel', endPan);
-    }
-
-    // Initialize zoom UI
-    updateZoomUI();
-  }
 
   // Contrast / Invert Colors Toggle
   if (contrastToggleBtn) {
-    let isContrastInverted = false;
-    const canvasContainer = document.getElementById('canvasContainer');
+      let isContrastInverted = false;
+      const canvasContainer = document.getElementById('canvasContainer');
 
-    contrastToggleBtn.addEventListener('click', () => {
-      if (canvasContainer) {
-        isContrastInverted = !isContrastInverted;
+      contrastToggleBtn.addEventListener('click', () => {
+        if (canvasContainer) {
+          isContrastInverted = !isContrastInverted;
 
-        if (isContrastInverted) {
-          // Apply invert filter for contrast testing
-          canvasContainer.style.filter = 'invert(1)';
-          canvasContainer.style.transition = 'filter 0.3s ease';
-        } else {
-          // Remove filter
-          canvasContainer.style.filter = '';
+          if (isContrastInverted) {
+            // Apply invert filter for contrast testing
+            canvasContainer.style.filter = 'invert(1)';
+            canvasContainer.style.transition = 'filter 0.3s ease';
+          } else {
+            // Remove filter
+            canvasContainer.style.filter = '';
+          }
+
+          contrastToggleBtn.classList.toggle('active', isContrastInverted);
         }
-
-        contrastToggleBtn.classList.toggle('active', isContrastInverted);
-      }
-    });
-  }
+      });
+    }
 
   if (transparencyCheckerBtn) {
-    let isTransparencyCheckerActive = false;
-    const canvasContainer = document.querySelector('.canvas-container');
+      let isTransparencyCheckerActive = false;
+      const canvasContainer = document.querySelector('.canvas-container');
 
-    transparencyCheckerBtn.addEventListener('click', () => {
-      if (canvasContainer) {
-        isTransparencyCheckerActive = !isTransparencyCheckerActive;
+      transparencyCheckerBtn.addEventListener('click', () => {
+        if (canvasContainer) {
+          isTransparencyCheckerActive = !isTransparencyCheckerActive;
 
-        if (isTransparencyCheckerActive) {
-          // Add transparency checkerboard class
-          canvasContainer.classList.add('transparency-checker');
-        } else {
-          // Remove transparency checkerboard class
-          canvasContainer.classList.remove('transparency-checker');
+          if (isTransparencyCheckerActive) {
+            // Add transparency checkerboard class
+            canvasContainer.classList.add('transparency-checker');
+          } else {
+            // Remove transparency checkerboard class
+            canvasContainer.classList.remove('transparency-checker');
+          }
+
+          transparencyCheckerBtn.classList.toggle('active', isTransparencyCheckerActive);
         }
-
-        transparencyCheckerBtn.classList.toggle('active', isTransparencyCheckerActive);
-      }
-    });
-  }
+      });
+    }
 
   // Layer Visibility Toggle
   if (layerVisibilityBtn) {
-    const layerVisibilityPanel = document.getElementById('layerVisibilityPanel');
-    const layerVisibilityHeader = layerVisibilityPanel?.querySelector('.layer-visibility-header');
-    let isLayerVisibilityPanelOpen = false;
-    let isDragging = false;
-    let dragOffset = { x: 0, y: 0 };
-    let panelPosition = { x: null, y: null };
+      const layerVisibilityPanel = document.getElementById('layerVisibilityPanel');
+      const layerVisibilityHeader = layerVisibilityPanel?.querySelector('.layer-visibility-header');
+      let isLayerVisibilityPanelOpen = false;
+      let isDragging = false;
+      let dragOffset = { x: 0, y: 0 };
+      let panelPosition = { x: null, y: null };
 
-    // Load saved position from localStorage
-    const savedPosition = localStorage.getItem('layerVisibilityPanelPosition');
-    if (savedPosition && layerVisibilityPanel) {
-      try {
-        const pos = JSON.parse(savedPosition);
-        panelPosition = pos;
-        layerVisibilityPanel.style.left = `${pos.x}px`;
-        layerVisibilityPanel.style.top = `${pos.y}px`;
-        layerVisibilityPanel.style.transform = 'none';
-      } catch (e) {
-        console.warn('Failed to load layer visibility panel position:', e);
+      // Load saved position from localStorage
+      const savedPosition = localStorage.getItem('layerVisibilityPanelPosition');
+      if (savedPosition && layerVisibilityPanel) {
+        try {
+          const pos = JSON.parse(savedPosition);
+          panelPosition = pos;
+          layerVisibilityPanel.style.left = `${pos.x}px`;
+          layerVisibilityPanel.style.top = `${pos.y}px`;
+          layerVisibilityPanel.style.transform = 'none';
+        } catch (e) {
+          console.warn('Failed to load layer visibility panel position:', e);
+        }
       }
-    }
 
-    // Drag functionality
-    if (layerVisibilityHeader && layerVisibilityPanel) {
-      layerVisibilityHeader.addEventListener('mousedown', e => {
+      // Drag functionality
+      if (layerVisibilityHeader && layerVisibilityPanel) {
+        layerVisibilityHeader.addEventListener('mousedown', e => {
         // Prevent dragging if clicking the close button
         if (e.target.id === 'closeLayerVisibilityBtn' || e.target.closest('#closeLayerVisibilityBtn')) {
-          return;
-        }
-
-        isDragging = true;
-        layerVisibilityHeader.classList.add('dragging');
-
-        const rect = layerVisibilityPanel.getBoundingClientRect();
-        dragOffset.x = e.clientX - rect.left;
-        dragOffset.y = e.clientY - rect.top;
-
-        e.preventDefault();
-      });
-
-      document.addEventListener('mousemove', e => {
-        if (isDragging && layerVisibilityPanel) {
-          const x = e.clientX - dragOffset.x;
-          const y = e.clientY - dragOffset.y;
-
-          // Constrain to viewport bounds
-          const maxX = window.innerWidth - layerVisibilityPanel.offsetWidth;
-          const maxY = window.innerHeight - layerVisibilityPanel.offsetHeight;
-
-          const constrainedX = Math.max(0, Math.min(x, maxX));
-          const constrainedY = Math.max(0, Math.min(y, maxY));
-
-          layerVisibilityPanel.style.left = `${constrainedX}px`;
-          layerVisibilityPanel.style.top = `${constrainedY}px`;
-          layerVisibilityPanel.style.transform = 'none';
-
-          // Save position
-          panelPosition = { x: constrainedX, y: constrainedY };
-          localStorage.setItem('layerVisibilityPanelPosition', JSON.stringify(panelPosition));
-        }
-      });
-
-      document.addEventListener('mouseup', () => {
-        if (isDragging) {
-          isDragging = false;
-          if (layerVisibilityHeader) {
-            layerVisibilityHeader.classList.remove('dragging');
+            return;
           }
-        }
-      });
-    }
 
-    layerVisibilityBtn.addEventListener('click', () => {
-      if (layerVisibilityPanel) {
-        isLayerVisibilityPanelOpen = !isLayerVisibilityPanelOpen;
-        layerVisibilityPanel.style.display = isLayerVisibilityPanelOpen ? 'flex' : 'none';
-        layerVisibilityBtn.classList.toggle('active', isLayerVisibilityPanelOpen);
+          isDragging = true;
+          layerVisibilityHeader.classList.add('dragging');
 
-        // Restore position if saved, otherwise center
-        if (isLayerVisibilityPanelOpen) {
-          if (panelPosition.x !== null && panelPosition.y !== null) {
-            layerVisibilityPanel.style.left = `${panelPosition.x}px`;
-            layerVisibilityPanel.style.top = `${panelPosition.y}px`;
+          const rect = layerVisibilityPanel.getBoundingClientRect();
+          dragOffset.x = e.clientX - rect.left;
+          dragOffset.y = e.clientY - rect.top;
+
+          e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', e => {
+          if (isDragging && layerVisibilityPanel) {
+            const x = e.clientX - dragOffset.x;
+            const y = e.clientY - dragOffset.y;
+
+            // Constrain to viewport bounds
+            const maxX = window.innerWidth - layerVisibilityPanel.offsetWidth;
+            const maxY = window.innerHeight - layerVisibilityPanel.offsetHeight;
+
+            const constrainedX = Math.max(0, Math.min(x, maxX));
+            const constrainedY = Math.max(0, Math.min(y, maxY));
+
+            layerVisibilityPanel.style.left = `${constrainedX}px`;
+            layerVisibilityPanel.style.top = `${constrainedY}px`;
             layerVisibilityPanel.style.transform = 'none';
-          } else {
-            // Center on first open
-            layerVisibilityPanel.style.left = '50%';
-            layerVisibilityPanel.style.top = '50%';
-            layerVisibilityPanel.style.transform = 'translate(-50%, -50%)';
+
+            // Save position
+            panelPosition = { x: constrainedX, y: constrainedY };
+            localStorage.setItem('layerVisibilityPanelPosition', JSON.stringify(panelPosition));
           }
-        }
-      }
-    });
+        });
 
-    if (closeLayerVisibilityBtn) {
-      closeLayerVisibilityBtn.addEventListener('click', () => {
-        if (layerVisibilityPanel) {
-          layerVisibilityPanel.style.display = 'none';
-          isLayerVisibilityPanelOpen = false;
-          layerVisibilityBtn.classList.remove('active');
-        }
-      });
-    }
-
-    // Layer visibility checkboxes
-    const layerCheckboxes = {
-      logo: document.getElementById('layerVisibilityLogo'),
-      title: document.getElementById('layerVisibilityTitle'),
-      subtitle: document.getElementById('layerVisibilitySubtitle'),
-      slogan: document.getElementById('layerVisibilitySlogan'),
-      pattern: document.getElementById('layerVisibilityPattern'),
-    };
-
-    // Apply visibility when checkboxes change
-    Object.entries(layerCheckboxes).forEach(([layerName, checkbox]) => {
-      if (checkbox) {
-        checkbox.addEventListener('change', () => {
-          applyLayerVisibility();
+        document.addEventListener('mouseup', () => {
+          if (isDragging) {
+            isDragging = false;
+            if (layerVisibilityHeader) {
+              layerVisibilityHeader.classList.remove('dragging');
+            }
+          }
         });
       }
-    });
-  }
+
+      layerVisibilityBtn.addEventListener('click', () => {
+        if (layerVisibilityPanel) {
+          isLayerVisibilityPanelOpen = !isLayerVisibilityPanelOpen;
+          layerVisibilityPanel.style.display = isLayerVisibilityPanelOpen ? 'flex' : 'none';
+          layerVisibilityBtn.classList.toggle('active', isLayerVisibilityPanelOpen);
+
+          // Restore position if saved, otherwise center
+          if (isLayerVisibilityPanelOpen) {
+            if (panelPosition.x !== null && panelPosition.y !== null) {
+              layerVisibilityPanel.style.left = `${panelPosition.x}px`;
+              layerVisibilityPanel.style.top = `${panelPosition.y}px`;
+              layerVisibilityPanel.style.transform = 'none';
+            } else {
+              // Center on first open
+              layerVisibilityPanel.style.left = '50%';
+              layerVisibilityPanel.style.top = '50%';
+              layerVisibilityPanel.style.transform = 'translate(-50%, -50%)';
+            }
+          }
+        }
+      });
+
+      if (closeLayerVisibilityBtn) {
+        closeLayerVisibilityBtn.addEventListener('click', () => {
+          if (layerVisibilityPanel) {
+            layerVisibilityPanel.style.display = 'none';
+            isLayerVisibilityPanelOpen = false;
+            layerVisibilityBtn.classList.remove('active');
+          }
+        });
+      }
+
+      // Layer visibility checkboxes
+      const layerCheckboxes = {
+        logo: document.getElementById('layerVisibilityLogo'),
+        title: document.getElementById('layerVisibilityTitle'),
+        subtitle: document.getElementById('layerVisibilitySubtitle'),
+        slogan: document.getElementById('layerVisibilitySlogan'),
+        pattern: document.getElementById('layerVisibilityPattern'),
+      };
+
+      // Apply visibility when checkboxes change
+      Object.entries(layerCheckboxes).forEach(([layerName, checkbox]) => {
+        if (checkbox) {
+          checkbox.addEventListener('change', () => {
+            applyLayerVisibility();
+          });
+        }
+      });
+    }
 
   // History Timeline
   if (historyTimelineBtn) {
@@ -2162,7 +2340,7 @@ function setupEventListeners() {
 
         // Apply state to UI (this sets all input values)
         // This includes setting colors via setTimeout(0)
-        applyStateToUI(state);
+          applyStateToUI(state);
 
         // Wait for color pickers to be applied, then update state and preview
         // applyStateToUI uses setTimeout(0) for colors, so we need to wait for that
@@ -2193,7 +2371,7 @@ function setupEventListeners() {
                 console.log('Updating state and preview from restored history state');
                 // Now update state from UI (which will read all the values we just set)
                 // This ensures everything is in sync and calls updatePreview
-                updateState(true); // Skip history to avoid duplicate entry
+          updateState(true); // Skip history to avoid duplicate entry
 
                 // Update undo/redo buttons
                 updateUndoRedoButtons();
@@ -2208,11 +2386,11 @@ function setupEventListeners() {
         });
 
         // Close timeline modal
-        const historyTimeline = document.getElementById('historyTimeline');
-        if (historyTimeline) {
-          historyTimeline.style.display = 'none';
-          if (historyTimelineBtn) {
-            historyTimelineBtn.classList.remove('active');
+          const historyTimeline = document.getElementById('historyTimeline');
+          if (historyTimeline) {
+            historyTimeline.style.display = 'none';
+            if (historyTimelineBtn) {
+              historyTimelineBtn.classList.remove('active');
           }
         }
       });
@@ -2745,15 +2923,15 @@ function setupEventListeners() {
       const canvasContainer = canvasWrapper.parentElement;
       const originalContainerStyles = canvasContainer
         ? {
-          position: canvasContainer.style.position,
-          overflow: canvasContainer.style.overflow,
-          contain: canvasContainer.style.contain,
-          width: canvasContainer.style.width,
-          height: canvasContainer.style.height,
-          aspectRatio: canvasContainer.style.aspectRatio,
-          minHeight: canvasContainer.style.minHeight,
-          maxHeight: canvasContainer.style.maxHeight,
-        }
+            position: canvasContainer.style.position,
+            overflow: canvasContainer.style.overflow,
+            contain: canvasContainer.style.contain,
+            width: canvasContainer.style.width,
+            height: canvasContainer.style.height,
+            aspectRatio: canvasContainer.style.aspectRatio,
+            minHeight: canvasContainer.style.minHeight,
+            maxHeight: canvasContainer.style.maxHeight,
+          }
         : null;
 
       // Store original styles to restore later
@@ -3322,11 +3500,11 @@ function setupEventListeners() {
                 .then(cacheNames => {
                   console.log('Found caches:', cacheNames);
                   return Promise.all(
-                    cacheNames.map(cacheName => {
-                      console.log('Deleting cache:', cacheName);
-                      return caches.delete(cacheName);
-                    })
-                  );
+              cacheNames.map(cacheName => {
+                console.log('Deleting cache:', cacheName);
+                return caches.delete(cacheName);
+              })
+            );
                 })
                 .then(() => console.log('All caches cleared via Cache API')),
               new Promise(resolve => setTimeout(resolve, 500)) // 500ms timeout
@@ -3360,24 +3538,24 @@ function setupEventListeners() {
               indexedDB.databases()
                 .then(databases => {
                   return Promise.all(
-                    databases.map(db => {
+              databases.map(db => {
                       return new Promise((resolve) => {
-                        const deleteReq = indexedDB.deleteDatabase(db.name);
-                        deleteReq.onsuccess = () => {
-                          console.log('Deleted IndexedDB:', db.name);
-                          resolve();
-                        };
+                  const deleteReq = indexedDB.deleteDatabase(db.name);
+                  deleteReq.onsuccess = () => {
+                    console.log('Deleted IndexedDB:', db.name);
+                    resolve();
+                  };
                         deleteReq.onerror = () => {
                           console.warn('Error deleting IndexedDB:', db.name);
                           resolve(); // Continue anyway
                         };
-                        deleteReq.onblocked = () => {
-                          console.warn('IndexedDB delete blocked for:', db.name);
-                          resolve(); // Continue anyway
-                        };
-                      });
-                    })
-                  );
+                  deleteReq.onblocked = () => {
+                    console.warn('IndexedDB delete blocked for:', db.name);
+                    resolve(); // Continue anyway
+                  };
+                });
+              })
+            );
                 }),
               new Promise(resolve => setTimeout(resolve, 500)) // 500ms timeout
             ]).catch(dbError => console.warn('Could not clear IndexedDB:', dbError))
@@ -4059,6 +4237,128 @@ function randomizeAllSettings() {
     const width = 1 + Math.random() * 9;
     sloganDividerWidthSlider.value = width;
     sloganDividerWidthValue.value = width;
+  }
+
+  // Randomize divider glow
+  if (titleDividerGlow) titleDividerGlow.checked = Math.random() > 0.5;
+  if (subtitleDividerGlow) subtitleDividerGlow.checked = Math.random() > 0.5;
+  if (sloganDividerGlow) sloganDividerGlow.checked = Math.random() > 0.5;
+
+  // Randomize divider gaps
+  if (titleDividerGapSlider && titleDividerGapValue) {
+    const gap = 10 + Math.random() * 50;
+    titleDividerGapSlider.value = gap;
+    titleDividerGapValue.value = gap;
+  }
+  if (subtitleDividerGapSlider && subtitleDividerGapValue) {
+    const gap = 10 + Math.random() * 50;
+    subtitleDividerGapSlider.value = gap;
+    subtitleDividerGapValue.value = gap;
+  }
+  if (sloganDividerGapSlider && sloganDividerGapValue) {
+    const gap = 10 + Math.random() * 50;
+    sloganDividerGapSlider.value = gap;
+    sloganDividerGapValue.value = gap;
+  }
+
+  // Randomize divider positions (X/Y) - sometimes use auto (null), sometimes random position
+  // Above Title
+  if (dividerAboveTitleXSlider && dividerAboveTitleXValue && dividerAboveTitleYSlider && dividerAboveTitleYValue) {
+    if (Math.random() > 0.3) {
+      // 70% chance: use auto positioning (null)
+      dividerAboveTitleXSlider.value = '';
+      dividerAboveTitleXValue.value = '';
+      dividerAboveTitleYSlider.value = '';
+      dividerAboveTitleYValue.value = '';
+    } else {
+      // 30% chance: random position
+      const x = Math.random() * 1200;
+      const y = Math.random() * 675;
+      dividerAboveTitleXSlider.value = x;
+      dividerAboveTitleXValue.value = x;
+      dividerAboveTitleYSlider.value = y;
+      dividerAboveTitleYValue.value = y;
+    }
+  }
+  // Below Title
+  if (dividerBelowTitleXSlider && dividerBelowTitleXValue && dividerBelowTitleYSlider && dividerBelowTitleYValue) {
+    if (Math.random() > 0.3) {
+      dividerBelowTitleXSlider.value = '';
+      dividerBelowTitleXValue.value = '';
+      dividerBelowTitleYSlider.value = '';
+      dividerBelowTitleYValue.value = '';
+    } else {
+      const x = Math.random() * 1200;
+      const y = Math.random() * 675;
+      dividerBelowTitleXSlider.value = x;
+      dividerBelowTitleXValue.value = x;
+      dividerBelowTitleYSlider.value = y;
+      dividerBelowTitleYValue.value = y;
+    }
+  }
+  // Above Subtitle
+  if (dividerAboveSubtitleXSlider && dividerAboveSubtitleXValue && dividerAboveSubtitleYSlider && dividerAboveSubtitleYValue) {
+    if (Math.random() > 0.3) {
+      dividerAboveSubtitleXSlider.value = '';
+      dividerAboveSubtitleXValue.value = '';
+      dividerAboveSubtitleYSlider.value = '';
+      dividerAboveSubtitleYValue.value = '';
+    } else {
+      const x = Math.random() * 1200;
+      const y = Math.random() * 675;
+      dividerAboveSubtitleXSlider.value = x;
+      dividerAboveSubtitleXValue.value = x;
+      dividerAboveSubtitleYSlider.value = y;
+      dividerAboveSubtitleYValue.value = y;
+    }
+  }
+  // Below Subtitle
+  if (dividerBelowSubtitleXSlider && dividerBelowSubtitleXValue && dividerBelowSubtitleYSlider && dividerBelowSubtitleYValue) {
+    if (Math.random() > 0.3) {
+      dividerBelowSubtitleXSlider.value = '';
+      dividerBelowSubtitleXValue.value = '';
+      dividerBelowSubtitleYSlider.value = '';
+      dividerBelowSubtitleYValue.value = '';
+    } else {
+      const x = Math.random() * 1200;
+      const y = Math.random() * 675;
+      dividerBelowSubtitleXSlider.value = x;
+      dividerBelowSubtitleXValue.value = x;
+      dividerBelowSubtitleYSlider.value = y;
+      dividerBelowSubtitleYValue.value = y;
+    }
+  }
+  // Above Slogan
+  if (dividerAboveSloganXSlider && dividerAboveSloganXValue && dividerAboveSloganYSlider && dividerAboveSloganYValue) {
+    if (Math.random() > 0.3) {
+      dividerAboveSloganXSlider.value = '';
+      dividerAboveSloganXValue.value = '';
+      dividerAboveSloganYSlider.value = '';
+      dividerAboveSloganYValue.value = '';
+    } else {
+      const x = Math.random() * 1200;
+      const y = Math.random() * 675;
+      dividerAboveSloganXSlider.value = x;
+      dividerAboveSloganXValue.value = x;
+      dividerAboveSloganYSlider.value = y;
+      dividerAboveSloganYValue.value = y;
+    }
+  }
+  // Below Slogan
+  if (dividerBelowSloganXSlider && dividerBelowSloganXValue && dividerBelowSloganYSlider && dividerBelowSloganYValue) {
+    if (Math.random() > 0.3) {
+      dividerBelowSloganXSlider.value = '';
+      dividerBelowSloganXValue.value = '';
+      dividerBelowSloganYSlider.value = '';
+      dividerBelowSloganYValue.value = '';
+    } else {
+      const x = Math.random() * 1200;
+      const y = Math.random() * 675;
+      dividerBelowSloganXSlider.value = x;
+      dividerBelowSloganXValue.value = x;
+      dividerBelowSloganYSlider.value = y;
+      dividerBelowSloganYValue.value = y;
+    }
   }
 
   // Randomize background pattern
